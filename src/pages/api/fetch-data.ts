@@ -23,7 +23,7 @@ const fetchData = async (req: NextApiRequest, resp: NextApiResponse) => {
           ]),
         ],
       };
-      await Promise.all([
+      await Promise.all<any>([
         updateChannel(channel),
         ...videos.map((video) =>
           putVideos({
