@@ -4,10 +4,10 @@ const TableName = process.env.AWS_DYNAMODB_TABLE;
 
 const db = new DynamoDB({
   credentials: new Credentials({
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: process.env.AWS_DYNAMODB_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_DYNAMODB_SECRET_ACCESS_KEY,
   }),
-  region: process.env.AWS_REGION,
+  region: process.env.AWS_DYNAMODB_REGION,
 });
 
 export const getData = async () => {

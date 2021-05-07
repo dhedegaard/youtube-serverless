@@ -3,9 +3,9 @@
 In order to run the project you need to set the following environment variables:
 
 ```
-AWS_ACCESS_KEY=
-AWS_SECRET_ACCESS_KEY=
-AWS_REGION=
+AWS_DYNAMODB_ACCESS_KEY=
+AWS_DYNAMODB_SECRET_ACCESS_KEY=
+AWS_DYNAMODB_REGION=
 AWS_DYNAMODB_TABLE=
 YOUTUBE_API_KEY=
 SECRET=
