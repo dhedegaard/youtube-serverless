@@ -6,7 +6,6 @@ interface Props {
 }
 
 const Index: NextPage<Props> = ({ videos }) => {
-  console.log("videos:", videos);
   return (
     <div>
       {videos.map((e) => (
