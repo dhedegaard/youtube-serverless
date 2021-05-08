@@ -8,6 +8,7 @@ const fetchData = async (req: NextApiRequest, resp: NextApiResponse) => {
   }
 
   const channels = await getChannels();
+  let newVideoCount = 0;
   await Promise.all(
     channels.map(async (channel) => {
       const info = await getChannelInfo(channel.channelId.S);
@@ -15,17 +16,21 @@ const fetchData = async (req: NextApiRequest, resp: NextApiResponse) => {
         S: info.items[0].contentDetails.relatedPlaylists.uploads,
       };
       const videos = await getVideosForChannelId(channel.playlist.S);
+      const newVideos = videos.filter(
+        (e) => !channel.videoIds.SS.includes(e.contentDetails.videoId)
+      );
+      newVideoCount += newVideos.length;
       channel.videoIds = {
         SS: [
           ...new Set([
             ...(channel.videoIds?.SS ?? []),
-            ...videos.map((e) => e.contentDetails.videoId),
+            ...newVideos.map((e) => e.contentDetails.videoId),
           ]),
         ],
       };
       await Promise.all<any>([
         updateChannel(channel),
-        ...videos.map((video) =>
+        ...newVideos.map((video) =>
           putVideos({
             ...video.contentDetails,
             channelId: channel.channelId.S,
@@ -34,7 +39,9 @@ const fetchData = async (req: NextApiRequest, resp: NextApiResponse) => {
       ]);
     })
   );
-  return resp.status(501).end(`channelcount: ${channels.length}`);
+  return resp
+    .status(200)
+    .json({ channelcount: channels.length, newVideoCount });
 };
 
 export default fetchData;
