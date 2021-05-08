@@ -21,7 +21,7 @@ export const getChannelInfo = async (
 
 export const getVideosForChannelId = async (channelId: string) => {
   const params = new URLSearchParams();
-  params.set("part", "contentDetails");
+  params.set("part", "contentDetails,snippet");
   params.set("maxResults", "50");
   params.set("playlistId", channelId);
   params.set("key", apiKey);
@@ -35,6 +35,20 @@ export const getVideosForChannelId = async (channelId: string) => {
       contentDetails: {
         videoId: string;
         videoPublishedAt: string;
+      };
+      snippet: {
+        publishedAt: string;
+        channelId: string;
+        title: string;
+        description: string;
+        thumbnails: {
+          default: { url: string; width: number; height: number };
+          medium: { url: string; width: number; height: number };
+          high: { url: string; width: number; height: number };
+          standard: { url: string; width: number; height: number };
+          maxres: { url: string; width: number; height: number };
+        };
+        channelTitle: string;
       };
     }>;
   };

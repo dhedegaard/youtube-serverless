@@ -35,7 +35,7 @@ export const getChannels = async (): Promise<Array<Channel>> => {
 };
 
 export const updateChannel = async (channel: Channel) => {
-  const asdfd = await db.putItem({ Item: channel as any, TableName }).promise();
+  await db.putItem({ Item: channel as any, TableName }).promise();
   return channel;
 };
 
@@ -43,15 +43,17 @@ export const putVideos = async (video: {
   videoId: string;
   videoPublishedAt: string;
   channelId: string;
+  thumbnail: string;
 }) => {
   await db
     .putItem({
       Item: {
         PK: { S: "VIDEOS" },
         SK: { S: `VIDEO#${video.videoId}` },
+        channelId: { S: video.channelId },
         videoId: { S: video.videoId },
         videoPublishedAt: { S: video.videoPublishedAt },
-        channelId: { S: video.channelId },
+        thumbnail: { S: video.thumbnail },
       },
       TableName,
     })
@@ -65,6 +67,7 @@ export const getLatestVideos = async (): Promise<
     channelId: { S: string };
     videoId: { S: string };
     videoPublishedAt: { S: string };
+    thumbnail: { S: string };
   }>
 > => {
   const resp = await db

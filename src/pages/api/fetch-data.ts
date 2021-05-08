@@ -34,6 +34,7 @@ const fetchData = async (req: NextApiRequest, resp: NextApiResponse) => {
           putVideos({
             ...video.contentDetails,
             channelId: channel.channelId.S,
+            thumbnail: video.snippet.thumbnails.high.url,
           })
         ),
       ]);
