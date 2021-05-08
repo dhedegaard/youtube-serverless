@@ -43,7 +43,9 @@ export const putVideos = async (video: {
   videoId: string;
   videoPublishedAt: string;
   channelId: string;
+  channelTitle: string;
   thumbnail: string;
+  title: string;
 }) => {
   await db
     .putItem({
@@ -54,6 +56,8 @@ export const putVideos = async (video: {
         videoId: { S: video.videoId },
         videoPublishedAt: { S: video.videoPublishedAt },
         thumbnail: { S: video.thumbnail },
+        channelTitle: { S: video.channelTitle },
+        title: { S: video.title },
       },
       TableName,
     })
@@ -68,6 +72,8 @@ export const getLatestVideos = async (): Promise<
     videoId: { S: string };
     videoPublishedAt: { S: string };
     thumbnail: { S: string };
+    channelTitle: { S: string };
+    title: { S: string };
   }>
 > => {
   const resp = await db

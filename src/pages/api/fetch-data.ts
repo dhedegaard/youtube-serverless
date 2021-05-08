@@ -32,9 +32,12 @@ const fetchData = async (req: NextApiRequest, resp: NextApiResponse) => {
         updateChannel(channel),
         ...newVideos.map((video) =>
           putVideos({
-            ...video.contentDetails,
             channelId: channel.channelId.S,
             thumbnail: video.snippet.thumbnails.high.url,
+            channelTitle: video.snippet.channelTitle,
+            title: video.snippet.title,
+            videoPublishedAt: video.snippet.publishedAt,
+            videoId: video.contentDetails.videoId,
           })
         ),
       ]);
