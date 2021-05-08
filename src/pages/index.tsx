@@ -1,4 +1,4 @@
-import { NextPage } from "next";
+import { GetStaticProps, NextPage } from "next";
 import { getLatestVideos } from "../data";
 
 interface Props {
@@ -17,13 +17,16 @@ const Index: NextPage<Props> = ({ videos }) => {
   );
 };
 
-Index.getInitialProps = async () => {
+export const getStaticProps: GetStaticProps<Props> = async () => {
   const videos = await getLatestVideos();
   return {
-    videos: videos.map((e) => ({
-      videoId: e.videoId.S,
-      publishedAt: e.videoPublishedAt.S,
-    })),
+    props: {
+      videos: videos.map((e) => ({
+        videoId: e.videoId.S,
+        publishedAt: e.videoPublishedAt.S,
+      })),
+    },
+    revalidate: 600,
   };
 };
 
