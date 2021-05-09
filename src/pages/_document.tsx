@@ -1,4 +1,4 @@
-import Document, { Head, Html, Main } from "next/document";
+import Document, { Head, Html, Main, NextScript } from "next/document";
 import { ServerStyleSheet } from "styled-components";
 
 export default class MyDocument extends Document {
@@ -34,8 +34,7 @@ export default class MyDocument extends Document {
         <Head />
         <body>
           <Main />
-          {/* Uncomment below if you ever need client side scripting. */}
-          {/* <NextScript /> */}
+          <NextScript />
         </body>
       </Html>
     );
