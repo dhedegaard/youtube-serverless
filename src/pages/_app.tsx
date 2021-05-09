@@ -24,7 +24,10 @@ const MyApp: FC<{
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
-        <meta name="description" content="Aggregating youtube videos since 2015">
+        <meta
+          name="description"
+          content="Aggregating youtube videos since 2015"
+        />
         <link rel="icon" type="image/png" href="/favicon.png" />
         <meta property="og:site_name" content="Youtube" />
         <meta property="og:url" content="https://ut.dhedegaard.dk/" />
