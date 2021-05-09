@@ -6,6 +6,7 @@ const GlobalStyle = createGlobalStyle`
   body {
     font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
     line-height: 1.5;
+    margin: 0;
   }
 `;
 

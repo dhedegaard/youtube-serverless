@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { getLatestVideos } from "../data";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import Image from "next/image";
 
 dayjs.extend(relativeTime);
 
@@ -12,6 +13,16 @@ const Container = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  padding-left: 8px;
+  padding-right: 8px;
+`;
+
+const Navbar = styled.nav`
+  width: 100%;
+  padding: 16px 0;
+  margin-bottom: 8px;
+  background-color: #333;
+  color: #fff;
 `;
 
 const Elem = styled.div`
@@ -117,52 +128,56 @@ interface Props {
   }>;
 }
 
-const formatRelativeTime = (date: Date) => {
-  const formatter = new Intl.RelativeTimeFormat();
-};
-
 const Index: NextPage<Props> = ({ videos }) => {
   return (
-    <Container>
-      {videos.map((e) => {
-        const publishedAt = new Date(e.publishedAt);
-        return (
-          <Elem key={e.videoId}>
-            <div>
-              <ThumbnailContainer
-                href={`https://www.youtube.com/watch?v=${e.videoId}`}
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <Thumbnail src={e.thumbnail} alt={e.title} />
-              </ThumbnailContainer>
+    <>
+      <Navbar>
+        <Container>
+          <Image src="/favicon.png" width={24} height={24} />
+          New youtube videos
+        </Container>
+      </Navbar>
+      <Container>
+        {videos.map((e) => {
+          const publishedAt = new Date(e.publishedAt);
+          return (
+            <Elem key={e.videoId}>
+              <div>
+                <ThumbnailContainer
+                  href={`https://www.youtube.com/watch?v=${e.videoId}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <Thumbnail src={e.thumbnail} alt={e.title} />
+                </ThumbnailContainer>
 
-              <Title>{e.title}</Title>
-            </div>
+                <Title>{e.title}</Title>
+              </div>
 
-            <TitleAndPublishedAt>
-              <ChannelTitle
-                href={e.channelLink}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <ChannelLogo
-                  src={e.channelThumbnail}
-                  width={16}
-                  height={16}
-                  alt={e.channelTitle}
-                />
-                {e.channelTitle}
-              </ChannelTitle>
+              <TitleAndPublishedAt>
+                <ChannelTitle
+                  href={e.channelLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ChannelLogo
+                    src={e.channelThumbnail}
+                    width={16}
+                    height={16}
+                    alt={e.channelTitle}
+                  />
+                  {e.channelTitle}
+                </ChannelTitle>
 
-              <PublishedAt title={publishedAt.toLocaleString()}>
-                {dayjs(publishedAt).fromNow(true)} ago
-              </PublishedAt>
-            </TitleAndPublishedAt>
-          </Elem>
-        );
-      })}
-    </Container>
+                <PublishedAt title={publishedAt.toLocaleString()}>
+                  {dayjs(publishedAt).fromNow(true)} ago
+                </PublishedAt>
+              </TitleAndPublishedAt>
+            </Elem>
+          );
+        })}
+      </Container>
+    </>
   );
 };
 
