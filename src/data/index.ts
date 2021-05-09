@@ -86,7 +86,7 @@ export const getLatestVideos = async (): Promise<
       TableName,
       IndexName: "PK_videoPublishedAt",
       ScanIndexForward: false,
-      Limit: 52,
+      Limit: 50,
       KeyConditionExpression: "PK = :pk",
       ExpressionAttributeValues: { ":pk": { S: "VIDEOS" } },
     })
