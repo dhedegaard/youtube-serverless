@@ -38,6 +38,8 @@ const fetchData = async (req: NextApiRequest, resp: NextApiResponse) => {
             title: video.snippet.title,
             videoPublishedAt: video.snippet.publishedAt,
             videoId: video.contentDetails.videoId,
+            channelThumbnail: channel.thumbnail.S,
+            channelLink: channel.channelLink.S,
           })
         ),
       ]);
