@@ -23,6 +23,8 @@ const addChannel = async (req: NextApiRequest, resp: NextApiResponse) => {
     playlist: { S: item.contentDetails.relatedPlaylists.uploads },
     videoIds: { SS: [] },
     thumbnail: { S: item.snippet.thumbnails.high.url },
+    channelLink: { S: `https://www.youtube.com/channel/${item.id}` },
+    channelThumbnail: { S: item.snippet.thumbnails.high.url },
   });
 
   return resp.status(201).json(channel);
