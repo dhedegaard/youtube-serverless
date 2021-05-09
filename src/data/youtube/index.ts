@@ -5,7 +5,12 @@ export const getChannelInfo = async (
 ): Promise<{
   items: {
     id: string;
-    snippet: { title: string };
+    snippet: {
+      title: string;
+      description: string;
+      customUrl: string;
+      thumbnails: { high: { url: string } };
+    };
     contentDetails: { relatedPlaylists: { uploads: string } };
   }[];
 }> => {

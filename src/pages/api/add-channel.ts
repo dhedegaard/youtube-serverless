@@ -12,14 +12,17 @@ const addChannel = async (req: NextApiRequest, resp: NextApiResponse) => {
     return resp.status(400).send("Missing channelId query param");
   }
 
-  const info = await getChannelInfo(channelId);
+  const {
+    items: [item],
+  } = await getChannelInfo(channelId);
   const channel = await updateChannel({
     PK: { S: "CHANNELS" },
-    SK: { S: "CHANNELID#" + info.items[0].id },
-    channelId: { S: info.items[0].id },
-    channelTitle: { S: info.items[0].snippet.title },
-    playlist: { S: info.items[0].contentDetails.relatedPlaylists.uploads },
-    videoIds: undefined,
+    SK: { S: `CHANNEL#${item.id}` },
+    channelId: { S: item.id },
+    channelTitle: { S: item.snippet.title },
+    playlist: { S: item.contentDetails.relatedPlaylists.uploads },
+    videoIds: { SS: [] },
+    thumbnail: { S: item.snippet.thumbnails.high.url },
   });
 
   return resp.status(201).json(channel);

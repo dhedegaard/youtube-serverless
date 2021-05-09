@@ -21,6 +21,7 @@ interface Channel {
   channelTitle: { S: string };
   playlist: { S: string };
   videoIds: { SS: string[] } | undefined;
+  thumbnail: { S: string };
 }
 
 export const getChannels = async (): Promise<Array<Channel>> => {
@@ -81,7 +82,7 @@ export const getLatestVideos = async (): Promise<
       TableName,
       IndexName: "PK_videoPublishedAt",
       ScanIndexForward: false,
-      Limit: 50,
+      Limit: 52,
       KeyConditionExpression: "PK = :pk",
       ExpressionAttributeValues: { ":pk": { S: "VIDEOS" } },
     })
