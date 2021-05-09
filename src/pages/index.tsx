@@ -29,7 +29,6 @@ const Elem = styled.div`
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
-  justify-content: space-between;
   align-items: stretch;
   margin-bottom: 16px;
   width: calc(20% - 8px);
@@ -51,7 +50,8 @@ const TitleAndPublishedAt = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
+  align-self: flex-end;
 `;
 
 const ThumbnailContainer = styled.a`
@@ -86,6 +86,7 @@ const Title = styled.b`
   overflow-y: hidden;
   text-overflow: ellipsis;
   margin-bottom: 4px;
+  font-size: 0.8em;
 `;
 
 const ChannelLogo = styled(Image)`
@@ -103,9 +104,20 @@ const ChannelTitle = styled.a`
   gap: 4px;
   align-items: center;
   white-space: nowrap;
-  margin-right: 8px;
+  padding-right: 8px;
   text-decoration: none;
   color: #000;
+  position: relative;
+
+  &::after {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    content: "";
+    position: absolute;
+    background: linear-gradient(to left, #fff, transparent);
+  }
 `;
 
 const PublishedAt = styled.div`
@@ -113,7 +125,7 @@ const PublishedAt = styled.div`
   white-space: nowrap;
   flex: 0 1 auto;
   color: #777;
-  font-size: 0.8em;
+  font-size: 0.75em;
 `;
 
 interface Props {
@@ -142,17 +154,15 @@ const Index: NextPage<Props> = ({ videos }) => {
           const publishedAt = new Date(e.publishedAt);
           return (
             <Elem key={e.videoId}>
-              <div>
-                <ThumbnailContainer
-                  href={`https://www.youtube.com/watch?v=${e.videoId}`}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  <Thumbnail src={e.thumbnail} alt={e.title} />
-                </ThumbnailContainer>
+              <ThumbnailContainer
+                href={`https://www.youtube.com/watch?v=${e.videoId}`}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <Thumbnail src={e.thumbnail} alt={e.title} />
+              </ThumbnailContainer>
 
-                <Title>{e.title}</Title>
-              </div>
+              <Title>{e.title}</Title>
 
               <TitleAndPublishedAt>
                 <ChannelTitle
