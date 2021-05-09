@@ -17,14 +17,18 @@ const Elem = styled.div`
   flex-direction: column;
   justify-content: space-between;
   align-items: stretch;
-  width: calc(25% - 8px);
   margin-bottom: 16px;
+  width: calc(20% - 8px);
 
-  @media (max-width: 1024px) {
-    width: calc(100% / 3 - 8px);
+  @media (max-width: 1140px) {
+    width: calc(25% - 8px);
   }
 
   @media (max-width: 768px) {
+    width: calc(100% / 3 - 8px);
+  }
+
+  @media (max-width: 475px) {
     width: calc(50% - 8px);
   }
 `;
