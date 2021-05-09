@@ -1,7 +1,10 @@
 import { GetStaticProps, NextPage } from "next";
-import Head from "next/head";
 import styled from "styled-components";
 import { getLatestVideos } from "../data";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 const Container = styled.div`
   max-width: 1140px;
@@ -74,20 +77,30 @@ const Title = styled.b`
   margin-bottom: 4px;
 `;
 
+const ChannelLogo = styled.img`
+  border-radius: 4px;
+`;
+
 const ChannelTitle = styled.div`
   word-wrap: break-word;
   flex: 1 1 auto;
   max-height: 5.8ex;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 0.9em;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  white-space: nowrap;
+  margin-right: 8px;
 `;
 
 const PublishedAt = styled.div`
   text-align: right;
   white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow-x: hidden;
   flex: 0 1 auto;
+  color: #777;
+  font-size: 0.8em;
 `;
 
 interface Props {
@@ -102,32 +115,50 @@ interface Props {
   }>;
 }
 
-const Index: NextPage<Props> = ({ videos }) => (
-  <Container>
-    {videos.map((e) => {
-      const publishedAt = new Date(e.publishedAt);
-      return (
-        <Elem key={e.videoId}>
-          <div>
-            <ThumbnailContainer
-              href={`https://www.youtube.com/watch?v=${e.videoId}`}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <Thumbnail src={e.thumbnail} alt={e.title} />
-            </ThumbnailContainer>
-            <Title>{e.title}</Title>
-          </div>
+const formatRelativeTime = (date: Date) => {
+  const formatter = new Intl.RelativeTimeFormat();
+};
 
-          <TitleAndPublishedAt>
-            <ChannelTitle>{e.channelTitle}</ChannelTitle>
-            <PublishedAt>{publishedAt.toLocaleString()}</PublishedAt>
-          </TitleAndPublishedAt>
-        </Elem>
-      );
-    })}
-  </Container>
-);
+const Index: NextPage<Props> = ({ videos }) => {
+  return (
+    <Container>
+      {videos.map((e) => {
+        const publishedAt = new Date(e.publishedAt);
+        return (
+          <Elem key={e.videoId}>
+            <div>
+              <ThumbnailContainer
+                href={`https://www.youtube.com/watch?v=${e.videoId}`}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <Thumbnail src={e.thumbnail} alt={e.title} />
+              </ThumbnailContainer>
+
+              <Title>{e.title}</Title>
+            </div>
+
+            <TitleAndPublishedAt>
+              <ChannelTitle>
+                <ChannelLogo
+                  src={e.channelThumbnail}
+                  width={16}
+                  height={16}
+                  alt={e.channelTitle}
+                />
+                {e.channelTitle}
+              </ChannelTitle>
+
+              <PublishedAt title={publishedAt.toLocaleString()}>
+                {dayjs(publishedAt).fromNow(true)} ago
+              </PublishedAt>
+            </TitleAndPublishedAt>
+          </Elem>
+        );
+      })}
+    </Container>
+  );
+};
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   const videos = await getLatestVideos();
