@@ -22,6 +22,8 @@ interface Channel {
   playlist: { S: string };
   videoIds: { SS: string[] } | undefined;
   thumbnail: { S: string };
+  channelThumbnail: { S: string };
+  channelLink: { S: string };
 }
 
 export const getChannels = async (): Promise<Array<Channel>> => {
@@ -47,6 +49,8 @@ export const putVideos = async (video: {
   channelTitle: string;
   thumbnail: string;
   title: string;
+  channelThumbnail: string;
+  channelLink: string;
 }) => {
   await db
     .putItem({

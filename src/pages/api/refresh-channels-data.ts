@@ -21,6 +21,9 @@ const refreshChannelsData = async (
     channel.channelTitle = { S: item.snippet.title };
     channel.playlist = { S: item.contentDetails.relatedPlaylists.uploads };
     channel.thumbnail = { S: item.snippet.thumbnails.high.url };
+    channel.channelLink = {
+      S: `https://www.youtube.com/channel/${channel.channelId.S}`,
+    };
     await updateChannel(channel);
   }
 
