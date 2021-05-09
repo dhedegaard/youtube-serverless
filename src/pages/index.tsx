@@ -72,7 +72,7 @@ const Thumbnail = styled.img`
   position: absolute;
   top: 50%;
   left: 50%;
-  margin-top: -37%;
+  margin-top: -37.5%;
   margin-left: -50%;
   bottom: 0;
   right: 0;
