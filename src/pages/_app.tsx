@@ -24,6 +24,16 @@ const MyApp: FC<{
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
         <link rel="icon" type="image/png" href="/favicon.png" />
+        <meta property="og:site_name" content="Youtube" />
+        <meta property="og:url" content="https://ut.dhedegaard.dk/" />
+        <meta property="og:title" content="New youtube videos" />
+        <meta
+          property="og:description"
+          content="Aggregating youtube videos since 2015"
+        />
+        <meta name="theme-color" content="#222222" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
       </Head>
       <Component {...pageProps} />;
     </>
