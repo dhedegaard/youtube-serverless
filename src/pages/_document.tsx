@@ -1,4 +1,4 @@
-import Document from "next/document";
+import Document, { Head, Html, Main } from "next/document";
 import { ServerStyleSheet } from "styled-components";
 
 export default class MyDocument extends Document {
@@ -26,5 +26,18 @@ export default class MyDocument extends Document {
     } finally {
       sheet.seal();
     }
+  }
+
+  render() {
+    return (
+      <Html>
+        <Head />
+        <body>
+          <Main />
+          {/* Uncomment below if you ever need client side scripting. */}
+          {/* <NextScript /> */}
+        </body>
+      </Html>
+    );
   }
 }

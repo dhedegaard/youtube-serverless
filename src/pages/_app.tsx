@@ -24,7 +24,7 @@ const MyApp: FC<{
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
         <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>{" "}
+      </Head>
       <Component {...pageProps} />;
     </>
   );
