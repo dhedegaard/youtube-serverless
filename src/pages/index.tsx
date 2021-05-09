@@ -1,4 +1,5 @@
 import { GetStaticProps, NextPage } from "next";
+import Head from "next/head";
 import styled from "styled-components";
 import { getLatestVideos } from "../data";
 
@@ -10,11 +11,21 @@ const Container = styled.div`
   gap: 10px;
 `;
 
-const Elem = styled.a`
+const Elem = styled.div`
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
   width: calc(25% - 8px);
+
+  @media (max-width: 1024px) {
+    width: calc(100% / 3 - 8px);
+  }
+
+  @media (max-width: 768px) {
+    width: calc(50% - 8px);
+  }
 `;
 
 const SpaceBetween = styled.div`
@@ -63,18 +74,19 @@ const Index: NextPage<Props> = ({ videos }) => (
     {videos.map((e) => {
       const publishedAt = new Date(e.publishedAt);
       return (
-        <Elem
-          key={e.videoId}
-          href={`https://www.youtube.com/watch?v=${e.videoId}`}
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          <ThumbnailContainer>
-            <Thumbnail src={e.thumbnail} alt={e.title} />
-          </ThumbnailContainer>
-          <p>
+        <Elem key={e.videoId}>
+          <div>
+            <a
+              href={`https://www.youtube.com/watch?v=${e.videoId}`}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <ThumbnailContainer>
+                <Thumbnail src={e.thumbnail} alt={e.title} />
+              </ThumbnailContainer>
+            </a>
             <b>{e.title}</b>
-          </p>
+          </div>
 
           <SpaceBetween>
             <p>{e.channelTitle}</p>
