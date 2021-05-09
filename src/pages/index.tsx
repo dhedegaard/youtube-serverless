@@ -82,8 +82,10 @@ const Thumbnail = styled.img`
 
 const Title = styled.b`
   display: block;
-  max-height: 6ex;
-  overflow-y: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   text-overflow: ellipsis;
   margin-bottom: 4px;
   font-size: 0.8em;
