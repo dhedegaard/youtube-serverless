@@ -17,7 +17,13 @@ const MyApp: FC<{
     <>
       <GlobalStyle />
       <Head>
-        <title>TODO: Youtube</title>
+        <meta charSet="utf-8" />
+        <title>New youtube videos</title>
+        <meta
+          name="viewport"
+          content="minimum-scale=1, initial-scale=1, width=device-width"
+        />
+        <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>{" "}
       <Component {...pageProps} />;
     </>

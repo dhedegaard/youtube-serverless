@@ -18,6 +18,7 @@ const Elem = styled.div`
   justify-content: space-between;
   align-items: stretch;
   width: calc(25% - 8px);
+  margin-bottom: 16px;
 
   @media (max-width: 1024px) {
     width: calc(100% / 3 - 8px);
@@ -28,13 +29,14 @@ const Elem = styled.div`
   }
 `;
 
-const SpaceBetween = styled.div`
+const TitleAndPublishedAt = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
 `;
 
-const ThumbnailContainer = styled.div`
+const ThumbnailContainer = styled.a`
   position: relative;
   margin-bottom: 0;
   padding: 0;
@@ -43,6 +45,7 @@ const ThumbnailContainer = styled.div`
   padding-top: calc(56.25% - 1px);
   display: flex;
   border-radius: 4px;
+  margin-bottom: 4px;
 `;
 
 const Thumbnail = styled.img`
@@ -57,6 +60,30 @@ const Thumbnail = styled.img`
   right: 0;
   border: 0;
   width: 100%;
+`;
+
+const Title = styled.b`
+  display: block;
+  max-height: 6ex;
+  overflow-y: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+`;
+
+const ChannelTitle = styled.div`
+  word-wrap: break-word;
+  flex: 1 1 auto;
+  max-height: 5.8ex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const PublishedAt = styled.div`
+  text-align: right;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  flex: 0 1 auto;
 `;
 
 interface Props {
@@ -76,22 +103,20 @@ const Index: NextPage<Props> = ({ videos }) => (
       return (
         <Elem key={e.videoId}>
           <div>
-            <a
+            <ThumbnailContainer
               href={`https://www.youtube.com/watch?v=${e.videoId}`}
               target="_blank"
               rel="noreferrer noopener"
             >
-              <ThumbnailContainer>
-                <Thumbnail src={e.thumbnail} alt={e.title} />
-              </ThumbnailContainer>
-            </a>
-            <b>{e.title}</b>
+              <Thumbnail src={e.thumbnail} alt={e.title} />
+            </ThumbnailContainer>
+            <Title>{e.title}</Title>
           </div>
 
-          <SpaceBetween>
-            <p>{e.channelTitle}</p>
-            <p>{publishedAt.toLocaleString()}</p>
-          </SpaceBetween>
+          <TitleAndPublishedAt>
+            <ChannelTitle>{e.channelTitle}</ChannelTitle>
+            <PublishedAt>{publishedAt.toLocaleString()}</PublishedAt>
+          </TitleAndPublishedAt>
         </Elem>
       );
     })}
