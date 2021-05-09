@@ -10,10 +10,6 @@ const db = new DynamoDB({
   region: process.env.AWS_DYNAMODB_REGION,
 });
 
-export const getData = async () => {
-  const resp = await db.getItem({ TableName, Key: {} }).promise();
-};
-
 interface Channel {
   PK: { S: string };
   SK: { S: string };
@@ -62,6 +58,8 @@ export const putVideos = async (video: {
         videoPublishedAt: { S: video.videoPublishedAt },
         thumbnail: { S: video.thumbnail },
         channelTitle: { S: video.channelTitle },
+        channelThumbnail: { S: video.channelThumbnail },
+        channelLink: { S: video.channelLink },
         title: { S: video.title },
       },
       TableName,
@@ -78,6 +76,8 @@ export const getLatestVideos = async (): Promise<
     videoPublishedAt: { S: string };
     thumbnail: { S: string };
     channelTitle: { S: string };
+    channelLink: { S: string };
+    channelThumbnail: { S: string };
     title: { S: string };
   }>
 > => {

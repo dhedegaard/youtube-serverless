@@ -93,6 +93,8 @@ interface Props {
     thumbnail: string;
     title: string;
     channelTitle: string;
+    channelLink: string;
+    channelThumbnail: string;
   }>;
 }
 
@@ -133,6 +135,8 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
         thumbnail: e.thumbnail.S,
         title: e.title.S,
         channelTitle: e.channelTitle.S,
+        channelLink: e.channelLink.S,
+        channelThumbnail: e.channelThumbnail.S,
       })),
     },
     revalidate: 600,

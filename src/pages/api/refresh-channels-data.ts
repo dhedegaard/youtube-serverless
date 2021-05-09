@@ -19,6 +19,7 @@ const refreshChannelsData = async (
       items: [item],
     } = await getChannelInfo(channel.channelId.S);
     channel.channelTitle = { S: item.snippet.title };
+    channel.channelThumbnail = { S: item.snippet.thumbnails.high.url };
     channel.playlist = { S: item.contentDetails.relatedPlaylists.uploads };
     channel.thumbnail = { S: item.snippet.thumbnails.high.url };
     channel.channelLink = {

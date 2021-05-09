@@ -39,7 +39,7 @@ const fetchData = async (req: NextApiRequest, resp: NextApiResponse) => {
             videoPublishedAt: video.snippet.publishedAt,
             videoId: video.contentDetails.videoId,
             channelThumbnail: channel.thumbnail.S,
-            channelLink: channel.channelLink.S,
+            channelLink: `https://www.youtube.com/channel/${channel.channelId.S}`,
           })
         ),
       ]);
