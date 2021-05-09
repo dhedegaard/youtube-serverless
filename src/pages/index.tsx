@@ -133,7 +133,7 @@ const Index: NextPage<Props> = ({ videos }) => {
     <>
       <Navbar>
         <Container>
-          <Image src="/favicon.png" width={24} height={24} />
+          <Image src="/favicon.png" width={24} height={24} alt="Logo" />
           New youtube videos
         </Container>
       </Navbar>
