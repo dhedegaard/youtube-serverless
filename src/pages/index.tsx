@@ -46,12 +46,12 @@ const Elem = styled.div`
   }
 `;
 
-const TitleAndPublishedAt = styled.div`
+const ChannelTitleAndPublishedAt = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  align-self: flex-end;
+  margin-top: auto;
 `;
 
 const ThumbnailContainer = styled.a`
@@ -91,8 +91,11 @@ const Title = styled.b`
   font-size: 0.8em;
 `;
 
-const ChannelLogo = styled(Image)`
-  border-radius: 4px;
+const ChannelLogoContainer = styled.div`
+  width: 16px;
+  height: 16px;
+  box-size: border-box;
+  flex: 0 0 auto;
 `;
 
 const ChannelTitle = styled.a`
@@ -101,7 +104,7 @@ const ChannelTitle = styled.a`
   max-height: 5.8ex;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 0.9em;
+  font-size: 0.85em;
   display: flex;
   gap: 4px;
   align-items: center;
@@ -166,25 +169,27 @@ const Index: NextPage<Props> = ({ videos }) => {
 
               <Title>{e.title}</Title>
 
-              <TitleAndPublishedAt>
+              <ChannelTitleAndPublishedAt>
                 <ChannelTitle
                   href={e.channelLink}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <ChannelLogo
-                    src={e.channelThumbnail}
-                    width={16}
-                    height={16}
-                    alt={e.channelTitle}
-                  />
-                  {e.channelTitle}
+                  <ChannelLogoContainer>
+                    <Image
+                      src={e.channelThumbnail}
+                      width={16}
+                      height={16}
+                      alt={e.channelTitle}
+                    />
+                  </ChannelLogoContainer>
+                  <span>{e.channelTitle}</span>
                 </ChannelTitle>
 
                 <PublishedAt title={publishedAt.toLocaleString()}>
                   {dayjs(publishedAt).fromNow(true)} ago
                 </PublishedAt>
-              </TitleAndPublishedAt>
+              </ChannelTitleAndPublishedAt>
             </Elem>
           );
         })}
