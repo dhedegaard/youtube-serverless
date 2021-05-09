@@ -81,7 +81,7 @@ const ChannelLogo = styled.img`
   border-radius: 4px;
 `;
 
-const ChannelTitle = styled.div`
+const ChannelTitle = styled.a`
   word-wrap: break-word;
   flex: 1 1 auto;
   max-height: 5.8ex;
@@ -93,6 +93,8 @@ const ChannelTitle = styled.div`
   align-items: center;
   white-space: nowrap;
   margin-right: 8px;
+  text-decoration: none;
+  color: #000;
 `;
 
 const PublishedAt = styled.div`
@@ -139,7 +141,11 @@ const Index: NextPage<Props> = ({ videos }) => {
             </div>
 
             <TitleAndPublishedAt>
-              <ChannelTitle>
+              <ChannelTitle
+                href={e.channelLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <ChannelLogo
                   src={e.channelThumbnail}
                   width={16}
