@@ -88,7 +88,7 @@ const Title = styled.b`
   margin-bottom: 4px;
 `;
 
-const ChannelLogo = styled.img`
+const ChannelLogo = styled(Image)`
   border-radius: 4px;
 `;
 
