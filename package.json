@@ -4,21 +4,24 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "watch": "next dev"
+    "watch": "next dev",
+    "lint": "next lint"
   },
   "devDependencies": {
     "@types/react": "^17.0.5",
     "@types/react-dom": "^17.0.3",
     "@types/styled-components": "^5.1.9",
-    "typescript": "^4.2.4"
+    "eslint": "7.x",
+    "eslint-config-next": "11.1.2",
+    "typescript": "^4.4.4"
   },
   "dependencies": {
     "aws-sdk": "^2.903.0",
     "dayjs": "^1.10.4",
-    "next": "^10.2.0",
+    "next": "^11.1.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-is": "^17.0.2",
-    "styled-components": "^5.3.0"
+    "styled-components": "^5.3.1"
   }
 }
