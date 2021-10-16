@@ -4,6 +4,7 @@ import { getLatestVideos } from "../data";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
+import favicon from "../../public/favicon.png";
 
 dayjs.extend(relativeTime);
 
@@ -150,7 +151,13 @@ const Index: NextPage<Props> = ({ videos }) => {
     <>
       <Navbar>
         <Container>
-          <Image src="/favicon.png" width={24} height={24} alt="Logo" />
+          <Image
+            src={favicon}
+            width={24}
+            height={24}
+            alt="Logo"
+            placeholder="blur"
+          />
           New youtube videos
         </Container>
       </Navbar>
