@@ -174,7 +174,7 @@ const Index: NextPage<Props> = ({ videos }) => {
                 <Thumbnail src={e.thumbnail} alt={e.title} />
               </ThumbnailContainer>
 
-              <Title>{e.title}</Title>
+              <Title title={e.title}>{e.title}</Title>
 
               <ChannelTitleAndPublishedAt>
                 <ChannelTitle
