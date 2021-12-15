@@ -79,6 +79,8 @@ const Thumbnail = styled.img`
   right: 0;
   border: 0;
   width: 100%;
+  background-color: #efefef;
+  color: #efefef;
 `;
 
 const Title = styled.b`
