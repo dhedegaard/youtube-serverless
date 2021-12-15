@@ -97,7 +97,7 @@ const Title = styled.b`
 const ChannelLogoContainer = styled.div`
   width: 16px;
   height: 16px;
-  box-size: border-box;
+  box-sizing: border-box;
   flex: 0 0 auto;
 `;
 
