@@ -65,6 +65,8 @@ const ThumbnailContainer = styled.a`
   display: flex;
   border-radius: 4px;
   margin-bottom: 4px;
+  background-blend-mode: multiply;
+  background-color: #efefef;
 `;
 
 const Thumbnail = styled.img`
@@ -79,7 +81,6 @@ const Thumbnail = styled.img`
   right: 0;
   border: 0;
   width: 100%;
-  background-color: #efefef;
   color: #efefef;
 `;
 
