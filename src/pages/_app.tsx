@@ -39,6 +39,7 @@ const MyApp: FC<{
         <meta name="theme-color" content="#222222" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
       </Head>
       <Component {...pageProps} />;
     </>
