@@ -1,14 +1,19 @@
 import Head from "next/head";
 import { FC } from "react";
-import { createGlobalStyle } from "styled-components";
+import { css, Global } from "@emotion/react";
 
-const GlobalStyle = createGlobalStyle`
-  body {
-    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
-    line-height: 1.5;
-    margin: 0;
-  }
-`;
+const GlobalStyle = () => (
+  <Global
+    styles={css`
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica,
+          Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+        line-height: 1.5;
+        margin: 0;
+      }
+    `}
+  />
+);
 
 const MyApp: FC<{
   Component: FC<any>;

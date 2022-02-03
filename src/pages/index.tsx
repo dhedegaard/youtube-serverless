@@ -1,5 +1,5 @@
 import { GetStaticProps, NextPage } from "next";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import { getLatestVideos } from "../data";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
