@@ -21,6 +21,11 @@ export const getChannelInfo = async (
   const resp = await fetch(
     `https://www.googleapis.com/youtube/v3/channels?${params.toString()}`
   );
+  if (!resp.ok) {
+    throw new Error(
+      `Unable to get channel info: ${resp.status} ${resp.statusText}`
+    );
+  }
   return await resp.json();
 };
 
