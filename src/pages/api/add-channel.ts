@@ -24,6 +24,7 @@ const addChannel = async (req: NextApiRequest, resp: NextApiResponse) => {
     SK: { S: `CHANNEL#${item.id}` },
     channelId: { S: item.id },
     channelTitle: { S: item.snippet.title },
+    videoIds: undefined,
     playlist: { S: item.contentDetails.relatedPlaylists.uploads },
     thumbnail: { S: item.snippet.thumbnails.high.url },
     channelLink: { S: `https://www.youtube.com/channel/${item.id}` },
