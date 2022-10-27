@@ -1,6 +1,18 @@
 import { Credentials, DynamoDB } from "aws-sdk";
 
 const TableName = process.env.AWS_DYNAMODB_TABLE;
+if (TableName == null) {
+  throw new Error("Missing AWS_DYNAMODB_TABLE");
+}
+if (process.env.AWS_DYNAMODB_ACCESS_KEY == null) {
+  throw new Error("Missing AWS_DYNAMODB_ACCESS_KEY");
+}
+if (process.env.AWS_DYNAMODB_SECRET_ACCESS_KEY == null) {
+  throw new Error("Missing AWS_DYNAMODB_SECRET_ACCESS_KEY");
+}
+if (process.env.AWS_DYNAMODB_REGION == null) {
+  throw new Error("Missing AWS_DYNAMODB_REGION");
+}
 
 const db = new DynamoDB({
   credentials: new Credentials({

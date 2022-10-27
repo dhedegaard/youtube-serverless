@@ -1,4 +1,7 @@
 const apiKey = process.env.YOUTUBE_API_KEY;
+if (apiKey == null) {
+  throw new Error("Missing YOUTUBE_API_KEY");
+}
 
 export const getChannelInfo = async (
   channelId: string
