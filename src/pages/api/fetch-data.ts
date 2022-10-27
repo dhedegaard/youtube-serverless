@@ -16,12 +16,11 @@ const fetchData = async (req: NextApiRequest, resp: NextApiResponse) => {
         S: info.items[0].contentDetails.relatedPlaylists.uploads,
       };
       const videos = await getVideosForChannelId(channel.playlist.S);
-      const newVideos =
+      const newVideos = videos.filter((e) =>
         channel.videoIds == null
-          ? videos
-          : videos.filter(
-              (e) => !channel.videoIds.SS.includes(e.contentDetails.videoId)
-            );
+          ? true
+          : !channel.videoIds.SS.includes(e.contentDetails.videoId)
+      );
       newVideoCount += newVideos.length;
       channel.videoIds = {
         SS: [
