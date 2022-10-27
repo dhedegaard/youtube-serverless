@@ -15,13 +15,16 @@ const addChannel = async (req: NextApiRequest, resp: NextApiResponse) => {
   const {
     items: [item],
   } = await getChannelInfo(channelId);
+  if (item == null) {
+    return resp.status(404).send(`Channel with id not found: ${channelId}`);
+  }
+
   const channel = await updateChannel({
     PK: { S: "CHANNELS" },
     SK: { S: `CHANNEL#${item.id}` },
     channelId: { S: item.id },
     channelTitle: { S: item.snippet.title },
     playlist: { S: item.contentDetails.relatedPlaylists.uploads },
-    videoIds: { SS: [] },
     thumbnail: { S: item.snippet.thumbnails.high.url },
     channelLink: { S: `https://www.youtube.com/channel/${item.id}` },
     channelThumbnail: { S: item.snippet.thumbnails.high.url },

@@ -19,7 +19,7 @@
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@types/node": "16",
-    "aws-sdk": "^2.1183.0",
+    "aws-sdk": "^2.1241.0",
     "dayjs": "^1.11.4",
     "next": "^12.2.3",
     "react": "^18.2.0",
