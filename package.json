@@ -9,19 +9,19 @@
     "lint": "next lint"
   },
   "devDependencies": {
-    "@types/react": "^18.0.24",
-    "@types/react-dom": "^18.0.8",
-    "eslint": "8.26.0",
-    "eslint-config-next": "13.0.0",
-    "typescript": "^4.8.4"
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
+    "eslint": "8.32.0",
+    "eslint-config-next": "13.1.6",
+    "typescript": "^4.9.4"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@types/node": "16",
-    "aws-sdk": "^2.1241.0",
-    "dayjs": "^1.11.4",
-    "next": "^13.0.0",
+    "@types/node": "18",
+    "aws-sdk": "^2.1304.0",
+    "dayjs": "^1.11.7",
+    "next": "^13.1.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-is": "^18.2.0"
