@@ -39,14 +39,6 @@ const Elem = styled.div`
   }
 `;
 
-const ChannelTitleAndPublishedAt = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-`;
-
 const Thumbnail = styled.img`
   padding: 0;
   margin: 0;
@@ -140,7 +132,7 @@ const Index: NextPage<Props> = ({ videos }) => {
 
               <Title title={e.title}>{e.title}</Title>
 
-              <ChannelTitleAndPublishedAt>
+              <div className="w-full flex justify-between items-center mt-auto">
                 <ChannelTitle
                   href={e.channelLink}
                   target="_blank"
@@ -163,7 +155,7 @@ const Index: NextPage<Props> = ({ videos }) => {
                 >
                   {dayjs(publishedAt).fromNow(true)} ago
                 </div>
-              </ChannelTitleAndPublishedAt>
+              </div>
             </Elem>
           );
         })}
