@@ -47,20 +47,6 @@ const ChannelTitleAndPublishedAt = styled.div`
   margin-top: auto;
 `;
 
-const ThumbnailContainer = styled.a`
-  position: relative;
-  margin-bottom: 0;
-  padding: 0;
-  overflow: hidden;
-  width: 100%;
-  padding-top: calc(56.25% - 1px);
-  display: flex;
-  border-radius: 4px;
-  margin-bottom: 4px;
-  background-blend-mode: multiply;
-  background-color: #efefef;
-`;
-
 const Thumbnail = styled.img`
   padding: 0;
   margin: 0;
@@ -143,13 +129,14 @@ const Index: NextPage<Props> = ({ videos }) => {
               className="flex grow-0 shrink-0 basis-auto flex-col items-stretch mb-4 w-[calc(20%-8px)] max-sm:w-[calc(50%-8px)] max"
               key={e.videoId}
             >
-              <ThumbnailContainer
+              <a
+                className="relative p-0 overflow-hidden w-full pt-[calc(56.25%-1px)] flex rounded mb-1 bg-blend-multiply bg-gray-50"
                 href={`https://www.youtube.com/watch?v=${e.videoId}`}
                 target="_blank"
                 rel="noreferrer noopener"
               >
                 <Thumbnail src={e.thumbnail} alt={e.title} />
-              </ThumbnailContainer>
+              </a>
 
               <Title title={e.title}>{e.title}</Title>
 
