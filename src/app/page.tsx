@@ -1,10 +1,11 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { GetStaticProps, NextPage } from "next";
+import { NextPage } from "next";
 import Image from "next/image";
+import { use } from "react";
 import favicon from "../../public/favicon.png";
 import { getLatestVideos } from "../data";
-import styles from "./index.module.css";
+import styles from "./page.module.css";
 
 dayjs.extend(relativeTime);
 
@@ -20,19 +21,13 @@ interface Props {
   }>;
 }
 
-const Index: NextPage<Props> = ({ videos }) => {
+const Index: NextPage<Props> = () => {
+  const { videos } = use(getVideos());
   return (
     <>
       <nav className="w-full py-4 mb-2 bg-gray-700 text-white">
         <div className="max-w-[1140px] mx-auto flex flex-wrap gap-[10px] px-2">
-          <Image
-            placeholder="blur"
-            priority
-            src={favicon}
-            width={24}
-            height={24}
-            alt="Logo"
-          />
+          <Image priority src={favicon} width={24} height={24} alt="Logo" />
           New youtube videos
         </div>
       </nav>
@@ -94,21 +89,18 @@ const Index: NextPage<Props> = ({ videos }) => {
   );
 };
 
-export const getStaticProps: GetStaticProps<Props> = async () => {
+const getVideos = async () => {
   const videos = await getLatestVideos();
   return {
-    props: {
-      videos: videos.map((e) => ({
-        videoId: e.videoId.S,
-        publishedAt: e.videoPublishedAt.S,
-        thumbnail: e.thumbnail.S,
-        title: e.title.S,
-        channelTitle: e.channelTitle.S,
-        channelLink: e.channelLink.S,
-        channelThumbnail: e.channelThumbnail.S,
-      })),
-    },
-    revalidate: 600,
+    videos: videos.map((e) => ({
+      videoId: e.videoId.S,
+      publishedAt: e.videoPublishedAt.S,
+      thumbnail: e.thumbnail.S,
+      title: e.title.S,
+      channelTitle: e.channelTitle.S,
+      channelLink: e.channelLink.S,
+      channelThumbnail: e.channelThumbnail.S,
+    })),
   };
 };
 
