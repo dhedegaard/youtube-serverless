@@ -8,27 +8,6 @@ import { getLatestVideos } from "../data";
 
 dayjs.extend(relativeTime);
 
-const Elem = styled.div`
-  display: flex;
-  flex: 0 0 auto;
-  flex-direction: column;
-  align-items: stretch;
-  margin-bottom: 16px;
-  width: calc(20% - 8px);
-
-  @media (max-width: 1140px) {
-    width: calc(25% - 8px);
-  }
-
-  @media (max-width: 768px) {
-    width: calc(100% / 3 - 8px);
-  }
-
-  @media (max-width: 475px) {
-    width: calc(50% - 8px);
-  }
-`;
-
 const Thumbnail = styled.img`
   padding: 0;
   margin: 0;
@@ -107,8 +86,8 @@ const Index: NextPage<Props> = ({ videos }) => {
         {videos.map((e) => {
           const publishedAt = new Date(e.publishedAt);
           return (
-            <Elem
-              className="flex grow-0 shrink-0 basis-auto flex-col items-stretch mb-4 w-[calc(20%-8px)] max-sm:w-[calc(50%-8px)] max"
+            <div
+              className="flex grow-0 shrink-0 basis-auto flex-col items-stretch mb-4 w-[calc(20%-8px)] max-lg:w-[calc(25%-8px)] max-md:w-[calc(100%/3-8px)] max-sm:w-[calc(50%-8px)]"
               key={e.videoId}
             >
               <a
@@ -146,7 +125,7 @@ const Index: NextPage<Props> = ({ videos }) => {
                   {dayjs(publishedAt).fromNow(true)} ago
                 </div>
               </div>
-            </Elem>
+            </div>
           );
         })}
       </div>
