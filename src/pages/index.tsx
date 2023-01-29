@@ -1,10 +1,10 @@
-import { GetStaticProps, NextPage } from "next";
 import styled from "@emotion/styled";
-import { getLatestVideos } from "../data";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { GetStaticProps, NextPage } from "next";
 import Image from "next/image";
 import favicon from "../../public/favicon.png";
+import { getLatestVideos } from "../data";
 
 dayjs.extend(relativeTime);
 
@@ -16,14 +16,6 @@ const Container = styled.div`
   gap: 10px;
   padding-left: 8px;
   padding-right: 8px;
-`;
-
-const Navbar = styled.nav`
-  width: 100%;
-  padding: 16px 0;
-  margin-bottom: 8px;
-  background-color: #333;
-  color: #fff;
 `;
 
 const Elem = styled.div`
@@ -152,12 +144,12 @@ interface Props {
 const Index: NextPage<Props> = ({ videos }) => {
   return (
     <>
-      <Navbar>
-        <Container>
+      <nav className="w-full py-4 mb-2 bg-slate-800 text-white">
+        <div className="max-w-[1140px] mx-auto flex flex-wrap gap-[10px] px-2">
           <Image src={favicon} width={24} height={24} alt="Logo" />
           New youtube videos
-        </Container>
-      </Navbar>
+        </div>
+      </nav>
       <Container>
         {videos.map((e) => {
           const publishedAt = new Date(e.publishedAt);
@@ -190,7 +182,7 @@ const Index: NextPage<Props> = ({ videos }) => {
                   <span>{e.channelTitle}</span>
                 </ChannelTitle>
 
-                <PublishedAt title={publishedAt.toLocaleString()}>
+                <PublishedAt title={publishedAt.toLocaleString("en-US")}>
                   {dayjs(publishedAt).fromNow(true)} ago
                 </PublishedAt>
               </ChannelTitleAndPublishedAt>

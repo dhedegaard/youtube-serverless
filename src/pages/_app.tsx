@@ -1,6 +1,7 @@
+import { css, Global } from "@emotion/react";
 import Head from "next/head";
 import { FC } from "react";
-import { css, Global } from "@emotion/react";
+import "../styles/globals.css";
 
 const GlobalStyle = () => (
   <Global
