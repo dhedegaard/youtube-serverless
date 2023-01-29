@@ -25,7 +25,14 @@ const Index: NextPage<Props> = ({ videos }) => {
     <>
       <nav className="w-full py-4 mb-2 bg-gray-700 text-white">
         <div className="max-w-[1140px] mx-auto flex flex-wrap gap-[10px] px-2">
-          <Image priority src={favicon} width={24} height={24} alt="Logo" />
+          <Image
+            placeholder="blur"
+            priority
+            src={favicon}
+            width={24}
+            height={24}
+            alt="Logo"
+          />
           New youtube videos
         </div>
       </nav>
