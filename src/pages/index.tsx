@@ -8,16 +8,6 @@ import { getLatestVideos } from "../data";
 
 dayjs.extend(relativeTime);
 
-const Container = styled.div`
-  max-width: 1140px;
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding-left: 8px;
-  padding-right: 8px;
-`;
-
 const Elem = styled.div`
   display: flex;
   flex: 0 0 auto;
@@ -113,7 +103,7 @@ const Index: NextPage<Props> = ({ videos }) => {
           New youtube videos
         </div>
       </nav>
-      <Container>
+      <div className="max-w-[1140px] mx-auto flex flex-wrap gap-[10px] px-2">
         {videos.map((e) => {
           const publishedAt = new Date(e.publishedAt);
           return (
@@ -159,7 +149,7 @@ const Index: NextPage<Props> = ({ videos }) => {
             </Elem>
           );
         })}
-      </Container>
+      </div>
     </>
   );
 };
