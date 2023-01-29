@@ -87,13 +87,6 @@ const Title = styled.b`
   font-size: 0.8em;
 `;
 
-const ChannelLogoContainer = styled.div`
-  width: 16px;
-  height: 16px;
-  box-sizing: border-box;
-  flex: 0 0 auto;
-`;
-
 const ChannelTitle = styled.a`
   word-wrap: break-word;
   flex: 1 1 auto;
@@ -154,7 +147,10 @@ const Index: NextPage<Props> = ({ videos }) => {
         {videos.map((e) => {
           const publishedAt = new Date(e.publishedAt);
           return (
-            <Elem key={e.videoId}>
+            <Elem
+              className="flex grow-0 shrink-0 basis-auto flex-col items-stretch mb-4 w-[calc(20%-8px)] max-sm:w-[calc(50%-8px)] max"
+              key={e.videoId}
+            >
               <ThumbnailContainer
                 href={`https://www.youtube.com/watch?v=${e.videoId}`}
                 target="_blank"
