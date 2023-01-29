@@ -1,20 +1,6 @@
-import { css, Global } from "@emotion/react";
 import Head from "next/head";
 import { FC } from "react";
 import "../styles/globals.css";
-
-const GlobalStyle = () => (
-  <Global
-    styles={css`
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica,
-          Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-        line-height: 1.5;
-        margin: 0;
-      }
-    `}
-  />
-);
 
 const MyApp: FC<{
   Component: FC<any>;
@@ -22,7 +8,6 @@ const MyApp: FC<{
 }> = ({ Component, pageProps }) => {
   return (
     <>
-      <GlobalStyle />
       <Head>
         <meta charSet="utf-8" />
         <title>New youtube videos</title>
