@@ -1,65 +1,12 @@
-import styled from "@emotion/styled";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { GetStaticProps, NextPage } from "next";
 import Image from "next/image";
 import favicon from "../../public/favicon.png";
 import { getLatestVideos } from "../data";
+import styles from "./index.module.css";
 
 dayjs.extend(relativeTime);
-
-const Thumbnail = styled.img`
-  padding: 0;
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -37.5%;
-  margin-left: -50%;
-  bottom: 0;
-  right: 0;
-  border: 0;
-  width: 100%;
-  color: #efefef;
-`;
-
-const Title = styled.b`
-  display: block;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 4px;
-  font-size: 0.8em;
-`;
-
-const ChannelTitle = styled.a`
-  word-wrap: break-word;
-  flex: 1 1 auto;
-  max-height: 5.8ex;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 0.85em;
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  white-space: nowrap;
-  padding-right: 8px;
-  text-decoration: none;
-  color: #000;
-  position: relative;
-
-  &::after {
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: 12px;
-    content: "";
-    position: absolute;
-    background: linear-gradient(to left, #fff, transparent);
-  }
-`;
 
 interface Props {
   videos: Array<{
@@ -96,13 +43,20 @@ const Index: NextPage<Props> = ({ videos }) => {
                 target="_blank"
                 rel="noreferrer noopener"
               >
-                <Thumbnail src={e.thumbnail} alt={e.title} />
+                <img
+                  className={styles.thumbnail}
+                  src={e.thumbnail}
+                  alt={e.title}
+                />
               </a>
 
-              <Title title={e.title}>{e.title}</Title>
+              <b className={styles.title} title={e.title}>
+                {e.title}
+              </b>
 
               <div className="w-full flex justify-between items-center mt-auto">
-                <ChannelTitle
+                <a
+                  className={styles.channelTitle}
                   href={e.channelLink}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -116,7 +70,7 @@ const Index: NextPage<Props> = ({ videos }) => {
                     />
                   </div>
                   <span>{e.channelTitle}</span>
-                </ChannelTitle>
+                </a>
 
                 <div
                   className="text-right whitespace-nowrap basis-auto text-gray-500 text-[0.75em]"
