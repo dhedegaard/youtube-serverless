@@ -144,7 +144,7 @@ interface Props {
 const Index: NextPage<Props> = ({ videos }) => {
   return (
     <>
-      <nav className="w-full py-4 mb-2 bg-slate-800 text-white">
+      <nav className="w-full py-4 mb-2 bg-gray-700 text-white">
         <div className="max-w-[1140px] mx-auto flex flex-wrap gap-[10px] px-2">
           <Image src={favicon} width={24} height={24} alt="Logo" />
           New youtube videos
