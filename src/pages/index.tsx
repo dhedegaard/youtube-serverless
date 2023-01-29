@@ -146,7 +146,7 @@ const Index: NextPage<Props> = ({ videos }) => {
     <>
       <nav className="w-full py-4 mb-2 bg-gray-700 text-white">
         <div className="max-w-[1140px] mx-auto flex flex-wrap gap-[10px] px-2">
-          <Image src={favicon} width={24} height={24} alt="Logo" />
+          <Image priority src={favicon} width={24} height={24} alt="Logo" />
           New youtube videos
         </div>
       </nav>
@@ -171,14 +171,14 @@ const Index: NextPage<Props> = ({ videos }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <ChannelLogoContainer>
+                  <div className="w-4 h-4 box-border shrink-0 grow-0 basis-auto">
                     <Image
                       src={e.channelThumbnail}
                       width={16}
                       height={16}
                       alt={e.channelTitle}
                     />
-                  </ChannelLogoContainer>
+                  </div>
                   <span>{e.channelTitle}</span>
                 </ChannelTitle>
 
