@@ -114,14 +114,6 @@ const ChannelTitle = styled.a`
   }
 `;
 
-const PublishedAt = styled.div`
-  text-align: right;
-  white-space: nowrap;
-  flex: 0 1 auto;
-  color: #777;
-  font-size: 0.75em;
-`;
-
 interface Props {
   videos: Array<{
     videoId: string;
@@ -178,9 +170,12 @@ const Index: NextPage<Props> = ({ videos }) => {
                   <span>{e.channelTitle}</span>
                 </ChannelTitle>
 
-                <PublishedAt title={publishedAt.toLocaleString("en-US")}>
+                <div
+                  className="text-right whitespace-nowrap basis-auto text-gray-500 text-[0.75em]"
+                  title={publishedAt.toLocaleString("en-US")}
+                >
                   {dayjs(publishedAt).fromNow(true)} ago
-                </PublishedAt>
+                </div>
               </ChannelTitleAndPublishedAt>
             </Elem>
           );
