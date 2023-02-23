@@ -10,7 +10,7 @@ import styles from "./page.module.css";
 dayjs.extend(relativeTime);
 
 // Revalidate every 10 minutes.
-export const revalidate = 60 * 10;
+export const revalidate = 600;
 
 const Index: NextPage = () => {
   const { videos } = use(getVideos());
