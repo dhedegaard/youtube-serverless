@@ -9,19 +9,7 @@ import styles from "./page.module.css";
 
 dayjs.extend(relativeTime);
 
-interface Props {
-  videos: Array<{
-    videoId: string;
-    publishedAt: string;
-    thumbnail: string;
-    title: string;
-    channelTitle: string;
-    channelLink: string;
-    channelThumbnail: string;
-  }>;
-}
-
-const Index: NextPage<Props> = () => {
+const Index: NextPage = () => {
   const { videos } = use(getVideos());
   return (
     <>
