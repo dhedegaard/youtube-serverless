@@ -45,11 +45,11 @@ const Index: NextPage = () => {
   return (
     <>
       <nav className="w-full py-4 mb-2 bg-gray-700 text-white flex gap-4 items-end">
-        <div className="max-w-[1140px] mx-auto flex flex-wrap gap-[10px] w-full px-2">
+        <div className="max-w-[1140px] mx-auto flex flex-wrap gap-3 w-full px-2">
           <Image priority src={favicon} width={24} height={24} alt="Logo" />
           New youtube videos
           <div
-            className={`${styles.channels} relative transition hover:bg-gray-800 rounded px-1 text-sm cursor-default`}
+            className={`${styles.channels} relative transition hover:bg-gray-800 rounded px-2 text-sm cursor-default self-end mb-0.5`}
             tabIndex={0}
           >
             Channels
