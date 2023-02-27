@@ -4,7 +4,7 @@ import { NextPage } from "next";
 import Image from "next/image";
 import { use } from "react";
 import favicon from "../../public/favicon.png";
-import { getLatestVideos } from "../data";
+import { getChannels, getLatestVideos } from "../data";
 import styles from "./page.module.css";
 
 dayjs.extend(relativeTime);
@@ -12,14 +12,70 @@ dayjs.extend(relativeTime);
 // Revalidate every 10 minutes.
 export const revalidate = 600;
 
+interface ChannelElem {
+  key: string;
+  link: string;
+  thumbnail: string;
+  title: string;
+}
+
 const Index: NextPage = () => {
-  const { videos } = use(getVideos());
+  const [{ videos }, channels] = use(
+    Promise.all([
+      getVideos(),
+      getChannels().then((channels) =>
+        channels
+          .map<ChannelElem>((channel) => ({
+            key: channel.channelId.S,
+            link: channel.channelLink.S,
+            thumbnail: channel.channelThumbnail.S,
+            title: channel.channelTitle.S,
+          }))
+          .reduce<ChannelElem[]>((acc, cur) => {
+            if (!acc.some((e) => e.key === cur.key)) {
+              acc.push(cur);
+            }
+            return acc;
+          }, [])
+          .sort((a, b) => a.title.localeCompare(b.title))
+      ),
+    ])
+  );
+
   return (
     <>
-      <nav className="w-full py-4 mb-2 bg-gray-700 text-white">
-        <div className="max-w-[1140px] mx-auto flex flex-wrap gap-[10px] px-2">
+      <nav className="w-full py-4 mb-2 bg-gray-700 text-white flex gap-4 items-end">
+        <div className="max-w-[1140px] mx-auto flex flex-wrap gap-3 w-full px-2">
           <Image priority src={favicon} width={24} height={24} alt="Logo" />
           New youtube videos
+          <div
+            className={`${styles.channels} relative transition hover:bg-gray-800 rounded px-2 text-sm cursor-default self-end mb-0.5`}
+            tabIndex={0}
+          >
+            Channels
+            <div
+              className={`${styles.channelDropdown} absolute top-full left-0 bg-white text-black z-10 rounded shadow-2xl border-slate-800 box-border border-solid flex-col gap-1 py-1`}
+            >
+              {channels.map((channel) => (
+                <a
+                  key={channel.key}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={channel.link}
+                  className="text-sm text-slate-700 no-underline transition hover:text-slate-800 hover:underline max-h-[100vh] overflow-y-auto flex gap-1 items-center bg-white hover:bg-slate-200 whitespace-nowrap py-1 px-4"
+                >
+                  <img
+                    src={channel.thumbnail}
+                    alt=""
+                    width={12}
+                    height={12}
+                    className="object-cover"
+                  />
+                  <div>{channel.title}</div>
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       </nav>
       <div className="max-w-[1140px] mx-auto flex flex-wrap gap-[10px] px-2">
