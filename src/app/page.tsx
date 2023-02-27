@@ -62,13 +62,13 @@ const Index: NextPage = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   href={channel.link}
-                  className="text-sm text-slate-700 no-underline transition hover:text-slate-800 hover:underline max-h-[100vh] overflow-y-auto flex gap-1 items-center bg-white hover:bg-slate-200 whitespace-nowrap py-1 px-4"
+                  className="text-sm text-slate-700 no-underline transition hover:text-slate-800 hover:underline max-h-[100vh] overflow-y-auto flex gap-2 items-center bg-white hover:bg-slate-200 whitespace-nowrap py-1 px-4"
                 >
-                  <img
+                  <Image
                     src={channel.thumbnail}
                     alt=""
-                    width={12}
-                    height={12}
+                    width={20}
+                    height={20}
                     className="object-cover"
                   />
                   <div>{channel.title}</div>
