@@ -54,6 +54,8 @@
   display: none;
 }
 
-.channels:hover > .channelDropdown {
+.channels:hover > .channelDropdown,
+.channels:focus > .channelDropdown,
+.channels:active > .channelDropdown {
   display: flex;
 }

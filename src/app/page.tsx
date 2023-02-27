@@ -49,7 +49,7 @@ const Index: NextPage = () => {
           <Image priority src={favicon} width={24} height={24} alt="Logo" />
           New youtube videos
           <div
-            className={`${styles.channels} relative transition hover:bg-gray-800 rounded px-2 text-sm cursor-default self-end mb-0.5`}
+            className={`${styles.channels} relative transition hover:bg-gray-800 rounded px-2 text-sm self-end mb-0.5`}
             tabIndex={0}
           >
             Channels
@@ -62,7 +62,7 @@ const Index: NextPage = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   href={channel.link}
-                  className="text-sm text-slate-700 no-underline transition hover:text-slate-800 hover:underline max-h-[100vh] overflow-y-auto flex gap-2 items-center bg-white hover:bg-slate-200 whitespace-nowrap py-1 px-4"
+                  className="text-sm text-slate-700 no-underline transition hover:text-slate-800 hover:underline max-h-[100vh] overflow-y-auto flex gap-2 items-center bg-white hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 whitespace-nowrap py-1 px-4"
                 >
                   <Image
                     src={channel.thumbnail}
