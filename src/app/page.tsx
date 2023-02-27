@@ -54,7 +54,7 @@ const Index: NextPage = () => {
           >
             Channels
             <div
-              className={`${styles.channelDropdown} absolute top-full left-0 bg-white text-black z-10 rounded shadow-2xl border-slate-800 box-border border-solid flex flex-col gap-1 py-1`}
+              className={`${styles.channelDropdown} absolute top-full left-0 bg-white text-black z-10 rounded shadow-2xl border-slate-800 box-border border-solid flex-col gap-1 py-1`}
             >
               {channels.map((channel) => (
                 <a
