@@ -1,4 +1,4 @@
-import { Credentials, DynamoDB } from "aws-sdk";
+import { DynamoDB } from "@aws-sdk/client-dynamodb";
 
 const TableName = process.env.AWS_DYNAMODB_TABLE;
 if (TableName == null) {
@@ -15,10 +15,10 @@ if (process.env.AWS_DYNAMODB_REGION == null) {
 }
 
 const db = new DynamoDB({
-  credentials: new Credentials({
+  credentials: {
     accessKeyId: process.env.AWS_DYNAMODB_ACCESS_KEY,
     secretAccessKey: process.env.AWS_DYNAMODB_SECRET_ACCESS_KEY,
-  }),
+  },
   region: process.env.AWS_DYNAMODB_REGION,
 });
 
@@ -35,18 +35,16 @@ interface Channel {
 }
 
 export const getChannels = async (): Promise<Array<Channel>> => {
-  const resp = await db
-    .query({
-      TableName,
-      KeyConditionExpression: "PK = :pk",
-      ExpressionAttributeValues: { ":pk": { S: "CHANNELS" } },
-    })
-    .promise();
+  const resp = await db.query({
+    TableName,
+    KeyConditionExpression: "PK = :pk",
+    ExpressionAttributeValues: { ":pk": { S: "CHANNELS" } },
+  });
   return resp.Items as any;
 };
 
 export const updateChannel = async (channel: Channel) => {
-  await db.putItem({ Item: channel as any, TableName }).promise();
+  await db.putItem({ Item: channel as any, TableName });
   return channel;
 };
 
@@ -60,23 +58,21 @@ export const putVideos = async (video: {
   channelThumbnail: string;
   channelLink: string;
 }) => {
-  await db
-    .putItem({
-      Item: {
-        PK: { S: "VIDEOS" },
-        SK: { S: `VIDEO#${video.videoId}` },
-        channelId: { S: video.channelId },
-        videoId: { S: video.videoId },
-        videoPublishedAt: { S: video.videoPublishedAt },
-        thumbnail: { S: video.thumbnail },
-        channelTitle: { S: video.channelTitle },
-        channelThumbnail: { S: video.channelThumbnail },
-        channelLink: { S: video.channelLink },
-        title: { S: video.title },
-      },
-      TableName,
-    })
-    .promise();
+  await db.putItem({
+    Item: {
+      PK: { S: "VIDEOS" },
+      SK: { S: `VIDEO#${video.videoId}` },
+      channelId: { S: video.channelId },
+      videoId: { S: video.videoId },
+      videoPublishedAt: { S: video.videoPublishedAt },
+      thumbnail: { S: video.thumbnail },
+      channelTitle: { S: video.channelTitle },
+      channelThumbnail: { S: video.channelThumbnail },
+      channelLink: { S: video.channelLink },
+      title: { S: video.title },
+    },
+    TableName,
+  });
 };
 
 export const getLatestVideos = async (): Promise<
@@ -93,15 +89,13 @@ export const getLatestVideos = async (): Promise<
     title: { S: string };
   }>
 > => {
-  const resp = await db
-    .query({
-      TableName,
-      IndexName: "PK_videoPublishedAt",
-      ScanIndexForward: false,
-      Limit: 50,
-      KeyConditionExpression: "PK = :pk",
-      ExpressionAttributeValues: { ":pk": { S: "VIDEOS" } },
-    })
-    .promise();
+  const resp = await db.query({
+    TableName,
+    IndexName: "PK_videoPublishedAt",
+    ScanIndexForward: false,
+    Limit: 50,
+    KeyConditionExpression: "PK = :pk",
+    ExpressionAttributeValues: { ":pk": { S: "VIDEOS" } },
+  });
   return (resp.Items as any) ?? [];
 };

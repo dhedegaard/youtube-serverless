@@ -21,7 +21,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "aws-sdk": "^2.1359.0",
+    "@aws-sdk/client-dynamodb": "^3.335.0",
     "dayjs": "^1.11.7",
     "next": "^13.4.3",
     "react": "^18.2.0",
