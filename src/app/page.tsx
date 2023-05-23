@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { NextPage } from "next";
