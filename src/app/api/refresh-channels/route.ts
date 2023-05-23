@@ -1,16 +1,13 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { getChannels, updateChannel } from "../../data";
-import { getChannelInfo } from "../../data/youtube";
+import { NextRequest, NextResponse } from "next/server";
+import { getChannels, updateChannel } from "../../../data";
+import { getChannelInfo } from "../../../data/youtube";
 
-/**
- * Refreshes the channel data on all the channels in the system.
- */
-const refreshChannelsData = async (
-  req: NextApiRequest,
-  resp: NextApiResponse
-) => {
-  if (req.headers["authorization"] !== process.env.SECRET) {
-    return resp.status(401).end("Not authorized");
+export const POST = async (request: NextRequest) => {
+  if (request.headers.get("authorization") !== process.env.SECRET) {
+    return NextResponse.json(
+      { error: "Missing or bad authorization header" },
+      { status: 401 }
+    );
   }
 
   const channels = await getChannels();
@@ -28,7 +25,5 @@ const refreshChannelsData = async (
     await updateChannel(channel);
   }
 
-  return resp.status(500).json({ channels });
+  return NextResponse.json({ channels });
 };
-
-export default refreshChannelsData;
