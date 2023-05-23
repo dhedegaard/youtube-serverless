@@ -38,14 +38,18 @@ export const POST = async (request: NextRequest) => {
           updateChannel(channel),
           ...newVideos.map((video) =>
             putVideos({
-              channelId: channel.channelId.S,
-              thumbnail: video.snippet.thumbnails.high.url,
-              channelTitle: video.snippet.channelTitle,
-              title: video.snippet.title,
-              videoPublishedAt: video.snippet.publishedAt,
-              videoId: video.contentDetails.videoId,
-              channelThumbnail: channel.thumbnail.S,
-              channelLink: `https://www.youtube.com/channel/${channel.channelId.S}`,
+              PK: { S: "VIDEOS" },
+              SK: { S: `VIDEO#${video.contentDetails.videoId}` },
+              channelId: { S: channel.channelId.S },
+              thumbnail: { S: video.snippet.thumbnails.high.url },
+              channelTitle: { S: video.snippet.channelTitle },
+              title: { S: video.snippet.title },
+              videoPublishedAt: { S: video.snippet.publishedAt },
+              videoId: { S: video.contentDetails.videoId },
+              channelThumbnail: { S: channel.thumbnail.S },
+              channelLink: {
+                S: `https://www.youtube.com/channel/${channel.channelId.S}`,
+              },
             })
           ),
         ]);

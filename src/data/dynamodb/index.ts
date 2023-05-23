@@ -74,28 +74,8 @@ export const updateChannel = async (channel: Channel) => {
   return channel;
 };
 
-export const putVideos = async (video: {
-  readonly videoId: string;
-  readonly videoPublishedAt: string;
-  readonly channelId: string;
-  readonly channelTitle: string;
-  readonly thumbnail: string;
-  readonly title: string;
-  readonly channelThumbnail: string;
-  readonly channelLink: string;
-}) => {
-  const validatedItem = await videoSchema.parseAsync({
-    PK: { S: "VIDEOS" },
-    SK: { S: `VIDEO#${video.videoId}` },
-    channelId: { S: video.channelId },
-    videoId: { S: video.videoId },
-    videoPublishedAt: { S: video.videoPublishedAt },
-    thumbnail: { S: video.thumbnail },
-    channelTitle: { S: video.channelTitle },
-    channelThumbnail: { S: video.channelThumbnail },
-    channelLink: { S: video.channelLink },
-    title: { S: video.title },
-  });
+export const putVideos = async (video: Video) => {
+  const validatedItem = await videoSchema.parseAsync(video);
   await db.putItem({
     Item: validatedItem,
     TableName,
