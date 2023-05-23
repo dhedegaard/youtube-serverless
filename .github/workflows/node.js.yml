@@ -3,21 +3,26 @@ name: Node.js CI
 on:
   push:
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18.x
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm run lint --if-present
-    - run: npm test --if-present
+      - uses: actions/checkout@v3
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: "npm"
+      - run: npm ci
+      - run: npm run build --if-present
+        env:
+          CI: true
+          AWS_DYNAMODB_TABLE: TEST
+          AWS_DYNAMODB_ACCESS_KEY: TEST
+          AWS_DYNAMODB_SECRET_ACCESS_KEY: TEST
+          AWS_DYNAMODB_REGION: TEST
+      - run: npm run lint --if-present
+      - run: npm test --if-present
