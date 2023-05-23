@@ -17,13 +17,6 @@ jobs:
           node-version: 18.x
           cache: "npm"
       - run: npm ci
-      - run: npm run build --if-present
-        env:
-          CI: true
-          AWS_DYNAMODB_TABLE: TEST
-          AWS_DYNAMODB_ACCESS_KEY: TEST
-          AWS_DYNAMODB_SECRET_ACCESS_KEY: TEST
-          AWS_DYNAMODB_REGION: TEST
-          YOUTUBE_API_KEY: TEST
+      - run: npm run typecheck --if-present
       - run: npm run lint --if-present
-      - run: npm test --if-present
+      - run: npm run test --if-present
