@@ -24,5 +24,6 @@ jobs:
           AWS_DYNAMODB_ACCESS_KEY: TEST
           AWS_DYNAMODB_SECRET_ACCESS_KEY: TEST
           AWS_DYNAMODB_REGION: TEST
+          YOUTUBE_API_KEY: TEST
       - run: npm run lint --if-present
       - run: npm test --if-present
