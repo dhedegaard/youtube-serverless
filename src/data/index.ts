@@ -1,5 +1,5 @@
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
-import Z, { TypeOf, object } from "zod";
+import Z from "zod";
 
 const TableName = process.env.AWS_DYNAMODB_TABLE;
 if (TableName == null) {
@@ -24,8 +24,14 @@ const db = new DynamoDB({
 });
 
 const channelSchema = Z.object({
-  PK: Z.object({ S: Z.string() }),
-  SK: Z.object({ S: Z.string() }),
+  PK: Z.object({ S: Z.literal("CHANNELS") }),
+  SK: Z.object({
+    S: Z.union([
+      Z.string().startsWith("CHANNEL#"),
+      // NOTE: Here due to some old data having a bad SK and me being lazy.
+      Z.string().startsWith("CHANNELID#"),
+    ]),
+  }),
   channelId: Z.object({ S: Z.string() }),
   channelTitle: Z.object({ S: Z.string() }),
   playlist: Z.object({ S: Z.string() }),
@@ -34,7 +40,7 @@ const channelSchema = Z.object({
   channelThumbnail: Z.object({ S: Z.string() }),
   channelLink: Z.object({ S: Z.string() }),
 });
-interface Channel extends TypeOf<typeof channelSchema> {}
+interface Channel extends Z.TypeOf<typeof channelSchema> {}
 
 const videoSchema = Z.object({
   PK: Z.object({ S: Z.literal("VIDEOS") }),
@@ -48,7 +54,7 @@ const videoSchema = Z.object({
   channelLink: Z.object({ S: Z.string() }),
   title: Z.object({ S: Z.string() }),
 });
-interface Video extends TypeOf<typeof videoSchema> {}
+interface Video extends Z.TypeOf<typeof videoSchema> {}
 
 export const getChannels = async () => {
   const resp = await db.query({
