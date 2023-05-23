@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getChannels, putVideos, updateChannel } from "../../../data";
+import { getChannels, putVideos, updateChannel } from "../../../data/dynamodb";
 import { getChannelInfo, getVideosForChannelId } from "../../../data/youtube";
 
 export const POST = async (request: NextRequest) => {
