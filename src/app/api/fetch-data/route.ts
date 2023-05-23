@@ -34,7 +34,7 @@ export const POST = async (request: NextRequest) => {
             ]),
           ],
         };
-        await Promise.all<any>([
+        await Promise.all([
           updateChannel(channel),
           ...newVideos.map((video) =>
             putVideos({
