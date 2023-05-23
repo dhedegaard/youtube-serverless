@@ -45,7 +45,7 @@ export const POST = async (request: NextRequest) => {
   } catch (error: unknown) {
     console.error(error);
     return NextResponse.json(
-      { error: "Some unknown error happened, check the logs" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
