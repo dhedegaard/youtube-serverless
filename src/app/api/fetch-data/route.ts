@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getChannels, putVideos, updateChannel } from "../../../data/dynamodb";
-import { getChannelInfo, getVideosForChannelId } from "../../../data/youtube";
+import {
+  getChannels,
+  putVideos,
+  updateChannel,
+} from "../../../clients/dynamodb";
+import {
+  getChannelInfo,
+  getVideosForChannelId,
+} from "../../../clients/youtube";
 
 export const POST = async (request: NextRequest) => {
   if (request.headers.get("authorization") !== process.env.SECRET) {

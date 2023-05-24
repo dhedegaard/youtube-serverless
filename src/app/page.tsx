@@ -5,7 +5,7 @@ import { NextPage } from "next";
 import Image from "next/image";
 import { use } from "react";
 import favicon from "../../public/favicon.png";
-import { getChannels, getLatestVideos } from "../data/dynamodb";
+import { getChannels, getLatestVideos } from "../clients/dynamodb";
 import styles from "./page.module.css";
 
 dayjs.extend(relativeTime);
