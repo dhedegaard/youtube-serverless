@@ -1,4 +1,5 @@
 import {
+  DeleteItemCommand,
   DynamoDBClient,
   PutItemCommand,
   QueryCommand,
@@ -106,3 +107,52 @@ export const getLatestVideos = async () => {
   );
   return await z.array(videoSchema).parseAsync(resp.Items ?? []);
 };
+
+export const deleteOldVideos = z
+  .function()
+  .args(z.object({ numberToKeep: z.number().int().positive() }))
+  .returns(z.promise(z.number().int().nonnegative()))
+  .implement(async function deleteOldVideos({ numberToKeep }): Promise<number> {
+    const oldVideos = await db
+      .send(
+        new QueryCommand({
+          TableName,
+          IndexName: "PK_videoPublishedAt",
+          ScanIndexForward: true,
+          Limit: numberToKeep * 2 + 1,
+          KeyConditionExpression: "PK = :pk",
+          ExpressionAttributeValues: { ":pk": { S: "VIDEOS" } },
+        })
+      )
+      .then((resp) =>
+        z
+          .array(
+            z.object({
+              SK: z.object({ S: z.string().startsWith("VIDEO#") }),
+              PK: z.object({ S: z.literal("VIDEOS") }),
+              videoPublishedAt: z.object({ S: z.string().datetime() }),
+            })
+          )
+          .parseAsync(resp.Items)
+      );
+
+    // Check that there are more videos to delete than there is to keep.
+    if (oldVideos.length > numberToKeep + 1) {
+      const videosToDelete = oldVideos.slice(0, -numberToKeep);
+      return await Promise.all(
+        videosToDelete.map((item) =>
+          db.send(
+            new DeleteItemCommand({
+              TableName,
+              Key: {
+                PK: item.PK,
+                SK: item.SK,
+              },
+            })
+          )
+        )
+      ).then((items) => items.length);
+    }
+
+    return 0;
+  });

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  deleteOldVideos,
   getChannels,
   putVideos,
   updateChannel,
@@ -20,8 +21,11 @@ export const POST = async (request: NextRequest) => {
   try {
     const channels = await getChannels();
     let newVideoCount = 0;
-    await Promise.all(
-      channels.map(async (channel) => {
+    const [deletedVideos] = await Promise.all([
+      // deletedVideos
+      deleteOldVideos({ numberToKeep: 100 }),
+      // ...rest
+      ...channels.map(async (channel) => {
         const info = await getChannelInfo(channel.channelId.S);
         channel.playlist = {
           S: info.items[0].contentDetails.relatedPlaylists.uploads,
@@ -60,9 +64,13 @@ export const POST = async (request: NextRequest) => {
             })
           ),
         ]);
-      })
-    );
-    return NextResponse.json({ channelcount: channels.length, newVideoCount });
+      }),
+    ]);
+    return NextResponse.json({
+      channelcount: channels.length,
+      newVideoCount,
+      deletedVideos,
+    });
   } catch (error: unknown) {
     console.error(error);
     return NextResponse.json(
