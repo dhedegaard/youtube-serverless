@@ -3,7 +3,7 @@ import {
   PutItemCommand,
   QueryCommand,
 } from "@aws-sdk/client-dynamodb";
-import Z from "zod";
+import { z } from "zod";
 
 const TableName = process.env.AWS_DYNAMODB_TABLE;
 if (TableName == null) {
@@ -27,38 +27,38 @@ const db = new DynamoDBClient({
   region: process.env.AWS_DYNAMODB_REGION,
 });
 
-const channelSchema = Z.object({
-  PK: Z.object({ S: Z.literal("CHANNELS") }),
-  SK: Z.object({
-    S: Z.union([
-      Z.string().startsWith("CHANNEL#"),
+const channelSchema = z.object({
+  PK: z.object({ S: z.literal("CHANNELS") }),
+  SK: z.object({
+    S: z.union([
+      z.string().startsWith("CHANNEL#"),
       // NOTE: Here due to some old data having a bad SK and me being lazy.
-      Z.string().startsWith("CHANNELID#"),
+      z.string().startsWith("CHANNELID#"),
     ]),
   }),
-  channelId: Z.object({ S: Z.string() }),
-  channelTitle: Z.object({ S: Z.string() }),
-  playlist: Z.object({ S: Z.string() }),
-  videoIds: Z.object({ SS: Z.array(Z.string()) }).optional(),
-  thumbnail: Z.object({ S: Z.string() }),
-  channelThumbnail: Z.object({ S: Z.string() }),
-  channelLink: Z.object({ S: Z.string() }),
+  channelId: z.object({ S: z.string() }),
+  channelTitle: z.object({ S: z.string() }),
+  playlist: z.object({ S: z.string() }),
+  videoIds: z.object({ SS: z.array(z.string()) }).optional(),
+  thumbnail: z.object({ S: z.string() }),
+  channelThumbnail: z.object({ S: z.string() }),
+  channelLink: z.object({ S: z.string() }),
 });
-interface Channel extends Z.TypeOf<typeof channelSchema> {}
+interface Channel extends z.TypeOf<typeof channelSchema> {}
 
-const videoSchema = Z.object({
-  PK: Z.object({ S: Z.literal("VIDEOS") }),
-  SK: Z.object({ S: Z.string().startsWith("VIDEO#") }),
-  channelId: Z.object({ S: Z.string() }),
-  videoId: Z.object({ S: Z.string() }),
-  videoPublishedAt: Z.object({ S: Z.string() }),
-  thumbnail: Z.object({ S: Z.string() }),
-  channelTitle: Z.object({ S: Z.string() }),
-  channelThumbnail: Z.object({ S: Z.string() }),
-  channelLink: Z.object({ S: Z.string() }),
-  title: Z.object({ S: Z.string() }),
+const videoSchema = z.object({
+  PK: z.object({ S: z.literal("VIDEOS") }),
+  SK: z.object({ S: z.string().startsWith("VIDEO#") }),
+  channelId: z.object({ S: z.string() }),
+  videoId: z.object({ S: z.string() }),
+  videoPublishedAt: z.object({ S: z.string() }),
+  thumbnail: z.object({ S: z.string() }),
+  channelTitle: z.object({ S: z.string() }),
+  channelThumbnail: z.object({ S: z.string() }),
+  channelLink: z.object({ S: z.string() }),
+  title: z.object({ S: z.string() }),
 });
-interface Video extends Z.TypeOf<typeof videoSchema> {}
+interface Video extends z.TypeOf<typeof videoSchema> {}
 
 export const getChannels = async () => {
   const resp = await db.send(
@@ -68,7 +68,7 @@ export const getChannels = async () => {
       ExpressionAttributeValues: { ":pk": { S: "CHANNELS" } },
     })
   );
-  return await Z.array(channelSchema).parseAsync(resp.Items ?? []);
+  return await z.array(channelSchema).parseAsync(resp.Items ?? []);
 };
 
 export const updateChannel = async (channel: Channel) => {
@@ -104,5 +104,5 @@ export const getLatestVideos = async () => {
       ExpressionAttributeValues: { ":pk": { S: "VIDEOS" } },
     })
   );
-  return await Z.array(videoSchema).parseAsync(resp.Items ?? []);
+  return await z.array(videoSchema).parseAsync(resp.Items ?? []);
 };
