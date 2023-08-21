@@ -10,22 +10,28 @@ const TableName = process.env.AWS_DYNAMODB_TABLE;
 if (TableName == null) {
   throw new Error("Missing AWS_DYNAMODB_TABLE");
 }
-if (process.env.AWS_DYNAMODB_ACCESS_KEY == null) {
-  throw new Error("Missing AWS_DYNAMODB_ACCESS_KEY");
-}
-if (process.env.AWS_DYNAMODB_SECRET_ACCESS_KEY == null) {
-  throw new Error("Missing AWS_DYNAMODB_SECRET_ACCESS_KEY");
-}
-if (process.env.AWS_DYNAMODB_REGION == null) {
-  throw new Error("Missing AWS_DYNAMODB_REGION");
-}
+
+const envSchema = z.object({
+  AWS_DYNAMODB_ACCESS_KEY: z.string().nonempty(),
+  AWS_DYNAMODB_SECRET_ACCESS_KEY: z.string().nonempty(),
+  AWS_DYNAMODB_REGION: z.string().nonempty(),
+});
+const {
+  AWS_DYNAMODB_ACCESS_KEY,
+  AWS_DYNAMODB_REGION,
+  AWS_DYNAMODB_SECRET_ACCESS_KEY,
+} = envSchema.parse(
+  Object.fromEntries(
+    Object.keys(envSchema.shape).map((key) => [key, process.env[key]])
+  )
+);
 
 const db = new DynamoDBClient({
   credentials: {
-    accessKeyId: process.env.AWS_DYNAMODB_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_DYNAMODB_SECRET_ACCESS_KEY,
+    accessKeyId: AWS_DYNAMODB_ACCESS_KEY,
+    secretAccessKey: AWS_DYNAMODB_SECRET_ACCESS_KEY,
   },
-  region: process.env.AWS_DYNAMODB_REGION,
+  region: AWS_DYNAMODB_REGION,
 });
 
 const channelSchema = z.object({
