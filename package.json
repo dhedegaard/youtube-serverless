@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.395.0",
+    "aws-crt": "^1.18.0",
     "dayjs": "^1.11.9",
     "next": "^13.4.19",
     "react": "^18.2.0",
