@@ -111,7 +111,7 @@ const Index: NextPage = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <div className="w-4 h-4 box-border shrink-0 grow-0 basis-auto">
+                  <div className="w-4 h-4 overflow-hidden box-border shrink-0 grow-0 basis-auto">
                     <Image
                       src={e.channelThumbnail}
                       width={16}
