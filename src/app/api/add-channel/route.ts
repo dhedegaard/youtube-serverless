@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { updateChannel } from "../../../clients/dynamodb";
 import { getChannelInfo } from "../../../clients/youtube";
+
+const searchParamsSchema = z.object({
+  channelId: z.string().nonempty(),
+  store: z.optional(z.literal("true")),
+});
 
 export const POST = async (request: NextRequest) => {
   if (request.headers.get("authorization") !== process.env.SECRET) {
@@ -10,14 +16,19 @@ export const POST = async (request: NextRequest) => {
     );
   }
 
-  const url = new URL(request.url);
-  const channelId = url.searchParams.get("channelId");
-  if (typeof channelId !== "string" || channelId.length < 1) {
+  const paramsResult = await searchParamsSchema.safeParseAsync(
+    Object.fromEntries(new URL(request.url).searchParams.entries())
+  );
+  if (!paramsResult.success) {
     return NextResponse.json(
-      { error: "Missing channelId query param" },
+      {
+        error: "Missing or bad query params",
+        errors: paramsResult.error.errors,
+      },
       { status: 400 }
     );
   }
+  const { channelId, store } = paramsResult.data;
 
   try {
     const {
@@ -27,6 +38,17 @@ export const POST = async (request: NextRequest) => {
       return NextResponse.json(
         { error: `Channel with id not found: ${channelId}` },
         { status: 404 }
+      );
+    }
+
+    if (store !== "true") {
+      return NextResponse.json(
+        {
+          error: 'store is not "true", nothing is saved',
+          channelTitle: item.snippet.title,
+          channelId: item.id,
+        },
+        { status: 206 }
       );
     }
 
