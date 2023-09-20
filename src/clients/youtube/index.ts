@@ -1,9 +1,5 @@
 import Z from "zod";
-
-const apiKey = process.env.YOUTUBE_API_KEY;
-if (apiKey == null) {
-  throw new Error("Missing YOUTUBE_API_KEY");
-}
+import { SERVER_ENV } from "../../utils/server-env";
 
 const channelInfoSchema = Z.object({
   items: Z.array(
@@ -27,7 +23,10 @@ const channelInfoSchema = Z.object({
     })
   ),
 });
-export const getChannelInfo = async (channelId: string) => {
+interface ChannelInfo extends Z.TypeOf<typeof channelInfoSchema> {}
+export const getChannelInfo = async (
+  channelId: string
+): Promise<ChannelInfo> => {
   const params = new URLSearchParams();
   params.set("part", "snippet,contentDetails");
   params.set("id", channelId);
@@ -45,57 +44,59 @@ export const getChannelInfo = async (channelId: string) => {
     .then((data: unknown) => channelInfoSchema.parseAsync(data));
 };
 
+const videoItemSchema = Z.object({
+  contentDetails: Z.object({
+    videoId: Z.string().nonempty(),
+    videoPublishedAt: Z.string().nonempty(),
+  }),
+  snippet: Z.object({
+    publishedAt: Z.string().nonempty(),
+    channelId: Z.string().nonempty(),
+    title: Z.string().nonempty(),
+    description: Z.string(),
+    thumbnails: Z.object({
+      default: Z.object({
+        url: Z.string().nonempty(),
+        width: Z.number(),
+        height: Z.number(),
+      }),
+      medium: Z.object({
+        url: Z.string().nonempty(),
+        width: Z.number(),
+        height: Z.number(),
+      }),
+      high: Z.object({
+        url: Z.string().nonempty(),
+        width: Z.number(),
+        height: Z.number(),
+      }),
+      standard: Z.object({
+        url: Z.string().nonempty(),
+        width: Z.number(),
+        height: Z.number(),
+      }).optional(),
+      maxres: Z.object({
+        url: Z.string().nonempty(),
+        width: Z.number(),
+        height: Z.number(),
+      }).optional(),
+    }),
+    channelTitle: Z.string().nonempty(),
+  }),
+});
+interface VideoItem extends Z.TypeOf<typeof videoItemSchema> {}
 const videoSchema = Z.object({
   nextPageToken: Z.string().optional(),
-  items: Z.array(
-    Z.object({
-      contentDetails: Z.object({
-        videoId: Z.string().nonempty(),
-        videoPublishedAt: Z.string().nonempty(),
-      }),
-      snippet: Z.object({
-        publishedAt: Z.string().nonempty(),
-        channelId: Z.string().nonempty(),
-        title: Z.string().nonempty(),
-        description: Z.string(),
-        thumbnails: Z.object({
-          default: Z.object({
-            url: Z.string().nonempty(),
-            width: Z.number(),
-            height: Z.number(),
-          }),
-          medium: Z.object({
-            url: Z.string().nonempty(),
-            width: Z.number(),
-            height: Z.number(),
-          }),
-          high: Z.object({
-            url: Z.string().nonempty(),
-            width: Z.number(),
-            height: Z.number(),
-          }),
-          standard: Z.object({
-            url: Z.string().nonempty(),
-            width: Z.number(),
-            height: Z.number(),
-          }).optional(),
-          maxres: Z.object({
-            url: Z.string().nonempty(),
-            width: Z.number(),
-            height: Z.number(),
-          }).optional(),
-        }),
-        channelTitle: Z.string().nonempty(),
-      }),
-    })
-  ),
+  items: Z.array(videoItemSchema),
 });
-export const getVideosForChannelId = async (channelId: string) => {
+export const getVideosForChannelId = async (
+  channelId: string
+): Promise<readonly VideoItem[]> => {
   const params = new URLSearchParams();
   params.set("part", "contentDetails,snippet");
   params.set("maxResults", "50");
   params.set("playlistId", channelId);
-  params.set("key", apiKey);
+  params.set("key", SERVER_ENV.YOUTUBE_API_KEY);
   const resp = await fetch(
     `https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`,
     {}
