@@ -72,7 +72,7 @@ export const updateChannel = async (channel: Channel): Promise<Channel> => {
   return channel;
 };
 
-export const putVideos = async (video: Video) => {
+export const putVideo = async (video: Video): Promise<Video> => {
   const validatedItem = await videoSchema.parseAsync(video);
   await db.send(
     new PutItemCommand({

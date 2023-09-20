@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   deleteOldVideos,
   getChannels,
-  putVideos,
+  putVideo,
   updateChannel,
 } from "../../../clients/dynamodb";
 import {
@@ -48,7 +48,7 @@ export const POST = async (request: NextRequest) => {
         await Promise.all([
           updateChannel(channel),
           ...newVideos.map((video) =>
-            putVideos({
+            putVideo({
               PK: { S: "VIDEOS" },
               SK: { S: `VIDEO#${video.contentDetails.videoId}` },
               channelId: { S: channel.channelId.S },
