@@ -30,7 +30,7 @@ export const getChannelInfo = async (
   const params = new URLSearchParams();
   params.set("part", "snippet,contentDetails");
   params.set("id", channelId);
-  params.set("key", apiKey);
+  params.set("key", SERVER_ENV.YOUTUBE_API_KEY);
   const resp = await fetch(
     `https://www.googleapis.com/youtube/v3/channels?${params.toString()}`
   );
