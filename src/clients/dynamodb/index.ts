@@ -5,30 +5,16 @@ import {
   QueryCommand,
 } from "@aws-sdk/client-dynamodb";
 import { z } from "zod";
+import { SERVER_ENV } from "../../utils/server-env";
 
-const envSchema = z.object({
-  AWS_DYNAMODB_ACCESS_KEY: z.string().nonempty(),
-  AWS_DYNAMODB_SECRET_ACCESS_KEY: z.string().nonempty(),
-  AWS_DYNAMODB_REGION: z.string().nonempty(),
-  AWS_DYNAMODB_TABLE: z.string().nonempty(),
-});
-const {
-  AWS_DYNAMODB_ACCESS_KEY,
-  AWS_DYNAMODB_REGION,
-  AWS_DYNAMODB_SECRET_ACCESS_KEY,
-  AWS_DYNAMODB_TABLE: TableName,
-} = envSchema.parse(
-  Object.fromEntries(
-    Object.keys(envSchema.shape).map((key) => [key, process.env[key]])
-  )
-);
+const TableName = SERVER_ENV.AWS_DYNAMODB_TABLE;
 
 const db = new DynamoDBClient({
   credentials: {
-    accessKeyId: AWS_DYNAMODB_ACCESS_KEY,
-    secretAccessKey: AWS_DYNAMODB_SECRET_ACCESS_KEY,
+    accessKeyId: SERVER_ENV.AWS_DYNAMODB_ACCESS_KEY,
+    secretAccessKey: SERVER_ENV.AWS_DYNAMODB_SECRET_ACCESS_KEY,
   },
-  region: AWS_DYNAMODB_REGION,
+  region: SERVER_ENV.AWS_DYNAMODB_REGION,
 });
 
 const channelSchema = z.object({
@@ -64,7 +50,7 @@ const videoSchema = z.object({
 });
 interface Video extends z.TypeOf<typeof videoSchema> {}
 
-export const getChannels = async () => {
+export const getChannels = async (): Promise<readonly Channel[]> => {
   const resp = await db.send(
     new QueryCommand({
       TableName,
@@ -75,7 +61,7 @@ export const getChannels = async () => {
   return await z.array(channelSchema).parseAsync(resp.Items ?? []);
 };
 
-export const updateChannel = async (channel: Channel) => {
+export const updateChannel = async (channel: Channel): Promise<Channel> => {
   const parsedChannel = await channelSchema.parseAsync(channel);
   await db.send(
     new PutItemCommand({
