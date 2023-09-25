@@ -24,6 +24,7 @@ const channelInfoSchema = Z.object({
   ),
 });
 interface ChannelInfo extends Z.TypeOf<typeof channelInfoSchema> {}
+
 export const getChannelInfo = async (
   channelId: string
 ): Promise<ChannelInfo> => {

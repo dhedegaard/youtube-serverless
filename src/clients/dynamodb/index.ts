@@ -38,7 +38,9 @@ interface Channel extends z.TypeOf<typeof channelSchema> {}
 
 const videoSchema = z.object({
   PK: z.object({ S: z.literal("VIDEOS") }),
-  SK: z.object({ S: z.string().startsWith("VIDEO#") }),
+  SK: z.object({
+    S: z.string().startsWith("VIDEO#") as z.ZodType<`VIDEO#${string}`>,
+  }),
   channelId: z.object({ S: z.string() }),
   videoId: z.object({ S: z.string() }),
   videoPublishedAt: z.object({ S: z.string() }),
@@ -83,7 +85,7 @@ export const putVideo = async (video: Video): Promise<Video> => {
   return validatedItem;
 };
 
-export const getLatestVideos = async () => {
+export const getLatestVideos = async (): Promise<readonly Video[]> => {
   const resp = await db.send(
     new QueryCommand({
       TableName,
@@ -117,7 +119,11 @@ export const deleteOldVideos = z
         z
           .array(
             z.object({
-              SK: z.object({ S: z.string().startsWith("VIDEO#") }),
+              SK: z.object({
+                S: z
+                  .string()
+                  .startsWith("VIDEO#") as z.ZodType<`VIDEO#${string}`>,
+              }),
               PK: z.object({ S: z.literal("VIDEOS") }),
               videoPublishedAt: z.object({ S: z.string().datetime() }),
             })
