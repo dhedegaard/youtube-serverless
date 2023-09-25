@@ -21,9 +21,9 @@ const channelSchema = z.object({
   PK: z.object({ S: z.literal("CHANNELS") }),
   SK: z.object({
     S: z.union([
-      z.string().startsWith("CHANNEL#"),
+      z.string().startsWith("CHANNEL#") as z.ZodType<`CHANNEL#${string}`>,
       // NOTE: Here due to some old data having a bad SK and me being lazy.
-      z.string().startsWith("CHANNELID#"),
+      z.string().startsWith("CHANNELID#") as z.ZodType<`CHANNELID#${string}`>,
     ]),
   }),
   channelId: z.object({ S: z.string() }),
