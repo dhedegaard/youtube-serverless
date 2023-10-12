@@ -4,7 +4,7 @@ import { updateChannel } from "../../../clients/dynamodb";
 import { getChannelInfo } from "../../../clients/youtube";
 
 const searchParamsSchema = z.object({
-  channelId: z.string().nonempty(),
+  channelId: z.string().min(1),
   store: z.optional(z.literal("true")),
 });
 

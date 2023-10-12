@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  YOUTUBE_API_KEY: z.string().nonempty(),
-  AWS_DYNAMODB_ACCESS_KEY: z.string().nonempty(),
-  AWS_DYNAMODB_SECRET_ACCESS_KEY: z.string().nonempty(),
-  AWS_DYNAMODB_REGION: z.string().nonempty(),
-  AWS_DYNAMODB_TABLE: z.string().nonempty(),
+  YOUTUBE_API_KEY: z.string().min(1),
+  AWS_DYNAMODB_ACCESS_KEY: z.string().min(1),
+  AWS_DYNAMODB_SECRET_ACCESS_KEY: z.string().min(1),
+  AWS_DYNAMODB_REGION: z.string().min(1),
+  AWS_DYNAMODB_TABLE: z.string().min(1),
 });
 
 export const SERVER_ENV = envSchema.parse(

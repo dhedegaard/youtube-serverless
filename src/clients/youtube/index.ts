@@ -4,20 +4,20 @@ import { SERVER_ENV } from "../../utils/server-env";
 const channelInfoSchema = Z.object({
   items: Z.array(
     Z.object({
-      id: Z.string().nonempty(),
+      id: Z.string().min(1),
       snippet: Z.object({
-        title: Z.string().nonempty(),
+        title: Z.string().min(1),
         description: Z.string(),
         customUrl: Z.string(),
         thumbnails: Z.object({
           high: Z.object({
-            url: Z.string().nonempty(),
+            url: Z.string().min(1),
           }),
         }),
       }),
       contentDetails: Z.object({
         relatedPlaylists: Z.object({
-          uploads: Z.string().nonempty(),
+          uploads: Z.string().min(1),
         }),
       }),
     })
@@ -47,42 +47,42 @@ export const getChannelInfo = async (
 
 const videoItemSchema = Z.object({
   contentDetails: Z.object({
-    videoId: Z.string().nonempty(),
-    videoPublishedAt: Z.string().nonempty(),
+    videoId: Z.string().min(1),
+    videoPublishedAt: Z.string().min(1),
   }),
   snippet: Z.object({
-    publishedAt: Z.string().nonempty(),
-    channelId: Z.string().nonempty(),
-    title: Z.string().nonempty(),
+    publishedAt: Z.string().min(1),
+    channelId: Z.string().min(1),
+    title: Z.string().min(1),
     description: Z.string(),
     thumbnails: Z.object({
       default: Z.object({
-        url: Z.string().nonempty(),
+        url: Z.string().min(1),
         width: Z.number(),
         height: Z.number(),
       }),
       medium: Z.object({
-        url: Z.string().nonempty(),
+        url: Z.string().min(1),
         width: Z.number(),
         height: Z.number(),
       }),
       high: Z.object({
-        url: Z.string().nonempty(),
+        url: Z.string().min(1),
         width: Z.number(),
         height: Z.number(),
       }),
       standard: Z.object({
-        url: Z.string().nonempty(),
+        url: Z.string().min(1),
         width: Z.number(),
         height: Z.number(),
       }).optional(),
       maxres: Z.object({
-        url: Z.string().nonempty(),
+        url: Z.string().min(1),
         width: Z.number(),
         height: Z.number(),
       }).optional(),
     }),
-    channelTitle: Z.string().nonempty(),
+    channelTitle: Z.string().min(1),
   }),
 });
 interface VideoItem extends Z.TypeOf<typeof videoItemSchema> {}
