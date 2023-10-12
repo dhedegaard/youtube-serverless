@@ -9,9 +9,10 @@ import {
   getChannelInfo,
   getVideosForChannelId,
 } from "../../../clients/youtube";
+import { SERVER_ENV } from "../../../utils/server-env";
 
 export const POST = async (request: NextRequest) => {
-  if (request.headers.get("authorization") !== process.env.SECRET) {
+  if (request.headers.get("authorization") !== SERVER_ENV.SECRET) {
     return NextResponse.json(
       { error: "Missing or bad authorization header" },
       { status: 401 }

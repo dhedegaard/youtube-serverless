@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const envSchema = z.object({
+  SECRET: z.string().min(1),
   YOUTUBE_API_KEY: z.string().min(1),
   AWS_DYNAMODB_ACCESS_KEY: z.string().min(1),
   AWS_DYNAMODB_SECRET_ACCESS_KEY: z.string().min(1),
