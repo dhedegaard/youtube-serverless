@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { updateChannel } from "../../../clients/dynamodb";
 import { getChannelInfo } from "../../../clients/youtube";
-import { SERVER_ENV } from "../../../utils/server-env";
+import { isApiRequestAuthenticated } from "../../../utils/api-helpers";
 
 const searchParamsSchema = z.object({
   channelId: z.string().min(1),
@@ -10,7 +10,7 @@ const searchParamsSchema = z.object({
 });
 
 export const POST = async (request: NextRequest) => {
-  if (request.headers.get("authorization") !== SERVER_ENV.SECRET) {
+  if (!isApiRequestAuthenticated(request)) {
     return NextResponse.json(
       { error: "Missing or bad authorization header" },
       { status: 401 }
