@@ -45,7 +45,7 @@
   bottom: 0;
   right: 0;
   width: 12px;
-  content: "";
+  content: '';
   position: absolute;
   background: linear-gradient(to left, #fff, transparent);
 }

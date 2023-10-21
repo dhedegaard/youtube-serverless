@@ -3,11 +3,11 @@ import {
   DynamoDBClient,
   PutItemCommand,
   QueryCommand,
-} from "@aws-sdk/client-dynamodb";
-import { z } from "zod";
-import { SERVER_ENV } from "../../utils/server-env";
+} from '@aws-sdk/client-dynamodb'
+import { z } from 'zod'
+import { SERVER_ENV } from '../../utils/server-env'
 
-const TableName = SERVER_ENV.AWS_DYNAMODB_TABLE;
+const TableName = SERVER_ENV.AWS_DYNAMODB_TABLE
 
 const db = new DynamoDBClient({
   credentials: {
@@ -15,15 +15,15 @@ const db = new DynamoDBClient({
     secretAccessKey: SERVER_ENV.AWS_DYNAMODB_SECRET_ACCESS_KEY,
   },
   region: SERVER_ENV.AWS_DYNAMODB_REGION,
-});
+})
 
 const channelSchema = z.object({
-  PK: z.object({ S: z.literal("CHANNELS") }),
+  PK: z.object({ S: z.literal('CHANNELS') }),
   SK: z.object({
     S: z.union([
-      z.string().startsWith("CHANNEL#") as z.ZodType<`CHANNEL#${string}`>,
+      z.string().startsWith('CHANNEL#') as z.ZodType<`CHANNEL#${string}`>,
       // NOTE: Here due to some old data having a bad SK and me being lazy.
-      z.string().startsWith("CHANNELID#") as z.ZodType<`CHANNELID#${string}`>,
+      z.string().startsWith('CHANNELID#') as z.ZodType<`CHANNELID#${string}`>,
     ]),
   }),
   channelId: z.object({ S: z.string() }),
@@ -33,13 +33,13 @@ const channelSchema = z.object({
   thumbnail: z.object({ S: z.string() }),
   channelThumbnail: z.object({ S: z.string() }),
   channelLink: z.object({ S: z.string() }),
-});
+})
 interface Channel extends z.TypeOf<typeof channelSchema> {}
 
 const videoSchema = z.object({
-  PK: z.object({ S: z.literal("VIDEOS") }),
+  PK: z.object({ S: z.literal('VIDEOS') }),
   SK: z.object({
-    S: z.string().startsWith("VIDEO#") as z.ZodType<`VIDEO#${string}`>,
+    S: z.string().startsWith('VIDEO#') as z.ZodType<`VIDEO#${string}`>,
   }),
   channelId: z.object({ S: z.string() }),
   videoId: z.object({ S: z.string() }),
@@ -49,55 +49,55 @@ const videoSchema = z.object({
   channelThumbnail: z.object({ S: z.string() }),
   channelLink: z.object({ S: z.string() }),
   title: z.object({ S: z.string() }),
-});
+})
 interface Video extends z.TypeOf<typeof videoSchema> {}
 
 export const getChannels = async (): Promise<readonly Channel[]> => {
   const resp = await db.send(
     new QueryCommand({
       TableName,
-      KeyConditionExpression: "PK = :pk",
-      ExpressionAttributeValues: { ":pk": { S: "CHANNELS" } },
+      KeyConditionExpression: 'PK = :pk',
+      ExpressionAttributeValues: { ':pk': { S: 'CHANNELS' } },
     })
-  );
-  return await z.array(channelSchema).parseAsync(resp.Items ?? []);
-};
+  )
+  return await z.array(channelSchema).parseAsync(resp.Items ?? [])
+}
 
 export const updateChannel = async (channel: Channel): Promise<Channel> => {
-  const parsedChannel = await channelSchema.parseAsync(channel);
+  const parsedChannel = await channelSchema.parseAsync(channel)
   await db.send(
     new PutItemCommand({
       Item: parsedChannel,
       TableName,
     })
-  );
-  return channel;
-};
+  )
+  return channel
+}
 
 export const putVideo = async (video: Video): Promise<Video> => {
-  const validatedItem = await videoSchema.parseAsync(video);
+  const validatedItem = await videoSchema.parseAsync(video)
   await db.send(
     new PutItemCommand({
       Item: validatedItem,
       TableName,
     })
-  );
-  return validatedItem;
-};
+  )
+  return validatedItem
+}
 
 export const getLatestVideos = async (): Promise<readonly Video[]> => {
   const resp = await db.send(
     new QueryCommand({
       TableName,
-      IndexName: "PK_videoPublishedAt",
+      IndexName: 'PK_videoPublishedAt',
       ScanIndexForward: false,
       Limit: 50,
-      KeyConditionExpression: "PK = :pk",
-      ExpressionAttributeValues: { ":pk": { S: "VIDEOS" } },
+      KeyConditionExpression: 'PK = :pk',
+      ExpressionAttributeValues: { ':pk': { S: 'VIDEOS' } },
     })
-  );
-  return await z.array(videoSchema).parseAsync(resp.Items ?? []);
-};
+  )
+  return await z.array(videoSchema).parseAsync(resp.Items ?? [])
+}
 
 export const deleteOldVideos = z
   .function()
@@ -108,11 +108,11 @@ export const deleteOldVideos = z
       .send(
         new QueryCommand({
           TableName,
-          IndexName: "PK_videoPublishedAt",
+          IndexName: 'PK_videoPublishedAt',
           ScanIndexForward: true,
           Limit: numberToKeep * 2 + 1,
-          KeyConditionExpression: "PK = :pk",
-          ExpressionAttributeValues: { ":pk": { S: "VIDEOS" } },
+          KeyConditionExpression: 'PK = :pk',
+          ExpressionAttributeValues: { ':pk': { S: 'VIDEOS' } },
         })
       )
       .then((resp) =>
@@ -120,20 +120,18 @@ export const deleteOldVideos = z
           .array(
             z.object({
               SK: z.object({
-                S: z
-                  .string()
-                  .startsWith("VIDEO#") as z.ZodType<`VIDEO#${string}`>,
+                S: z.string().startsWith('VIDEO#') as z.ZodType<`VIDEO#${string}`>,
               }),
-              PK: z.object({ S: z.literal("VIDEOS") }),
+              PK: z.object({ S: z.literal('VIDEOS') }),
               videoPublishedAt: z.object({ S: z.string().datetime() }),
             })
           )
           .parseAsync(resp.Items)
-      );
+      )
 
     // Check that there are more videos to delete than there is to keep.
     if (oldVideos.length > numberToKeep + 1) {
-      const videosToDelete = oldVideos.slice(0, -numberToKeep);
+      const videosToDelete = oldVideos.slice(0, -numberToKeep)
       return await Promise.all(
         videosToDelete.map((item) =>
           db.send(
@@ -146,8 +144,8 @@ export const deleteOldVideos = z
             })
           )
         )
-      ).then((items) => items.length);
+      ).then((items) => items.length)
     }
 
-    return 0;
-  });
+    return 0
+  })

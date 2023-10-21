@@ -1,23 +1,23 @@
 /* eslint-disable @next/next/no-img-element */
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { NextPage } from "next";
-import Image from "next/image";
-import { use } from "react";
-import favicon from "../../public/favicon.png";
-import { getChannels, getLatestVideos } from "../clients/dynamodb";
-import styles from "./page.module.css";
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { NextPage } from 'next'
+import Image from 'next/image'
+import { use } from 'react'
+import favicon from '../../public/favicon.png'
+import { getChannels, getLatestVideos } from '../clients/dynamodb'
+import styles from './page.module.css'
 
-dayjs.extend(relativeTime);
+dayjs.extend(relativeTime)
 
 // Revalidate every 10 minutes.
-export const revalidate = 600;
+export const revalidate = 600
 
 interface ChannelElem {
-  key: string;
-  link: string;
-  thumbnail: string;
-  title: string;
+  key: string
+  link: string
+  thumbnail: string
+  title: string
 }
 
 const Index: NextPage = () => {
@@ -34,14 +34,14 @@ const Index: NextPage = () => {
           }))
           .reduce<ChannelElem[]>((acc, cur) => {
             if (!acc.some((e) => e.key === cur.key)) {
-              acc.push(cur);
+              acc.push(cur)
             }
-            return acc;
+            return acc
           }, [])
           .sort((a, b) => a.title.localeCompare(b.title))
       ),
     ])
-  );
+  )
 
   return (
     <>
@@ -81,7 +81,7 @@ const Index: NextPage = () => {
       </nav>
       <div className="max-w-[1140px] mx-auto flex flex-wrap gap-[10px] px-2">
         {videos.map((e) => {
-          const publishedAt = new Date(e.publishedAt);
+          const publishedAt = new Date(e.publishedAt)
           return (
             <div
               className="flex grow-0 shrink-0 basis-auto flex-col items-stretch mb-4 w-[calc(20%-8px)] max-lg:w-[calc(25%-8px)] max-md:w-[calc(100%/3-8px)] max-sm:w-[calc(50%-8px)]"
@@ -93,11 +93,7 @@ const Index: NextPage = () => {
                 target="_blank"
                 rel="noreferrer noopener"
               >
-                <img
-                  className={styles.thumbnail}
-                  src={e.thumbnail}
-                  alt={e.title}
-                />
+                <img className={styles.thumbnail} src={e.thumbnail} alt={e.title} />
               </a>
 
               <b className={styles.title} title={e.title}>
@@ -112,33 +108,28 @@ const Index: NextPage = () => {
                   rel="noopener noreferrer"
                 >
                   <div className="w-4 h-4 overflow-hidden box-border shrink-0 grow-0 basis-auto">
-                    <Image
-                      src={e.channelThumbnail}
-                      width={16}
-                      height={16}
-                      alt={e.channelTitle}
-                    />
+                    <Image src={e.channelThumbnail} width={16} height={16} alt={e.channelTitle} />
                   </div>
                   <span>{e.channelTitle}</span>
                 </a>
 
                 <div
                   className="text-right whitespace-nowrap basis-auto text-gray-500 text-[0.75em]"
-                  title={publishedAt.toLocaleString("en-US")}
+                  title={publishedAt.toLocaleString('en-US')}
                 >
                   {dayjs(publishedAt).fromNow(true)} ago
                 </div>
               </div>
             </div>
-          );
+          )
         })}
       </div>
     </>
-  );
-};
+  )
+}
 
 const getVideos = async () => {
-  const videos = await getLatestVideos();
+  const videos = await getLatestVideos()
   return {
     videos: videos.map((e) => ({
       videoId: e.videoId.S,
@@ -149,7 +140,7 @@ const getVideos = async () => {
       channelLink: e.channelLink.S,
       channelThumbnail: e.channelThumbnail.S,
     })),
-  };
-};
+  }
+}
 
-export default Index;
+export default Index
