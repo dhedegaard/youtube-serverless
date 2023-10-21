@@ -9,7 +9,7 @@ const resultSchema = z.object({
   channels: z.array(dumpedChannelSchema as z.ZodType<DumpedChannel>),
   message: z.string().min(1),
 })
-type Result = z.TypeOf<typeof resultSchema>
+interface Result extends z.TypeOf<typeof resultSchema> {}
 
 export const GET = async (request: NextRequest): Promise<NextResponse<Result>> => {
   const result = await handleRequest({ request })
