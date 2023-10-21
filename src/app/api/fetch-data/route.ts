@@ -2,6 +2,7 @@ import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 import { deleteOldVideos, getChannels, putVideo, updateChannel } from '../../../clients/dynamodb'
 import { getChannelInfo, getVideosForChannelId } from '../../../clients/youtube'
+import { Video } from '../../../models/video'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 
 export const POST = async (request: NextRequest) => {
@@ -38,22 +39,20 @@ export const POST = async (request: NextRequest) => {
         }
         await Promise.all([
           updateChannel(channel),
-          ...newVideos.map((video) =>
-            putVideo({
-              PK: { S: 'VIDEOS' },
-              SK: { S: `VIDEO#${video.contentDetails.videoId}` },
-              channelId: { S: channel.channelId.S },
-              thumbnail: { S: video.snippet.thumbnails.high.url },
-              channelTitle: { S: video.snippet.channelTitle },
-              title: { S: video.snippet.title },
-              videoPublishedAt: { S: video.snippet.publishedAt },
-              videoId: { S: video.contentDetails.videoId },
-              channelThumbnail: { S: channel.thumbnail.S },
-              channelLink: {
-                S: `https://www.youtube.com/channel/${channel.channelId.S}`,
-              },
-            })
-          ),
+          ...newVideos.map((videoItem) => {
+            const video: Video = {
+              id: null,
+              videoId: videoItem.contentDetails.videoId,
+              channelId: channel.channelId.S,
+              thumbnail: videoItem.snippet.thumbnails.high.url,
+              channelTitle: videoItem.snippet.channelTitle,
+              title: videoItem.snippet.title,
+              videoPublishedAt: videoItem.snippet.publishedAt,
+              channelThumbnail: channel.thumbnail.S,
+              channelLink: `https://www.youtube.com/channel/${channel.channelId.S}`,
+            }
+            return putVideo({ video })
+          }),
         ])
       }),
     ])

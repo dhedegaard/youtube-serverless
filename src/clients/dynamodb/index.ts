@@ -75,16 +75,30 @@ export const updateChannel = async (channel: DynamoDbChannel): Promise<DynamoDbC
   return channel
 }
 
-export const putVideo = async (video: DynamoDbVideo): Promise<DynamoDbVideo> => {
-  const validatedItem = await dynamoDbVideoSchema.parseAsync(video)
-  await db.send(
-    new PutItemCommand({
-      Item: validatedItem,
-      TableName,
-    })
-  )
-  return validatedItem
-}
+export const putVideo = z
+  .function()
+  .args(z.object({ video: videoSchema as z.ZodType<Video> }))
+  .implement(async function putVideo({ video }): Promise<void> {
+    const dynamoVideoInput: DynamoDbVideo = {
+      PK: { S: 'VIDEOS' },
+      SK: { S: `VIDEO#${video.videoId}` },
+      videoId: { S: video.videoId },
+      channelId: { S: video.channelId },
+      videoPublishedAt: { S: video.videoPublishedAt },
+      thumbnail: { S: video.thumbnail },
+      channelTitle: { S: video.channelTitle },
+      channelThumbnail: { S: video.channelThumbnail },
+      channelLink: { S: video.channelLink },
+      title: { S: video.title },
+    }
+    const validatedItem = await dynamoDbVideoSchema.parseAsync(dynamoVideoInput)
+    await db.send(
+      new PutItemCommand({
+        Item: validatedItem,
+        TableName,
+      })
+    )
+  })
 
 export const getLatestVideos = z
   .function()
