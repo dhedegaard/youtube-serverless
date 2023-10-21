@@ -5,3 +5,4 @@ yarn*.log
 .DS_Store
 .vscode
 *.tsbuildinfo
+test-results

@@ -1,9 +1,9 @@
+import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { updateChannel } from '../../../clients/dynamodb'
 import { getChannelInfo } from '../../../clients/youtube'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
-import { revalidatePath } from 'next/cache'
 
 const searchParamsSchema = z.object({
   channelId: z.string().min(1),
@@ -30,9 +30,7 @@ export const POST = async (request: NextRequest) => {
   const { channelId, store } = paramsResult.data
 
   try {
-    const {
-      items: [item],
-    } = await getChannelInfo(channelId)
+    const item = await getChannelInfo(channelId).then((data) => data.items?.[0])
     if (item == null) {
       return NextResponse.json(
         { error: `Channel with id not found: ${channelId}` },

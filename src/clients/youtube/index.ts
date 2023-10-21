@@ -2,25 +2,28 @@ import Z from 'zod'
 import { SERVER_ENV } from '../../utils/server-env'
 
 const channelInfoSchema = Z.object({
-  items: Z.array(
-    Z.object({
-      id: Z.string().min(1),
-      snippet: Z.object({
-        title: Z.string().min(1),
-        description: Z.string(),
-        customUrl: Z.string(),
-        thumbnails: Z.object({
-          high: Z.object({
-            url: Z.string().min(1),
+  /** Not defined when there's no result for given channel ID input parameter. */
+  items: Z.optional(
+    Z.array(
+      Z.object({
+        id: Z.string().min(1),
+        snippet: Z.object({
+          title: Z.string().min(1),
+          description: Z.string(),
+          customUrl: Z.string(),
+          thumbnails: Z.object({
+            high: Z.object({
+              url: Z.string().min(1),
+            }),
           }),
         }),
-      }),
-      contentDetails: Z.object({
-        relatedPlaylists: Z.object({
-          uploads: Z.string().min(1),
+        contentDetails: Z.object({
+          relatedPlaylists: Z.object({
+            uploads: Z.string().min(1),
+          }),
         }),
-      }),
-    })
+      })
+    )
   ),
 })
 interface ChannelInfo extends Z.TypeOf<typeof channelInfoSchema> {}

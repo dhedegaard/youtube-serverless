@@ -8,9 +8,11 @@
     "watch": "next dev",
     "dev": "next dev",
     "lint": "next lint",
-    "typecheck": "tsc --noemit"
+    "typecheck": "tsc --noemit",
+    "playwright": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.39.0",
     "@types/node": "^18.18.6",
     "@types/react": "^18.2.31",
     "@types/react-dom": "^18.2.14",

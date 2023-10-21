@@ -1,8 +1,8 @@
+import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 import { deleteOldVideos, getChannels, putVideo, updateChannel } from '../../../clients/dynamodb'
 import { getChannelInfo, getVideosForChannelId } from '../../../clients/youtube'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
-import { revalidatePath } from 'next/cache'
 
 export const POST = async (request: NextRequest) => {
   if (!isApiRequestAuthenticated(request)) {
@@ -17,9 +17,11 @@ export const POST = async (request: NextRequest) => {
       deleteOldVideos({ numberToKeep: 100 }),
       // ...rest
       ...channels.map(async (channel) => {
-        const info = await getChannelInfo(channel.channelId.S)
-        channel.playlist = {
-          S: info.items[0].contentDetails.relatedPlaylists.uploads,
+        const item = await getChannelInfo(channel.channelId.S).then((data) => data.items?.[0])
+        if (item != null) {
+          channel.playlist = {
+            S: item.contentDetails.relatedPlaylists.uploads,
+          }
         }
         const videos = await getVideosForChannelId(channel.playlist.S)
         const newVideos = videos.filter((e) =>

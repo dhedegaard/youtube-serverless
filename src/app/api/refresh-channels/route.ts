@@ -12,9 +12,10 @@ export const POST = async (request: NextRequest) => {
   try {
     const channels = await getChannels()
     for (const channel of channels) {
-      const {
-        items: [item],
-      } = await getChannelInfo(channel.channelId.S)
+      const item = await getChannelInfo(channel.channelId.S).then((data) => data.items?.[0])
+      if (item == null) {
+        continue
+      }
       channel.channelTitle = { S: item.snippet.title }
       channel.channelThumbnail = { S: item.snippet.thumbnails.high.url }
       channel.playlist = { S: item.contentDetails.relatedPlaylists.uploads }
