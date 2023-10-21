@@ -81,7 +81,7 @@ const Index: NextPage = () => {
       </nav>
       <div className="max-w-[1140px] mx-auto flex flex-wrap gap-[10px] px-2">
         {videos.map((e) => {
-          const publishedAt = new Date(e.publishedAt)
+          const publishedAt = new Date(e.videoPublishedAt)
           return (
             <div
               className="flex grow-0 shrink-0 basis-auto flex-col items-stretch mb-4 w-[calc(20%-8px)] max-lg:w-[calc(25%-8px)] max-md:w-[calc(100%/3-8px)] max-sm:w-[calc(50%-8px)]"
@@ -128,19 +128,8 @@ const Index: NextPage = () => {
   )
 }
 
-const getVideos = async () => {
-  const videos = await getLatestVideos()
-  return {
-    videos: videos.map((e) => ({
-      videoId: e.videoId.S,
-      publishedAt: e.videoPublishedAt.S,
-      thumbnail: e.thumbnail.S,
-      title: e.title.S,
-      channelTitle: e.channelTitle.S,
-      channelLink: e.channelLink.S,
-      channelThumbnail: e.channelThumbnail.S,
-    })),
-  }
-}
+const getVideos = async () => ({
+  videos: await getLatestVideos(),
+})
 
 export default Index

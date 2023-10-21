@@ -5,6 +5,7 @@ import {
   QueryCommand,
 } from '@aws-sdk/client-dynamodb'
 import { z } from 'zod'
+import { Video, videoSchema } from '../../models/video'
 import { SERVER_ENV } from '../../utils/server-env'
 
 const TableName = SERVER_ENV.AWS_DYNAMODB_TABLE
@@ -85,19 +86,36 @@ export const putVideo = async (video: DynamoDbVideo): Promise<DynamoDbVideo> => 
   return validatedItem
 }
 
-export const getLatestVideos = async (): Promise<readonly DynamoDbVideo[]> => {
-  const resp = await db.send(
-    new QueryCommand({
-      TableName,
-      IndexName: 'PK_videoPublishedAt',
-      ScanIndexForward: false,
-      Limit: 50,
-      KeyConditionExpression: 'PK = :pk',
-      ExpressionAttributeValues: { ':pk': { S: 'VIDEOS' } },
+export const getLatestVideos = z
+  .function()
+  .returns(z.promise(z.array(videoSchema as z.ZodType<Video>)))
+  .implement(async function getLatestVideos(): Promise<Video[]> {
+    const resp = await db.send(
+      new QueryCommand({
+        TableName,
+        IndexName: 'PK_videoPublishedAt',
+        ScanIndexForward: false,
+        Limit: 50,
+        KeyConditionExpression: 'PK = :pk',
+        ExpressionAttributeValues: { ':pk': { S: 'VIDEOS' } },
+      })
+    )
+    const dynamoDbVideos = await z.array(dynamoDbVideoSchema).parseAsync(resp.Items ?? [])
+    return dynamoDbVideos.map((video): Video => {
+      const result: Video = {
+        id: video.SK.S,
+        channelId: video.channelId.S,
+        videoId: video.videoId.S,
+        videoPublishedAt: video.videoPublishedAt.S,
+        thumbnail: video.thumbnail.S,
+        channelTitle: video.channelTitle.S,
+        channelThumbnail: video.channelThumbnail.S,
+        channelLink: video.channelLink.S,
+        title: video.title.S,
+      }
+      return result
     })
-  )
-  return await z.array(dynamoDbVideoSchema).parseAsync(resp.Items ?? [])
-}
+  })
 
 export const deleteOldVideos = z
   .function()
