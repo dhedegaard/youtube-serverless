@@ -17,7 +17,7 @@ const db = new DynamoDBClient({
   region: SERVER_ENV.AWS_DYNAMODB_REGION,
 })
 
-const channelSchema = z.object({
+const dynamoDbChannelSchema = z.object({
   PK: z.object({ S: z.literal('CHANNELS') }),
   SK: z.object({
     S: z.union([
@@ -34,9 +34,9 @@ const channelSchema = z.object({
   channelThumbnail: z.object({ S: z.string() }),
   channelLink: z.object({ S: z.string() }),
 })
-interface DynamoDbChannel extends z.TypeOf<typeof channelSchema> {}
+interface DynamoDbChannel extends z.TypeOf<typeof dynamoDbChannelSchema> {}
 
-const videoSchema = z.object({
+const dynamoDbVideoSchema = z.object({
   PK: z.object({ S: z.literal('VIDEOS') }),
   SK: z.object({
     S: z.string().startsWith('VIDEO#') as z.ZodType<`VIDEO#${string}`>,
@@ -50,7 +50,7 @@ const videoSchema = z.object({
   channelLink: z.object({ S: z.string() }),
   title: z.object({ S: z.string() }),
 })
-interface DynamoDbVideo extends z.TypeOf<typeof videoSchema> {}
+interface DynamoDbVideo extends z.TypeOf<typeof dynamoDbVideoSchema> {}
 
 export const getChannels = async (): Promise<readonly DynamoDbChannel[]> => {
   const resp = await db.send(
@@ -60,11 +60,11 @@ export const getChannels = async (): Promise<readonly DynamoDbChannel[]> => {
       ExpressionAttributeValues: { ':pk': { S: 'CHANNELS' } },
     })
   )
-  return await z.array(channelSchema).parseAsync(resp.Items ?? [])
+  return await z.array(dynamoDbChannelSchema).parseAsync(resp.Items ?? [])
 }
 
 export const updateChannel = async (channel: DynamoDbChannel): Promise<DynamoDbChannel> => {
-  const parsedChannel = await channelSchema.parseAsync(channel)
+  const parsedChannel = await dynamoDbChannelSchema.parseAsync(channel)
   await db.send(
     new PutItemCommand({
       Item: parsedChannel,
@@ -75,7 +75,7 @@ export const updateChannel = async (channel: DynamoDbChannel): Promise<DynamoDbC
 }
 
 export const putVideo = async (video: DynamoDbVideo): Promise<DynamoDbVideo> => {
-  const validatedItem = await videoSchema.parseAsync(video)
+  const validatedItem = await dynamoDbVideoSchema.parseAsync(video)
   await db.send(
     new PutItemCommand({
       Item: validatedItem,
@@ -96,7 +96,7 @@ export const getLatestVideos = async (): Promise<readonly DynamoDbVideo[]> => {
       ExpressionAttributeValues: { ':pk': { S: 'VIDEOS' } },
     })
   )
-  return await z.array(videoSchema).parseAsync(resp.Items ?? [])
+  return await z.array(dynamoDbVideoSchema).parseAsync(resp.Items ?? [])
 }
 
 export const deleteOldVideos = z
