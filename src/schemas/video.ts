@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
 export const videoSchema = z.object({
+  /** Determine by the database backend, null if we're creating something new. */
+  id: z.nullable(z.string()),
   channelId: z.string(),
   videoId: z.string(),
   videoPublishedAt: z.string(),
