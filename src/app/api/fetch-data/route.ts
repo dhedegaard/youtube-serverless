@@ -10,6 +10,7 @@ import {
   getVideosForChannelId,
 } from "../../../clients/youtube";
 import { isApiRequestAuthenticated } from "../../../utils/api-helpers";
+import { revalidatePath } from "next/cache";
 
 export const POST = async (request: NextRequest) => {
   if (!isApiRequestAuthenticated(request)) {
@@ -67,6 +68,9 @@ export const POST = async (request: NextRequest) => {
         ]);
       }),
     ]);
+
+    revalidatePath("/");
+
     return NextResponse.json({
       channelcount: channels.length,
       newVideoCount,

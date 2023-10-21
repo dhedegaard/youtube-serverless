@@ -3,6 +3,7 @@ import { z } from "zod";
 import { updateChannel } from "../../../clients/dynamodb";
 import { getChannelInfo } from "../../../clients/youtube";
 import { isApiRequestAuthenticated } from "../../../utils/api-helpers";
+import { revalidatePath } from "next/cache";
 
 const searchParamsSchema = z.object({
   channelId: z.string().min(1),
@@ -63,6 +64,8 @@ export const POST = async (request: NextRequest) => {
       channelLink: { S: `https://www.youtube.com/channel/${item.id}` },
       channelThumbnail: { S: item.snippet.thumbnails.high.url },
     });
+
+    revalidatePath("/");
 
     return NextResponse.json(channel);
   } catch (error: unknown) {

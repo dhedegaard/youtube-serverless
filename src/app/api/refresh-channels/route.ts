@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { getChannels, updateChannel } from "../../../clients/dynamodb";
 import { getChannelInfo } from "../../../clients/youtube";
@@ -26,6 +27,8 @@ export const POST = async (request: NextRequest) => {
       };
       await updateChannel(channel);
     }
+
+    revalidatePath("/");
 
     return NextResponse.json({ channels });
   } catch (error: unknown) {
