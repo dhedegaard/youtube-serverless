@@ -34,7 +34,7 @@ const channelSchema = z.object({
   channelThumbnail: z.object({ S: z.string() }),
   channelLink: z.object({ S: z.string() }),
 })
-interface Channel extends z.TypeOf<typeof channelSchema> {}
+interface DynamoDbChannel extends z.TypeOf<typeof channelSchema> {}
 
 const videoSchema = z.object({
   PK: z.object({ S: z.literal('VIDEOS') }),
@@ -50,9 +50,9 @@ const videoSchema = z.object({
   channelLink: z.object({ S: z.string() }),
   title: z.object({ S: z.string() }),
 })
-interface Video extends z.TypeOf<typeof videoSchema> {}
+interface DynamoDbVideo extends z.TypeOf<typeof videoSchema> {}
 
-export const getChannels = async (): Promise<readonly Channel[]> => {
+export const getChannels = async (): Promise<readonly DynamoDbChannel[]> => {
   const resp = await db.send(
     new QueryCommand({
       TableName,
@@ -63,7 +63,7 @@ export const getChannels = async (): Promise<readonly Channel[]> => {
   return await z.array(channelSchema).parseAsync(resp.Items ?? [])
 }
 
-export const updateChannel = async (channel: Channel): Promise<Channel> => {
+export const updateChannel = async (channel: DynamoDbChannel): Promise<DynamoDbChannel> => {
   const parsedChannel = await channelSchema.parseAsync(channel)
   await db.send(
     new PutItemCommand({
@@ -74,7 +74,7 @@ export const updateChannel = async (channel: Channel): Promise<Channel> => {
   return channel
 }
 
-export const putVideo = async (video: Video): Promise<Video> => {
+export const putVideo = async (video: DynamoDbVideo): Promise<DynamoDbVideo> => {
   const validatedItem = await videoSchema.parseAsync(video)
   await db.send(
     new PutItemCommand({
@@ -85,7 +85,7 @@ export const putVideo = async (video: Video): Promise<Video> => {
   return validatedItem
 }
 
-export const getLatestVideos = async (): Promise<readonly Video[]> => {
+export const getLatestVideos = async (): Promise<readonly DynamoDbVideo[]> => {
   const resp = await db.send(
     new QueryCommand({
       TableName,
