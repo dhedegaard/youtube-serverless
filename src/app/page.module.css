@@ -49,21 +49,3 @@
   position: absolute;
   background: linear-gradient(to left, #fff, transparent);
 }
-
-.channelDropdown {
-  display: none;
-}
-
-.channels:hover > .channelDropdown,
-.channels:focus > .channelDropdown,
-.channels:active > .channelDropdown {
-  display: flex;
-}
-
-@media (pointer: coarse) {
-  .channels:hover > .channelDropdown,
-  .channels:focus > .channelDropdown,
-  .channels:active > .channelDropdown {
-    display: none;
-  }
-}
