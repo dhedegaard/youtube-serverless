@@ -1,6 +1,7 @@
 import { Document, MongoClient, ObjectId } from 'mongodb'
 import { z } from 'zod'
 import { Channel } from '../../models/channel'
+import { Video } from '../../models/video'
 import { DbClient, dbClientSchema } from '../../schemas/db-client'
 
 export const createMongoDbClient = z
@@ -14,12 +15,21 @@ export const createMongoDbClient = z
     type Collection = 'channels' | 'videos'
 
     const getConnectionAndCollection = async <C extends Document = never>(
-      collection: Collection
+      collectionName: Collection
     ) => {
       const connection = await client.connect()
+      const collection = connection.db(databaseName).collection<C>(collectionName)
+
+      // Ensure specific indices exist.
+      if (collectionName === 'videos') {
+        await collection.createIndex({
+          videoPublishedAt: -1,
+        })
+      }
+
       return {
         connection,
-        collection: connection.db(databaseName).collection<C>(collection),
+        collection,
       }
     }
 
@@ -27,8 +37,8 @@ export const createMongoDbClient = z
       async function getChannels(): Promise<Channel[]> {
         const { connection, collection } = await getConnectionAndCollection<Channel>('channels')
         try {
-          const channels = await collection.find().toArray()
-          const result = channels.map<Channel>(({ _id, ...channel }) => channel)
+          const channelsWithId = await collection.find().toArray()
+          const result = channelsWithId.map<Channel>(({ _id, ...channel }) => channel)
           return result
         } finally {
           await connection.close(true)
@@ -40,7 +50,7 @@ export const createMongoDbClient = z
       async function updateChannel({ channel }) {
         const { connection, collection } = await getConnectionAndCollection<Channel>('channels')
         try {
-          collection.insertOne({
+          await collection.insertOne({
             ...channel,
             _id: new ObjectId(channel.channelId),
           })
@@ -50,13 +60,31 @@ export const createMongoDbClient = z
       }
     )
 
-    const putVideo = dbClientSchema.shape.putVideo.implement(function putVideo() {
-      throw new Error('TODO: Implement me!')
+    const putVideo = dbClientSchema.shape.putVideo.implement(async function putVideo({ video }) {
+      const { connection, collection } = await getConnectionAndCollection<Video>('videos')
+      try {
+        await collection.insertOne({
+          ...video,
+          _id: new ObjectId(video.videoId),
+        })
+      } finally {
+        await connection.close(true)
+      }
     })
 
     const getLatestVideos = dbClientSchema.shape.getLatestVideos.implement(
-      function getLatestVideos() {
-        throw new Error('TODO: Implement me!')
+      async function getLatestVideos({ limit }): Promise<Video[]> {
+        const { connection, collection } = await getConnectionAndCollection<Video>('videos')
+        try {
+          const videosWithId = await collection
+            .find()
+            .sort({ videoPublishedAt: -1 })
+            .limit(limit)
+            .toArray()
+          return videosWithId.map(({ _id, ...video }) => video)
+        } finally {
+          await connection.close(true)
+        }
       }
     )
 
