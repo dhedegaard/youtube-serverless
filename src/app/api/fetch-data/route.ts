@@ -19,7 +19,7 @@ export const POST = async (request: NextRequest) => {
   })
 
   try {
-    const channels = await dbClient.getChannels()
+    const channels = await dbClient.getChannels({})
     let newVideoCount = 0
     const [deletedVideos] = await Promise.all([
       // deletedVideos

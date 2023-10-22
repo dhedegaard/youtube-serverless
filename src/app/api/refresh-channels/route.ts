@@ -19,7 +19,7 @@ export const POST = async (request: NextRequest) => {
   })
 
   try {
-    const channels = await dbClient.getChannels()
+    const channels = await dbClient.getChannels({})
     for (const channel of channels) {
       const item = await getChannelInfo(channel.channelId).then((data) => data.items?.[0])
       if (item == null) {

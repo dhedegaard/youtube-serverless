@@ -5,8 +5,9 @@ import {
   QueryCommand,
 } from '@aws-sdk/client-dynamodb'
 import { z } from 'zod'
-import { Channel, channelSchema } from '../../models/channel'
-import { Video, videoSchema } from '../../models/video'
+import { Channel } from '../../models/channel'
+import { Video } from '../../models/video'
+import { DbClient, dbClientSchema } from '../../schemas/db-client'
 
 const createDynamoDbClientArgsSchema = z.strictObject({
   tableName: z.string().min(1),
@@ -19,12 +20,13 @@ interface CreateDynamoDbClientArgs extends z.TypeOf<typeof createDynamoDbClientA
 export const innerCreateDynamoDbClient = z
   .function()
   .args(createDynamoDbClientArgsSchema)
+  .returns(dbClientSchema)
   .implement(function createDynamoDbClient({
     tableName: TableName,
     accessKeyId,
     secretAccessKey,
     region,
-  }) {
+  }): DbClient {
     const db = new DynamoDBClient({
       credentials: {
         accessKeyId,
@@ -72,37 +74,34 @@ export const innerCreateDynamoDbClient = z
     })
     interface DynamoDbVideo extends z.TypeOf<typeof dynamoDbVideoSchema> {}
 
-    const getChannels = z
-      .function()
-      .returns(z.promise(z.array(channelSchema as z.ZodType<Channel>)))
-      .implement(async function (): Promise<Channel[]> {
-        const resp = await db.send(
-          new QueryCommand({
-            TableName,
-            KeyConditionExpression: 'PK = :pk',
-            ExpressionAttributeValues: { ':pk': { S: 'CHANNELS' } },
-          })
-        )
-        const dynamoChannels = await z.array(dynamoDbChannelSchema).parseAsync(resp.Items ?? [])
-        return dynamoChannels.map((channel): Channel => {
-          const result: Channel = {
-            id: channel.SK.S,
-            channelId: channel.channelId.S,
-            channelTitle: channel.channelTitle.S,
-            playlist: channel.playlist.S,
-            thumbnail: channel.thumbnail.S,
-            channelThumbnail: channel.channelThumbnail.S,
-            channelLink: channel.channelLink.S,
-            videoIds: channel.videoIds?.SS ?? [],
-          }
-          return result
+    const getChannels = dbClientSchema.shape.getChannels.implement(async function (): Promise<
+      Channel[]
+    > {
+      const resp = await db.send(
+        new QueryCommand({
+          TableName,
+          KeyConditionExpression: 'PK = :pk',
+          ExpressionAttributeValues: { ':pk': { S: 'CHANNELS' } },
         })
+      )
+      const dynamoChannels = await z.array(dynamoDbChannelSchema).parseAsync(resp.Items ?? [])
+      return dynamoChannels.map((channel): Channel => {
+        const result: Channel = {
+          id: channel.SK.S,
+          channelId: channel.channelId.S,
+          channelTitle: channel.channelTitle.S,
+          playlist: channel.playlist.S,
+          thumbnail: channel.thumbnail.S,
+          channelThumbnail: channel.channelThumbnail.S,
+          channelLink: channel.channelLink.S,
+          videoIds: channel.videoIds?.SS ?? [],
+        }
+        return result
       })
+    })
 
-    const updateChannel = z
-      .function()
-      .args(z.object({ channel: channelSchema as z.ZodType<Channel> }))
-      .implement(async function updateChannel({ channel }): Promise<void> {
+    const updateChannel = dbClientSchema.shape.updateChannel.implement(
+      async function updateChannel({ channel }): Promise<void> {
         const dynamoChannel: DynamoDbChannel = {
           PK: { S: 'CHANNELS' },
           SK: { S: `CHANNEL#${channel.channelId}` },
@@ -122,38 +121,35 @@ export const innerCreateDynamoDbClient = z
             TableName,
           })
         )
-      })
+      }
+    )
 
-    const putVideo = z
-      .function()
-      .args(z.object({ video: videoSchema as z.ZodType<Video> }))
-      .implement(async function putVideo({ video }): Promise<void> {
-        const dynamoVideoInput: DynamoDbVideo = {
-          PK: { S: 'VIDEOS' },
-          SK: { S: `VIDEO#${video.videoId}` },
-          videoId: { S: video.videoId },
-          channelId: { S: video.channelId },
-          videoPublishedAt: { S: video.videoPublishedAt },
-          thumbnail: { S: video.thumbnail },
-          channelTitle: { S: video.channelTitle },
-          channelThumbnail: { S: video.channelThumbnail },
-          channelLink: { S: video.channelLink },
-          title: { S: video.title },
-        }
-        const validatedItem = await dynamoDbVideoSchema.parseAsync(dynamoVideoInput)
-        await db.send(
-          new PutItemCommand({
-            Item: validatedItem,
-            TableName,
-          })
-        )
-      })
+    const putVideo = dbClientSchema.shape.putVideo.implement(async function putVideo({
+      video,
+    }): Promise<void> {
+      const dynamoVideoInput: DynamoDbVideo = {
+        PK: { S: 'VIDEOS' },
+        SK: { S: `VIDEO#${video.videoId}` },
+        videoId: { S: video.videoId },
+        channelId: { S: video.channelId },
+        videoPublishedAt: { S: video.videoPublishedAt },
+        thumbnail: { S: video.thumbnail },
+        channelTitle: { S: video.channelTitle },
+        channelThumbnail: { S: video.channelThumbnail },
+        channelLink: { S: video.channelLink },
+        title: { S: video.title },
+      }
+      const validatedItem = await dynamoDbVideoSchema.parseAsync(dynamoVideoInput)
+      await db.send(
+        new PutItemCommand({
+          Item: validatedItem,
+          TableName,
+        })
+      )
+    })
 
-    const getLatestVideos = z
-      .function()
-      .args(z.object({ limit: z.number().int().positive() }))
-      .returns(z.promise(z.array(videoSchema as z.ZodType<Video>)))
-      .implement(async function getLatestVideos({ limit }): Promise<Video[]> {
+    const getLatestVideos = dbClientSchema.shape.getLatestVideos.implement(
+      async function getLatestVideos({ limit }): Promise<Video[]> {
         const resp = await db.send(
           new QueryCommand({
             TableName,
@@ -179,7 +175,8 @@ export const innerCreateDynamoDbClient = z
           }
           return result
         })
-      })
+      }
+    )
 
     const deleteOldVideos = z
       .function()
@@ -232,16 +229,15 @@ export const innerCreateDynamoDbClient = z
         return 0
       })
 
-    return {
+    const result: DbClient = {
       deleteOldVideos,
       getLatestVideos,
       putVideo,
       updateChannel,
       getChannels,
     }
+    return result
   })
 
-export interface DynamoDbClient extends ReturnType<typeof innerCreateDynamoDbClient> {}
-
-export const createDynamoDbClient = (args: CreateDynamoDbClientArgs): DynamoDbClient =>
+export const createDynamoDbClient = (args: CreateDynamoDbClientArgs): DbClient =>
   innerCreateDynamoDbClient(args)

@@ -38,7 +38,7 @@ const handleRequest = z
       secretAccessKey: SERVER_ENV.AWS_DYNAMODB_SECRET_ACCESS_KEY,
     })
 
-    const channels = await dbClient.getChannels().then((channels) =>
+    const channels = await dbClient.getChannels({}).then((channels) =>
       channels.map((channel): DumpedChannel => {
         const result: DumpedChannel = {
           channelId: channel.channelId,
