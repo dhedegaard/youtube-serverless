@@ -31,12 +31,13 @@ const handleRequest = z
     }
 
     const channels = await getChannels().then((channels) =>
-      channels.map(
-        (channel): DumpedChannel => ({
-          channelId: channel.channelId.S,
-          channelTitle: channel.channelTitle.S,
-        })
-      )
+      channels.map((channel): DumpedChannel => {
+        const result: DumpedChannel = {
+          channelId: channel.channelId,
+          channelTitle: channel.channelTitle,
+        }
+        return result
+      })
     )
     const result: Result = {
       statusCode: 200,

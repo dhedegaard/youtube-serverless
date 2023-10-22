@@ -5,6 +5,7 @@ import {
   QueryCommand,
 } from '@aws-sdk/client-dynamodb'
 import { z } from 'zod'
+import { Channel, channelSchema } from '../../models/channel'
 import { Video, videoSchema } from '../../models/video'
 import { SERVER_ENV } from '../../utils/server-env'
 
@@ -53,27 +54,55 @@ const dynamoDbVideoSchema = z.object({
 })
 interface DynamoDbVideo extends z.TypeOf<typeof dynamoDbVideoSchema> {}
 
-export const getChannels = async (): Promise<readonly DynamoDbChannel[]> => {
-  const resp = await db.send(
-    new QueryCommand({
-      TableName,
-      KeyConditionExpression: 'PK = :pk',
-      ExpressionAttributeValues: { ':pk': { S: 'CHANNELS' } },
+export const getChannels = z
+  .function()
+  .returns(z.promise(z.array(channelSchema as z.ZodType<Channel>)))
+  .implement(async function (): Promise<Channel[]> {
+    const resp = await db.send(
+      new QueryCommand({
+        TableName,
+        KeyConditionExpression: 'PK = :pk',
+        ExpressionAttributeValues: { ':pk': { S: 'CHANNELS' } },
+      })
+    )
+    const dynamoChannels = await z.array(dynamoDbChannelSchema).parseAsync(resp.Items ?? [])
+    return dynamoChannels.map((channel): Channel => {
+      const result: Channel = {
+        id: channel.SK.S,
+        channelId: channel.channelId.S,
+        channelTitle: channel.channelTitle.S,
+        playlist: channel.playlist.S,
+        thumbnail: channel.thumbnail.S,
+        channelThumbnail: channel.channelThumbnail.S,
+        channelLink: channel.channelLink.S,
+        videoIds: channel.videoIds?.SS ?? [],
+      }
+      return result
     })
-  )
-  return await z.array(dynamoDbChannelSchema).parseAsync(resp.Items ?? [])
-}
+  })
 
-export const updateChannel = async (channel: DynamoDbChannel): Promise<DynamoDbChannel> => {
-  const parsedChannel = await dynamoDbChannelSchema.parseAsync(channel)
-  await db.send(
-    new PutItemCommand({
-      Item: parsedChannel,
-      TableName,
-    })
-  )
-  return channel
-}
+export const updateChannel = z
+  .function()
+  .args(z.object({ channel: channelSchema as z.ZodType<Channel> }))
+  .implement(async function updateChannel({ channel }): Promise<void> {
+    const dynamoChannel: DynamoDbChannel = {
+      PK: { S: 'CHANNELS' },
+      SK: { S: `CHANNEL#${channel.channelId}` },
+      channelId: { S: channel.channelId },
+      channelTitle: { S: channel.channelTitle },
+      playlist: { S: channel.playlist },
+      thumbnail: { S: channel.thumbnail },
+      channelThumbnail: { S: channel.channelThumbnail },
+      channelLink: { S: channel.channelLink },
+    }
+    const parsedChannel = await dynamoDbChannelSchema.parseAsync(dynamoChannel)
+    await db.send(
+      new PutItemCommand({
+        Item: parsedChannel,
+        TableName,
+      })
+    )
+  })
 
 export const putVideo = z
   .function()

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { updateChannel } from '../../../clients/dynamodb'
 import { getChannelInfo } from '../../../clients/youtube'
+import { Channel } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 
 const searchParamsSchema = z.object({
@@ -49,16 +50,17 @@ export const POST = async (request: NextRequest) => {
       )
     }
 
-    const channel = await updateChannel({
-      PK: { S: 'CHANNELS' },
-      SK: { S: `CHANNEL#${item.id}` },
-      channelId: { S: item.id },
-      channelTitle: { S: item.snippet.title },
-      playlist: { S: item.contentDetails.relatedPlaylists.uploads },
-      thumbnail: { S: item.snippet.thumbnails.high.url },
-      channelLink: { S: `https://www.youtube.com/channel/${item.id}` },
-      channelThumbnail: { S: item.snippet.thumbnails.high.url },
-    })
+    const channel: Channel = {
+      id: `CHANNEL#${item.id}`,
+      channelId: item.id,
+      channelTitle: item.snippet.title,
+      playlist: item.contentDetails.relatedPlaylists.uploads,
+      thumbnail: item.snippet.thumbnails.high.url,
+      channelLink: `https://www.youtube.com/channel/${item.id}`,
+      channelThumbnail: item.snippet.thumbnails.high.url,
+      videoIds: [],
+    }
+    await updateChannel({ channel })
 
     revalidatePath('/')
 

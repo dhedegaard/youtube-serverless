@@ -18,38 +18,31 @@ export const POST = async (request: NextRequest) => {
       deleteOldVideos({ numberToKeep: 100 }),
       // ...rest
       ...channels.map(async (channel) => {
-        const item = await getChannelInfo(channel.channelId.S).then((data) => data.items?.[0])
+        const item = await getChannelInfo(channel.channelId).then((data) => data.items?.[0])
         if (item != null) {
-          channel.playlist = {
-            S: item.contentDetails.relatedPlaylists.uploads,
-          }
+          channel.playlist = item.contentDetails.relatedPlaylists.uploads
         }
-        const videos = await getVideosForChannelId(channel.playlist.S)
+        const videos = await getVideosForChannelId(channel.playlist)
         const newVideos = videos.filter((e) =>
-          channel.videoIds == null ? true : !channel.videoIds.SS.includes(e.contentDetails.videoId)
+          channel.videoIds == null ? true : !channel.videoIds.includes(e.contentDetails.videoId)
         )
         newVideoCount += newVideos.length
-        channel.videoIds = {
-          SS: [
-            ...new Set([
-              ...(channel.videoIds?.SS ?? []),
-              ...newVideos.map((e) => e.contentDetails.videoId),
-            ]),
-          ],
-        }
+        channel.videoIds = [
+          ...new Set([...channel.videoIds, ...newVideos.map((e) => e.contentDetails.videoId)]),
+        ]
         await Promise.all([
-          updateChannel(channel),
+          updateChannel({ channel }),
           ...newVideos.map((videoItem) => {
             const video: Video = {
               id: null,
               videoId: videoItem.contentDetails.videoId,
-              channelId: channel.channelId.S,
+              channelId: channel.channelId,
               thumbnail: videoItem.snippet.thumbnails.high.url,
               channelTitle: videoItem.snippet.channelTitle,
               title: videoItem.snippet.title,
               videoPublishedAt: videoItem.snippet.publishedAt,
-              channelThumbnail: channel.thumbnail.S,
-              channelLink: `https://www.youtube.com/channel/${channel.channelId.S}`,
+              channelThumbnail: channel.thumbnail,
+              channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
             }
             return putVideo({ video })
           }),

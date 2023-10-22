@@ -12,18 +12,16 @@ export const POST = async (request: NextRequest) => {
   try {
     const channels = await getChannels()
     for (const channel of channels) {
-      const item = await getChannelInfo(channel.channelId.S).then((data) => data.items?.[0])
+      const item = await getChannelInfo(channel.channelId).then((data) => data.items?.[0])
       if (item == null) {
         continue
       }
-      channel.channelTitle = { S: item.snippet.title }
-      channel.channelThumbnail = { S: item.snippet.thumbnails.high.url }
-      channel.playlist = { S: item.contentDetails.relatedPlaylists.uploads }
-      channel.thumbnail = { S: item.snippet.thumbnails.high.url }
-      channel.channelLink = {
-        S: `https://www.youtube.com/channel/${channel.channelId.S}`,
-      }
-      await updateChannel(channel)
+      channel.channelTitle = item.snippet.title
+      channel.channelThumbnail = item.snippet.thumbnails.high.url
+      channel.playlist = item.contentDetails.relatedPlaylists.uploads
+      channel.thumbnail = item.snippet.thumbnails.high.url
+      channel.channelLink = `https://www.youtube.com/channel/${channel.channelId}`
+      await updateChannel({ channel })
     }
 
     revalidatePath('/')
