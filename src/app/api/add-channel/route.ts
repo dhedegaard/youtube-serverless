@@ -1,10 +1,11 @@
 import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { updateChannel } from '../../../clients/dynamodb'
+import { createDynamoDbClient } from '../../../clients/dynamodb'
 import { getChannelInfo } from '../../../clients/youtube'
 import { Channel } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
+import { SERVER_ENV } from '../../../utils/server-env'
 
 const searchParamsSchema = z.object({
   channelId: z.string().min(1),
@@ -60,7 +61,15 @@ export const POST = async (request: NextRequest) => {
       channelThumbnail: item.snippet.thumbnails.high.url,
       videoIds: [],
     }
-    await updateChannel({ channel })
+
+    const dbClient = createDynamoDbClient({
+      tableName: SERVER_ENV.AWS_DYNAMODB_TABLE,
+      region: SERVER_ENV.AWS_DYNAMODB_REGION,
+      accessKeyId: SERVER_ENV.AWS_DYNAMODB_ACCESS_KEY,
+      secretAccessKey: SERVER_ENV.AWS_DYNAMODB_SECRET_ACCESS_KEY,
+    })
+
+    await dbClient.updateChannel({ channel })
 
     revalidatePath('/')
 

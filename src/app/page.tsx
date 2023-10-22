@@ -5,7 +5,8 @@ import { NextPage } from 'next'
 import Image from 'next/image'
 import { use } from 'react'
 import favicon from '../../public/favicon.png'
-import { getLatestVideos } from '../clients/dynamodb'
+import { createDynamoDbClient } from '../clients/dynamodb'
+import { SERVER_ENV } from '../utils/server-env'
 import styles from './page.module.css'
 
 dayjs.extend(relativeTime)
@@ -80,8 +81,17 @@ const Index: NextPage = () => {
   )
 }
 
-const getVideos = async () => ({
-  videos: await getLatestVideos(),
-})
+const getVideos = async () => {
+  const dbClient = createDynamoDbClient({
+    tableName: SERVER_ENV.AWS_DYNAMODB_TABLE,
+    region: SERVER_ENV.AWS_DYNAMODB_REGION,
+    accessKeyId: SERVER_ENV.AWS_DYNAMODB_ACCESS_KEY,
+    secretAccessKey: SERVER_ENV.AWS_DYNAMODB_SECRET_ACCESS_KEY,
+  })
+
+  return {
+    videos: await dbClient.getLatestVideos(),
+  }
+}
 
 export default Index

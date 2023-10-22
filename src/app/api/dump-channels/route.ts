@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { getChannels } from '../../../clients/dynamodb'
+import { createDynamoDbClient } from '../../../clients/dynamodb'
 import { DumpedChannel, dumpedChannelSchema } from '../../../schemas/dumped-channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
+import { SERVER_ENV } from '../../../utils/server-env'
 
 const resultSchema = z.object({
   statusCode: z.number().int().positive(),
@@ -30,7 +31,14 @@ const handleRequest = z
       return result
     }
 
-    const channels = await getChannels().then((channels) =>
+    const dbClient = createDynamoDbClient({
+      tableName: SERVER_ENV.AWS_DYNAMODB_TABLE,
+      region: SERVER_ENV.AWS_DYNAMODB_REGION,
+      accessKeyId: SERVER_ENV.AWS_DYNAMODB_ACCESS_KEY,
+      secretAccessKey: SERVER_ENV.AWS_DYNAMODB_SECRET_ACCESS_KEY,
+    })
+
+    const channels = await dbClient.getChannels().then((channels) =>
       channels.map((channel): DumpedChannel => {
         const result: DumpedChannel = {
           channelId: channel.channelId,

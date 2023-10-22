@@ -1,17 +1,25 @@
 import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
-import { getChannels, updateChannel } from '../../../clients/dynamodb'
+import { createDynamoDbClient } from '../../../clients/dynamodb'
 import { getChannelInfo } from '../../../clients/youtube'
 import { Channel } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
+import { SERVER_ENV } from '../../../utils/server-env'
 
 export const POST = async (request: NextRequest) => {
   if (!isApiRequestAuthenticated(request)) {
     return NextResponse.json({ error: 'Missing or bad authorization header' }, { status: 401 })
   }
 
+  const dbClient = createDynamoDbClient({
+    tableName: SERVER_ENV.AWS_DYNAMODB_TABLE,
+    region: SERVER_ENV.AWS_DYNAMODB_REGION,
+    accessKeyId: SERVER_ENV.AWS_DYNAMODB_ACCESS_KEY,
+    secretAccessKey: SERVER_ENV.AWS_DYNAMODB_SECRET_ACCESS_KEY,
+  })
+
   try {
-    const channels = await getChannels()
+    const channels = await dbClient.getChannels()
     for (const channel of channels) {
       const item = await getChannelInfo(channel.channelId).then((data) => data.items?.[0])
       if (item == null) {
@@ -25,7 +33,7 @@ export const POST = async (request: NextRequest) => {
         thumbnail: item.snippet.thumbnails.high.url,
         channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
       }
-      await updateChannel({ channel: toBeUpdated })
+      await dbClient.updateChannel({ channel: toBeUpdated })
     }
 
     revalidatePath('/')
