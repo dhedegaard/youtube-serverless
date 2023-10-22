@@ -1,30 +1,28 @@
 import Z from 'zod'
 import { SERVER_ENV } from '../../utils/server-env'
 
+const channelInfoItemSchema = Z.object({
+  id: Z.string().min(1),
+  snippet: Z.object({
+    title: Z.string().min(1),
+    description: Z.string(),
+    customUrl: Z.string(),
+    thumbnails: Z.object({
+      high: Z.object({
+        url: Z.string().min(1),
+      }),
+    }),
+  }),
+  contentDetails: Z.object({
+    relatedPlaylists: Z.object({
+      uploads: Z.string().min(1),
+    }),
+  }),
+})
+interface ChannelInfoItem extends Z.TypeOf<typeof channelInfoItemSchema> {}
 const channelInfoSchema = Z.object({
   /** Not defined when there's no result for given channel ID input parameter. */
-  items: Z.optional(
-    Z.array(
-      Z.object({
-        id: Z.string().min(1),
-        snippet: Z.object({
-          title: Z.string().min(1),
-          description: Z.string(),
-          customUrl: Z.string(),
-          thumbnails: Z.object({
-            high: Z.object({
-              url: Z.string().min(1),
-            }),
-          }),
-        }),
-        contentDetails: Z.object({
-          relatedPlaylists: Z.object({
-            uploads: Z.string().min(1),
-          }),
-        }),
-      })
-    )
-  ),
+  items: Z.optional(Z.array(channelInfoItemSchema as Z.ZodType<ChannelInfoItem>)),
 })
 interface ChannelInfo extends Z.TypeOf<typeof channelInfoSchema> {}
 
@@ -83,7 +81,7 @@ const videoItemSchema = Z.object({
 interface VideoItem extends Z.TypeOf<typeof videoItemSchema> {}
 const videoSchema = Z.object({
   nextPageToken: Z.string().optional(),
-  items: Z.array(videoItemSchema),
+  items: Z.array(videoItemSchema as Z.ZodType<VideoItem>),
 })
 export const getVideosForChannelId = async (channelId: string): Promise<readonly VideoItem[]> => {
   const params = new URLSearchParams()
