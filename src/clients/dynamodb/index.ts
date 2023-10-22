@@ -19,7 +19,7 @@ const db = new DynamoDBClient({
   region: SERVER_ENV.AWS_DYNAMODB_REGION,
 })
 
-const dynamoDbChannelSchema = z.object({
+const dynamoDbChannelSchema = z.strictObject({
   PK: z.object({ S: z.literal('CHANNELS') }),
   SK: z.object({
     S: z.union([
@@ -36,9 +36,10 @@ const dynamoDbChannelSchema = z.object({
   channelThumbnail: z.object({ S: z.string() }),
   channelLink: z.object({ S: z.string() }),
 })
+
 interface DynamoDbChannel extends z.TypeOf<typeof dynamoDbChannelSchema> {}
 
-const dynamoDbVideoSchema = z.object({
+const dynamoDbVideoSchema = z.strictObject({
   PK: z.object({ S: z.literal('VIDEOS') }),
   SK: z.object({
     S: z.string().startsWith('VIDEO#') as z.ZodType<`VIDEO#${string}`>,
