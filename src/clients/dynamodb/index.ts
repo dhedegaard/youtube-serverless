@@ -7,7 +7,6 @@ import {
 import { z } from 'zod'
 import { Channel, channelSchema } from '../../models/channel'
 import { Video, videoSchema } from '../../models/video'
-import { SERVER_ENV } from '../../utils/server-env'
 
 const createDynamoDbClientArgsSchema = z.strictObject({
   tableName: z.string().min(1),
@@ -20,15 +19,18 @@ interface CreateDynamoDbClientArgs extends z.TypeOf<typeof createDynamoDbClientA
 export const innerCreateDynamoDbClient = z
   .function()
   .args(createDynamoDbClientArgsSchema)
-  .implement(function createDynamoDbClient({ tableName, accessKeyId, secretAccessKey, region }) {
-    const TableName = SERVER_ENV.AWS_DYNAMODB_TABLE
-
+  .implement(function createDynamoDbClient({
+    tableName: TableName,
+    accessKeyId,
+    secretAccessKey,
+    region,
+  }) {
     const db = new DynamoDBClient({
       credentials: {
-        accessKeyId: SERVER_ENV.AWS_DYNAMODB_ACCESS_KEY,
-        secretAccessKey: SERVER_ENV.AWS_DYNAMODB_SECRET_ACCESS_KEY,
+        accessKeyId,
+        secretAccessKey,
       },
-      region: SERVER_ENV.AWS_DYNAMODB_REGION,
+      region,
     })
 
     const dynamoDbChannelSchema = z.strictObject({
