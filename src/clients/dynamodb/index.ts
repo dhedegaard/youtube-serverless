@@ -43,7 +43,7 @@ export const innerCreateDynamoDbClient = z
       channelId: z.object({ S: z.string() }),
       channelTitle: z.object({ S: z.string() }),
       playlist: z.object({ S: z.string() }),
-      videoIds: z.object({ SS: z.array(z.string()).min(1) }).optional(),
+      videoIds: z.object({ SS: z.array(z.string()) }).nullable(),
       thumbnail: z.object({ S: z.string() }),
       channelThumbnail: z.object({ S: z.string() }),
       channelLink: z.object({ S: z.string() }),
@@ -107,11 +107,12 @@ export const innerCreateDynamoDbClient = z
           thumbnail: { S: channel.thumbnail },
           channelThumbnail: { S: channel.channelThumbnail },
           channelLink: { S: channel.channelLink },
-          videoIds: channel.videoIds.length > 0 ? { SS: channel.videoIds } : undefined,
+          videoIds: channel.videoIds.length === 0 ? null : { SS: channel.videoIds },
         }
         const parsedChannel = await dynamoDbChannelSchema.parseAsync(dynamoChannel)
         await db.send(
           new PutItemCommand({
+            // @ts-expect-error
             Item: parsedChannel,
             TableName,
           })
