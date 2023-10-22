@@ -30,7 +30,7 @@ const dynamoDbChannelSchema = z.object({
   channelId: z.object({ S: z.string() }),
   channelTitle: z.object({ S: z.string() }),
   playlist: z.object({ S: z.string() }),
-  videoIds: z.object({ SS: z.array(z.string()) }).optional(),
+  videoIds: z.object({ SS: z.array(z.string()).min(1) }).optional(),
   thumbnail: z.object({ S: z.string() }),
   channelThumbnail: z.object({ S: z.string() }),
   channelLink: z.object({ S: z.string() }),

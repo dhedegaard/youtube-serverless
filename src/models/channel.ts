@@ -9,5 +9,6 @@ export const channelSchema = z.object({
   thumbnail: z.string(),
   channelThumbnail: z.string(),
   channelLink: z.string(),
+  videoIds: z.array(z.string()),
 })
 export interface Channel extends z.TypeOf<typeof channelSchema> {}
