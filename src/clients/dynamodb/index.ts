@@ -43,7 +43,10 @@ export const innerCreateDynamoDbClient = z
       channelId: z.object({ S: z.string() }),
       channelTitle: z.object({ S: z.string() }),
       playlist: z.object({ S: z.string() }),
-      videoIds: z.object({ SS: z.array(z.string()) }).nullable(),
+      /**
+       * For empty values, use `null` when updating, and receive `undefined` when fetching.
+       */
+      videoIds: z.object({ SS: z.array(z.string()) }).nullish(),
       thumbnail: z.object({ S: z.string() }),
       channelThumbnail: z.object({ S: z.string() }),
       channelLink: z.object({ S: z.string() }),
