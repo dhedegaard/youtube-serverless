@@ -94,6 +94,7 @@ export const updateChannel = z
       thumbnail: { S: channel.thumbnail },
       channelThumbnail: { S: channel.channelThumbnail },
       channelLink: { S: channel.channelLink },
+      videoIds: channel.videoIds.length > 0 ? { SS: channel.videoIds } : undefined,
     }
     const parsedChannel = await dynamoDbChannelSchema.parseAsync(dynamoChannel)
     await db.send(
