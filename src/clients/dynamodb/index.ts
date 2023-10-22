@@ -151,14 +151,15 @@ export const innerCreateDynamoDbClient = z
 
     const getLatestVideos = z
       .function()
+      .args(z.object({ limit: z.number().int().positive() }))
       .returns(z.promise(z.array(videoSchema as z.ZodType<Video>)))
-      .implement(async function getLatestVideos(): Promise<Video[]> {
+      .implement(async function getLatestVideos({ limit }): Promise<Video[]> {
         const resp = await db.send(
           new QueryCommand({
             TableName,
             IndexName: 'PK_videoPublishedAt',
             ScanIndexForward: false,
-            Limit: 50,
+            Limit: limit,
             KeyConditionExpression: 'PK = :pk',
             ExpressionAttributeValues: { ':pk': { S: 'VIDEOS' } },
           })

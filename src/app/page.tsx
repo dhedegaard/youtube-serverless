@@ -90,7 +90,7 @@ const getVideos = async () => {
   })
 
   return {
-    videos: await dbClient.getLatestVideos(),
+    videos: await dbClient.getLatestVideos({ limit: 50 }),
   }
 }
 
