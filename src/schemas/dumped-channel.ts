@@ -1,8 +1,9 @@
 import { z } from 'zod'
+import { channelSchema } from '../models/channel'
 
-export const dumpedChannelSchema = z.object({
-  channelId: z.string().min(1),
-  channelTitle: z.string().min(1),
+export const dumpedChannelSchema = channelSchema.pick({
+  channelId: true,
+  channelTitle: true,
 })
 
 export interface DumpedChannel extends z.TypeOf<typeof dumpedChannelSchema> {}
