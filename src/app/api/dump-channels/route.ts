@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createDynamoDbClient } from '../../../clients/dynamodb'
-import { DumpedChannel, dumpedChannelSchema } from '../../../schemas/dumped-channel'
+import { channelSchema } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
+
+export const dumpedChannelSchema = channelSchema.pick({
+  channelId: true,
+  channelTitle: true,
+})
+
+export interface DumpedChannel extends z.TypeOf<typeof dumpedChannelSchema> {}
 
 const resultSchema = z.object({
   statusCode: z.number().int().positive(),
