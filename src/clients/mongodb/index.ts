@@ -25,6 +25,9 @@ export const createMongoDbClient = z
         await collection.createIndex({
           videoPublishedAt: -1,
         })
+        await collection.createIndex({
+          videoId: 1,
+        })
       }
 
       return {
@@ -89,8 +92,22 @@ export const createMongoDbClient = z
     )
 
     const deleteOldVideos = dbClientSchema.shape.deleteOldVideos.implement(
-      function deleteOldVideos() {
-        throw new Error('TODO: Implement me!')
+      async function deleteOldVideos({ numberToKeep }): Promise<number> {
+        const videoIdsToDelete = await getLatestVideos({ limit: numberToKeep * 2 + 1 }).then(
+          (videos) => videos.slice(numberToKeep + 1).map((video) => video.videoId)
+        )
+
+        if (videoIdsToDelete.length === 0) {
+          return 0
+        }
+
+        const { connection, collection } = await getConnectionAndCollection<Video>('videos')
+        try {
+          const result = await collection.deleteMany(videoIdsToDelete)
+          return result.deletedCount
+        } finally {
+          await connection.close(true)
+        }
       }
     )
 
