@@ -29,6 +29,11 @@ export const createMongoDbClient = z
           videoId: 1,
         })
       }
+      if (collectionName === 'channels') {
+        await collection.createIndex({
+          channelId: 1,
+        })
+      }
 
       return {
         connection,
