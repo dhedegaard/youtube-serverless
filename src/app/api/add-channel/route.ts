@@ -1,7 +1,7 @@
 import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createDynamoDbClient } from '../../../clients/dynamodb'
+import { createMongoDbClient } from '../../../clients/mongodb'
 import { getChannelInfo } from '../../../clients/youtube'
 import { Channel } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
@@ -62,11 +62,8 @@ export const POST = async (request: NextRequest) => {
       videoIds: [],
     }
 
-    const dbClient = createDynamoDbClient({
-      tableName: SERVER_ENV.AWS_DYNAMODB_TABLE,
-      region: SERVER_ENV.AWS_DYNAMODB_REGION,
-      accessKeyId: SERVER_ENV.AWS_DYNAMODB_ACCESS_KEY,
-      secretAccessKey: SERVER_ENV.AWS_DYNAMODB_SECRET_ACCESS_KEY,
+    const dbClient = createMongoDbClient({
+      connectionString: SERVER_ENV.MONGODB_URI,
     })
 
     await dbClient.updateChannel({ channel })
