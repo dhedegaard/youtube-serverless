@@ -4,13 +4,19 @@ import { Channel } from '../../models/channel'
 import { Video } from '../../models/video'
 import { DbClient, dbClientSchema } from '../../schemas/db-client'
 
+const mongoDbCache = new Map<string, MongoClient>()
 export const createMongoDbClient = z
   .function()
   .args(z.object({ connectionString: z.string().min(1) }))
   .returns(dbClientSchema as z.ZodType<DbClient>)
   .implement(function createMongoDbClient({ connectionString }): DbClient {
     const databaseName = 'youtube-serverless'
-    const client = new MongoClient(connectionString, { appName: 'youtube-serverless' })
+
+    // Maintain the same client across factory calls, as long as the connection string is the same.
+    const client =
+      mongoDbCache.get(connectionString) ??
+      new MongoClient(connectionString, { appName: 'youtube-serverless' })
+    mongoDbCache.set(connectionString, client)
 
     type Collection = 'channels' | 'videos'
 
