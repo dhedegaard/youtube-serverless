@@ -1,4 +1,4 @@
-import { Document, MongoClient, ObjectId } from 'mongodb'
+import { Document, MongoClient } from 'mongodb'
 import { z } from 'zod'
 import { Channel } from '../../models/channel'
 import { Video } from '../../models/video'
@@ -58,10 +58,11 @@ export const createMongoDbClient = z
       async function updateChannel({ channel }) {
         const { connection, collection } = await getConnectionAndCollection<Channel>('channels')
         try {
-          await collection.insertOne({
-            ...channel,
-            _id: new ObjectId(channel.channelId),
-          })
+          await collection.replaceOne(
+            { channelId: channel.channelId },
+            { ...channel },
+            { upsert: true }
+          )
         } finally {
           await connection.close(true)
         }
@@ -71,10 +72,7 @@ export const createMongoDbClient = z
     const putVideo = dbClientSchema.shape.putVideo.implement(async function putVideo({ video }) {
       const { connection, collection } = await getConnectionAndCollection<Video>('videos')
       try {
-        await collection.insertOne({
-          ...video,
-          _id: new ObjectId(video.videoId),
-        })
+        await collection.replaceOne({ videoId: video.videoId }, { ...video }, { upsert: true })
       } finally {
         await connection.close(true)
       }
