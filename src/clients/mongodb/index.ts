@@ -55,7 +55,7 @@ export const createMongoDbClient = z
           const result = channelsWithId.map<Channel>(({ _id, ...channel }) => channel)
           return result
         } finally {
-          await connection.close(true)
+          await connection.close()
         }
       }
     )
@@ -70,7 +70,7 @@ export const createMongoDbClient = z
             { upsert: true }
           )
         } finally {
-          await connection.close(true)
+          await connection.close()
         }
       }
     )
@@ -80,7 +80,7 @@ export const createMongoDbClient = z
       try {
         await collection.replaceOne({ videoId: video.videoId }, { ...video }, { upsert: true })
       } finally {
-        await connection.close(true)
+        await connection.close()
       }
     })
 
@@ -95,7 +95,7 @@ export const createMongoDbClient = z
             .toArray()
           return videosWithId.map(({ _id, ...video }) => video)
         } finally {
-          await connection.close(true)
+          await connection.close()
         }
       }
     )
@@ -115,7 +115,7 @@ export const createMongoDbClient = z
           const result = await collection.deleteMany(videoIdsToDelete)
           return result.deletedCount
         } finally {
-          await connection.close(true)
+          await connection.close()
         }
       }
     )
