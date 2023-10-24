@@ -1,20 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createDynamoDbClient } from '../../../clients/dynamodb'
-import { channelSchema } from '../../../models/channel'
+import { Channel, channelSchema } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
 
-export const dumpedChannelSchema = channelSchema.pick({
-  channelId: true,
-  channelTitle: true,
-})
-
-export interface DumpedChannel extends z.TypeOf<typeof dumpedChannelSchema> {}
-
 const resultSchema = z.object({
   statusCode: z.number().int().positive(),
-  channels: z.array(dumpedChannelSchema as z.ZodType<DumpedChannel>),
+  channels: z.array(channelSchema as z.ZodType<Channel>),
   message: z.string().min(1),
 })
 interface Result extends z.TypeOf<typeof resultSchema> {}
@@ -46,10 +39,18 @@ const handleRequest = z
     })
 
     const channels = await dbClient.getChannels({}).then((channels) =>
-      channels.map((channel): DumpedChannel => {
-        const result: DumpedChannel = {
+      channels.map((channel) => {
+        const result: Channel = {
+          id: channel.id,
           channelId: channel.channelId,
           channelTitle: channel.channelTitle,
+          playlist: channel.playlist,
+          thumbnail: channel.thumbnail,
+          channelThumbnail: channel.channelThumbnail,
+          channelLink: channel.channelLink,
+          // NOTE: We emit emoty videoIds here, as we do not dump videos we expect the receiver system (mostly likely
+          // our selves), to just import chennals and have no videos.
+          videoIds: [],
         }
         return result
       })
