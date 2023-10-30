@@ -6,12 +6,14 @@ import { Video } from '../../../models/video'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
 
+export const maxDuration = 30_000
+
 export const POST = async (request: NextRequest) => {
   if (!isApiRequestAuthenticated(request)) {
     return NextResponse.json({ error: 'Missing or bad authorization header' }, { status: 401 })
   }
 
-  const dbClient = createMongoDbClient({
+  const dbClient = await createMongoDbClient({
     connectionString: SERVER_ENV.MONGODB_URI,
   })
 
@@ -65,5 +67,7 @@ export const POST = async (request: NextRequest) => {
   } catch (error: unknown) {
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  } finally {
+    await dbClient.close()
   }
 }

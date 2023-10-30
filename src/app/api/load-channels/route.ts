@@ -22,12 +22,16 @@ export const POST = async (request: NextRequest) => {
 
   const { channels } = requestBodyResult.data
 
-  const dbClient = createMongoDbClient({
+  const dbClient = await createMongoDbClient({
     connectionString: SERVER_ENV.MONGODB_URI,
   })
-  // NOTE: This is slow an imperative, but we avoid extending the db-client interface any further.
-  for (const channel of channels) {
-    await dbClient.updateChannel({ channel })
+  try {
+    // NOTE: This is slow an imperative, but we avoid extending the db-client interface any further.
+    for (const channel of channels) {
+      await dbClient.updateChannel({ channel })
+    }
+    return new Response(`Saved/updated ${channels.length} channels`, { status: 200 })
+  } finally {
+    await dbClient.close()
   }
-  return new Response(`Saved/updated ${channels.length} channels`, { status: 200 })
 }

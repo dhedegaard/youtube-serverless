@@ -82,12 +82,16 @@ const Index: NextPage = () => {
 }
 
 const getVideos = async () => {
-  const dbClient = createMongoDbClient({
+  const dbClient = await createMongoDbClient({
     connectionString: SERVER_ENV.MONGODB_URI,
   })
 
-  return {
-    videos: await dbClient.getLatestVideos({ limit: 50 }),
+  try {
+    return {
+      videos: await dbClient.getLatestVideos({ limit: 50 }),
+    }
+  } finally {
+    await dbClient.close()
   }
 }
 

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { createMongoDbClient } from '../../../clients/mongodb'
 import { Channel, channelSchema } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
-import { createMongoDbClient } from '../../../clients/mongodb'
 
 const resultSchema = z.object({
   statusCode: z.number().int().positive(),
@@ -31,31 +31,35 @@ const handleRequest = z
       return result
     }
 
-    const dbClient = createMongoDbClient({
+    const dbClient = await createMongoDbClient({
       connectionString: SERVER_ENV.MONGODB_URI,
     })
 
-    const channels = await dbClient.getChannels({}).then((channels) =>
-      channels.map((channel) => {
-        const result: Channel = {
-          id: channel.id,
-          channelId: channel.channelId,
-          channelTitle: channel.channelTitle,
-          playlist: channel.playlist,
-          thumbnail: channel.thumbnail,
-          channelThumbnail: channel.channelThumbnail,
-          channelLink: channel.channelLink,
-          // NOTE: We emit emoty videoIds here, as we do not dump videos we expect the receiver system (mostly likely
-          // our selves), to just import chennals and have no videos.
-          videoIds: [],
-        }
-        return result
-      })
-    )
-    const result: Result = {
-      statusCode: 200,
-      channels,
-      message: `Total number of channels: ${channels.length}`,
+    try {
+      const channels = await dbClient.getChannels({}).then((channels) =>
+        channels.map((channel) => {
+          const result: Channel = {
+            id: channel.id,
+            channelId: channel.channelId,
+            channelTitle: channel.channelTitle,
+            playlist: channel.playlist,
+            thumbnail: channel.thumbnail,
+            channelThumbnail: channel.channelThumbnail,
+            channelLink: channel.channelLink,
+            // NOTE: We emit emoty videoIds here, as we do not dump videos we expect the receiver system (mostly likely
+            // our selves), to just import chennals and have no videos.
+            videoIds: [],
+          }
+          return result
+        })
+      )
+      const result: Result = {
+        statusCode: 200,
+        channels,
+        message: `Total number of channels: ${channels.length}`,
+      }
+      return result
+    } finally {
+      await dbClient.close()
     }
-    return result
   })

@@ -11,7 +11,7 @@ export const POST = async (request: NextRequest) => {
     return NextResponse.json({ error: 'Missing or bad authorization header' }, { status: 401 })
   }
 
-  const dbClient = createMongoDbClient({
+  const dbClient = await createMongoDbClient({
     connectionString: SERVER_ENV.MONGODB_URI,
   })
 
@@ -44,5 +44,7 @@ export const POST = async (request: NextRequest) => {
   } catch (error: unknown) {
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  } finally {
+    await dbClient.close()
   }
 }

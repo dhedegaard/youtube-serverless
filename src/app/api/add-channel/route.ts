@@ -62,11 +62,14 @@ export const POST = async (request: NextRequest) => {
       videoIds: [],
     }
 
-    const dbClient = createMongoDbClient({
+    const dbClient = await createMongoDbClient({
       connectionString: SERVER_ENV.MONGODB_URI,
     })
-
-    await dbClient.updateChannel({ channel })
+    try {
+      await dbClient.updateChannel({ channel })
+    } finally {
+      await dbClient.close()
+    }
 
     revalidatePath('/')
 
