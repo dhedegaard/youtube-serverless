@@ -6,7 +6,7 @@ import { Video } from '../../../models/video'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
 
-export const maxDuration = 30_000
+export const maxDuration = 10_000
 
 export const POST = async (request: NextRequest) => {
   if (!isApiRequestAuthenticated(request)) {
