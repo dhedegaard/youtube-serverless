@@ -27,6 +27,8 @@ export const dbClientSchema = z.strictObject({
     .function()
     .args(z.object({ numberToKeep: z.number().int().positive() }))
     .returns(z.promise(z.number().int().nonnegative())),
+
+  close: z.function().returns(z.promise(z.void())),
 })
 
 export interface DbClient extends z.TypeOf<typeof dbClientSchema> {}

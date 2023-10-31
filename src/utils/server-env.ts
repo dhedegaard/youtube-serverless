@@ -2,11 +2,10 @@ import { z } from 'zod'
 
 const envSchema = z.object({
   SECRET: z.string().min(1),
+
   YOUTUBE_API_KEY: z.string().min(1),
-  AWS_DYNAMODB_ACCESS_KEY: z.string().min(1),
-  AWS_DYNAMODB_SECRET_ACCESS_KEY: z.string().min(1),
-  AWS_DYNAMODB_REGION: z.string().min(1),
-  AWS_DYNAMODB_TABLE: z.string().min(1),
+
+  MONGODB_URI: z.string().startsWith('mongodb://') as z.ZodType<`mongodb://${string}`>,
 })
 
 export const SERVER_ENV = envSchema.parse(

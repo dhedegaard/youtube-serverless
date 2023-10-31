@@ -1,21 +1,20 @@
 import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
-import { createDynamoDbClient } from '../../../clients/dynamodb'
+import { createMongoDbClient } from '../../../clients/mongodb'
 import { getChannelInfo, getVideosForChannelId } from '../../../clients/youtube'
 import { Video } from '../../../models/video'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
+
+export const maxDuration = 10
 
 export const POST = async (request: NextRequest) => {
   if (!isApiRequestAuthenticated(request)) {
     return NextResponse.json({ error: 'Missing or bad authorization header' }, { status: 401 })
   }
 
-  const dbClient = createDynamoDbClient({
-    tableName: SERVER_ENV.AWS_DYNAMODB_TABLE,
-    region: SERVER_ENV.AWS_DYNAMODB_REGION,
-    accessKeyId: SERVER_ENV.AWS_DYNAMODB_ACCESS_KEY,
-    secretAccessKey: SERVER_ENV.AWS_DYNAMODB_SECRET_ACCESS_KEY,
+  const dbClient = await createMongoDbClient({
+    connectionString: SERVER_ENV.MONGODB_URI,
   })
 
   try {
@@ -68,5 +67,7 @@ export const POST = async (request: NextRequest) => {
   } catch (error: unknown) {
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  } finally {
+    await dbClient.close()
   }
 }

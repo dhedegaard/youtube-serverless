@@ -5,7 +5,7 @@ import { NextPage } from 'next'
 import Image from 'next/image'
 import { use } from 'react'
 import favicon from '../../public/favicon.png'
-import { createDynamoDbClient } from '../clients/dynamodb'
+import { createMongoDbClient } from '../clients/mongodb'
 import { SERVER_ENV } from '../utils/server-env'
 import styles from './page.module.css'
 
@@ -82,15 +82,16 @@ const Index: NextPage = () => {
 }
 
 const getVideos = async () => {
-  const dbClient = createDynamoDbClient({
-    tableName: SERVER_ENV.AWS_DYNAMODB_TABLE,
-    region: SERVER_ENV.AWS_DYNAMODB_REGION,
-    accessKeyId: SERVER_ENV.AWS_DYNAMODB_ACCESS_KEY,
-    secretAccessKey: SERVER_ENV.AWS_DYNAMODB_SECRET_ACCESS_KEY,
+  const dbClient = await createMongoDbClient({
+    connectionString: SERVER_ENV.MONGODB_URI,
   })
 
-  return {
-    videos: await dbClient.getLatestVideos({ limit: 50 }),
+  try {
+    return {
+      videos: await dbClient.getLatestVideos({ limit: 50 }),
+    }
+  } finally {
+    await dbClient.close()
   }
 }
 
