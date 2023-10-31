@@ -72,7 +72,7 @@ export const createMongoDbClient = z
         }
 
         const { collection } = await getCollection<Video>('videos')
-        const result = await collection.deleteMany(videoIdsToDelete)
+        const result = await collection.deleteMany({ videoId: { $in: videoIdsToDelete } })
         return result.deletedCount
       }
     )

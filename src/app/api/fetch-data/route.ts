@@ -20,11 +20,8 @@ export const POST = async (request: NextRequest) => {
   try {
     const channels = await dbClient.getChannels({})
     let newVideoCount = 0
-    const [deletedVideos] = await Promise.all([
-      // deletedVideos
-      dbClient.deleteOldVideos({ numberToKeep: 100 }),
-      // ...rest
-      ...channels.map(async (channel) => {
+    await Promise.all(
+      channels.map(async (channel) => {
         const item = await getChannelInfo(channel.channelId).then((data) => data.items?.[0])
         if (item != null) {
           channel.playlist = item.contentDetails.relatedPlaylists.uploads
@@ -54,15 +51,14 @@ export const POST = async (request: NextRequest) => {
             return dbClient.putVideo({ video })
           }),
         ])
-      }),
-    ])
+      })
+    )
 
     revalidatePath('/')
 
     return NextResponse.json({
       channelcount: channels.length,
       newVideoCount,
-      deletedVideos,
     })
   } catch (error: unknown) {
     console.error(error)
