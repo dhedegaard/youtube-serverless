@@ -19,21 +19,6 @@ export const createMongoDbClient = z
     const getCollection = async <C extends Document = never>(collectionName: Collection) => {
       const collection = client.db(databaseName).collection<C>(collectionName)
 
-      // Ensure specific indices exist.
-      if (collectionName === 'videos') {
-        await collection.createIndex({
-          videoPublishedAt: -1,
-        })
-        await collection.createIndex({
-          videoId: 1,
-        })
-      }
-      if (collectionName === 'channels') {
-        await collection.createIndex({
-          channelId: 1,
-        })
-      }
-
       return {
         collection,
       }
