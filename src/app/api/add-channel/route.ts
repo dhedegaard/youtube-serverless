@@ -52,7 +52,6 @@ export const POST = async (request: NextRequest) => {
     }
 
     const channel: Channel = {
-      id: `CHANNEL#${item.id}`,
       channelId: item.id,
       channelTitle: item.snippet.title,
       playlist: item.contentDetails.relatedPlaylists.uploads,

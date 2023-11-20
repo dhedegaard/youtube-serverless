@@ -28,7 +28,18 @@ export const createMongoDbClient = z
       async function getChannels(): Promise<Channel[]> {
         const { collection } = await getCollection<Channel>('channels')
         const channelsWithId = await collection.find().toArray()
-        const result = channelsWithId.map<Channel>(({ _id, ...channel }) => channel)
+        const result = channelsWithId.map<Channel>((channel) => {
+          const result: Channel = {
+            channelId: channel.channelId,
+            channelTitle: channel.channelTitle,
+            playlist: channel.playlist,
+            thumbnail: channel.thumbnail,
+            channelThumbnail: channel.channelThumbnail,
+            channelLink: channel.channelLink,
+            videoIds: channel.videoIds,
+          }
+          return result
+        })
         return result
       }
     )
@@ -57,7 +68,19 @@ export const createMongoDbClient = z
           .sort({ videoPublishedAt: -1 })
           .limit(limit)
           .toArray()
-        return videosWithId.map(({ _id, ...video }) => video)
+        return videosWithId.map((video) => {
+          const result: Video  = {
+            channelId: video.channelId,
+            videoId: video.videoId,
+            videoPublishedAt: video.videoPublishedAt,
+            thumbnail: video.thumbnail,
+            channelTitle: video.channelTitle,
+            channelThumbnail: video.channelThumbnail,
+            channelLink: video.channelLink,
+            title: video.title
+          }
+          return result
+        })
       }
     )
 

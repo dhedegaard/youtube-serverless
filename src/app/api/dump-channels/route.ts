@@ -39,7 +39,6 @@ const handleRequest = z
       const channels = await dbClient.getChannels({}).then((channels) =>
         channels.map((channel) => {
           const result: Channel = {
-            id: channel.id,
             channelId: channel.channelId,
             channelTitle: channel.channelTitle,
             playlist: channel.playlist,
