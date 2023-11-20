@@ -38,7 +38,6 @@ export const POST = async (request: NextRequest) => {
           dbClient.updateChannel({ channel }),
           ...newVideos.map((videoItem) => {
             const video: Video = {
-              id: null,
               videoId: videoItem.contentDetails.videoId,
               channelId: channel.channelId,
               thumbnail: videoItem.snippet.thumbnails.high.url,
