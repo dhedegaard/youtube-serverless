@@ -11,8 +11,9 @@ import styles from './page.module.css'
 
 dayjs.extend(relativeTime)
 
-// Revalidate every 10 minutes.
-export const revalidate = 600
+// Revalidate at least every 3 hours.
+// This is valid since we expect explicit cache invalidation when changes happen to data.
+export const revalidate = 10800
 
 interface ChannelElem {
   key: string
