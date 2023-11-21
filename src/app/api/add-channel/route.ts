@@ -7,6 +7,8 @@ import { Channel } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
 
+export const revalidate = 0
+
 const searchParamsSchema = z.object({
   channelId: z.string().min(1),
   store: z.optional(z.literal('true')),

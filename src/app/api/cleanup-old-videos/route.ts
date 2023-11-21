@@ -4,6 +4,8 @@ import { createMongoDbClient } from '../../../clients/mongodb'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
 
+export const revalidate = 0
+
 export const POST = async (request: NextRequest) => {
   if (!isApiRequestAuthenticated(request)) {
     return NextResponse.json({ error: 'Missing or bad authorization header' }, { status: 401 })

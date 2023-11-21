@@ -5,6 +5,8 @@ import { Channel, channelSchema } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
 
+export const revalidate = 0
+
 const resultSchema = z.object({
   statusCode: z.number().int().positive(),
   channels: z.array(channelSchema as z.ZodType<Channel>),

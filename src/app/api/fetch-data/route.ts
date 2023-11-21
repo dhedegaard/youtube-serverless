@@ -7,6 +7,7 @@ import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
 
 export const maxDuration = 10
+export const revalidate = 0
 
 export const POST = async (request: NextRequest) => {
   if (!isApiRequestAuthenticated(request)) {
