@@ -69,7 +69,7 @@ export const createMongoDbClient = z
           .limit(limit)
           .toArray()
         return videosWithId.map((video) => {
-          const result: Video  = {
+          const result: Video = {
             channelId: video.channelId,
             videoId: video.videoId,
             videoPublishedAt: video.videoPublishedAt,
@@ -77,7 +77,7 @@ export const createMongoDbClient = z
             channelTitle: video.channelTitle,
             channelThumbnail: video.channelThumbnail,
             channelLink: video.channelLink,
-            title: video.title
+            title: video.title,
           }
           return result
         })

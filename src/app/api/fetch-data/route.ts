@@ -19,9 +19,10 @@ export const POST = async (request: NextRequest) => {
 
   try {
     const channels = await dbClient.getChannels({})
-    let newVideoCount = 0
-    await Promise.all(
-      channels.map(async (channel) => {
+    const updateChannelsPromises: Promise<unknown>[] = []
+    // Determine all the new videos.
+    const { newVideos } = await Promise.all(
+      channels.map<Promise<{ newVideos: Video[] }>>(async (channel) => {
         const item = await getChannelInfo(channel.channelId).then((data) => data.items?.[0])
         if (item != null) {
           channel.playlist = item.contentDetails.relatedPlaylists.uploads
@@ -30,13 +31,12 @@ export const POST = async (request: NextRequest) => {
         const newVideos = videos.filter((e) =>
           channel.videoIds == null ? true : !channel.videoIds.includes(e.contentDetails.videoId)
         )
-        newVideoCount += newVideos.length
         channel.videoIds = [
           ...new Set([...channel.videoIds, ...newVideos.map((e) => e.contentDetails.videoId)]),
         ]
-        await Promise.all([
-          dbClient.updateChannel({ channel }),
-          ...newVideos.map((videoItem) => {
+        updateChannelsPromises.push(dbClient.updateChannel({ channel }))
+        return {
+          newVideos: newVideos.map((videoItem) => {
             const video: Video = {
               videoId: videoItem.contentDetails.videoId,
               channelId: channel.channelId,
@@ -47,17 +47,34 @@ export const POST = async (request: NextRequest) => {
               channelThumbnail: channel.thumbnail,
               channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
             }
-            return dbClient.putVideo({ video })
+            return video
           }),
-        ])
+        }
       })
-    )
+    ).then((results) => ({
+      // Flatmap the videos from all the channels, and order then by when they were published (ASC).
+      newVideos: results
+        .flatMap((result) => result.newVideos)
+        .sort((a, b) => a.videoPublishedAt.localeCompare(b.videoPublishedAt)),
+    }))
+
+    const [, newVideoPromises] = await Promise.all([
+      // The channelpromises ran in parallel, await them before invalidating anything.
+      Promise.all(updateChannelsPromises),
+      // We store up to the last 50 videos and throw away the rest.
+      Promise.all(
+        newVideos
+          .reverse()
+          .slice(0, 50)
+          .map((newVideo) => dbClient.putVideo({ video: newVideo }))
+      ),
+    ])
 
     revalidatePath('/')
 
     return NextResponse.json({
       channelcount: channels.length,
-      newVideoCount,
+      newVideoCount: newVideoPromises.length,
     })
   } catch (error: unknown) {
     console.error(error)
