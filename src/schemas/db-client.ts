@@ -13,9 +13,9 @@ export const dbClientSchema = z.strictObject({
     .args(z.object({ channel: channelSchema as z.ZodType<Channel> }))
     .returns(z.promise(z.void())),
 
-  putVideo: z
+  putLatestVideos: z
     .function()
-    .args(z.object({ video: videoSchema as z.ZodType<Video> }))
+    .args(z.object({ videos: z.array(videoSchema as z.ZodType<Video>) }))
     .returns(z.promise(z.void())),
 
   getLatestVideos: z

@@ -55,20 +55,18 @@ export const createMongoDbClient = z
       }
     )
 
-    const putVideo = dbClientSchema.shape.putVideo.implement(async function putVideo({ video }) {
-      const { collection } = await getCollection<Video>('videos')
-      await collection.replaceOne({ videoId: video.videoId }, { ...video }, { upsert: true })
+    const putLatestVideos = dbClientSchema.shape.putLatestVideos.implement(async function putVideo({
+      videos,
+    }) {
+      const { collection } = await getCollection<{ videos: Video[] }>('videos')
+      await collection.updateOne({}, { $set: { videos } }, { upsert: true })
     })
 
     const getLatestVideos = dbClientSchema.shape.getLatestVideos.implement(
       async function getLatestVideos({ limit }): Promise<Video[]> {
-        const { collection } = await getCollection<Video>('videos')
-        const videosWithId = await collection
-          .find()
-          .sort({ videoPublishedAt: -1 })
-          .limit(limit)
-          .toArray()
-        return videosWithId.map((video) => {
+        const { collection } = await getCollection<{ videos: Video[] }>('videos')
+        const { videos } = (await collection.findOne()) ?? { videos: [] }
+        return videos.slice(0, limit).map((video) => {
           const result: Video = {
             channelId: video.channelId,
             videoId: video.videoId,
@@ -86,17 +84,8 @@ export const createMongoDbClient = z
 
     const deleteOldVideos = dbClientSchema.shape.deleteOldVideos.implement(
       async function deleteOldVideos({ numberToKeep }): Promise<number> {
-        const videoIdsToDelete = await getLatestVideos({ limit: numberToKeep * 2 + 1 }).then(
-          (videos) => videos.slice(numberToKeep + 1).map((video) => video.videoId)
-        )
-
-        if (videoIdsToDelete.length === 0) {
-          return 0
-        }
-
-        const { collection } = await getCollection<Video>('videos')
-        const result = await collection.deleteMany({ videoId: { $in: videoIdsToDelete } })
-        return result.deletedCount
+        // NOTE: Nothing to cleanup for this backend.
+        return Promise.resolve(0)
       }
     )
 
@@ -107,7 +96,7 @@ export const createMongoDbClient = z
     const result: DbClient = {
       getChannels,
       updateChannel,
-      putVideo,
+      putLatestVideos,
       getLatestVideos,
       deleteOldVideos,
       close,
