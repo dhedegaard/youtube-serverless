@@ -65,20 +65,22 @@ export const createMongoDbClient = z
     const getLatestVideos = dbClientSchema.shape.getLatestVideos.implement(
       async function getLatestVideos({ limit }): Promise<Video[]> {
         const { collection } = await getCollection<{ videos: Video[] }>('videos')
-        const { videos } = (await collection.findOne()) ?? { videos: [] }
-        return videos.slice(0, limit).map((video) => {
-          const result: Video = {
-            channelId: video.channelId,
-            videoId: video.videoId,
-            videoPublishedAt: video.videoPublishedAt,
-            thumbnail: video.thumbnail,
-            channelTitle: video.channelTitle,
-            channelThumbnail: video.channelThumbnail,
-            channelLink: video.channelLink,
-            title: video.title,
-          }
-          return result
-        })
+        const { videos } = (await collection.findOne()) ?? {}
+        return videos == null
+          ? []
+          : videos.slice(0, limit).map((video) => {
+              const result: Video = {
+                channelId: video.channelId,
+                videoId: video.videoId,
+                videoPublishedAt: video.videoPublishedAt,
+                thumbnail: video.thumbnail,
+                channelTitle: video.channelTitle,
+                channelThumbnail: video.channelThumbnail,
+                channelLink: video.channelLink,
+                title: video.title,
+              }
+              return result
+            })
       }
     )
 
