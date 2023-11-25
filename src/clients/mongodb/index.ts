@@ -36,7 +36,8 @@ export const createMongoDbClient = z
             thumbnail: channel.thumbnail,
             channelThumbnail: channel.channelThumbnail,
             channelLink: channel.channelLink,
-            videoIds: channel.videoIds,
+            // NOTE: We never use videoIds for anything in the mongo backend.
+            videoIds: [],
           }
           return result
         })
@@ -49,7 +50,11 @@ export const createMongoDbClient = z
         const { collection } = await getCollection<Channel>('channels')
         await collection.replaceOne(
           { channelId: channel.channelId },
-          { ...channel },
+          {
+            ...channel,
+            // NOTE: We never use videoIds for anything in the mongo backend.
+            videoIds: [],
+          },
           { upsert: true }
         )
       }
