@@ -25,12 +25,11 @@ export const POST = async (request: NextRequest) => {
     const { videos } = await Promise.all(
       channels.map<Promise<{ videos: Video[] }>>(async (channel) => {
         const item = await getChannelInfo(channel.channelId).then((data) => data.items?.[0])
-        if (item != null) {
+        if (item != null && channel.playlist !== item.contentDetails.relatedPlaylists.uploads) {
           channel.playlist = item.contentDetails.relatedPlaylists.uploads
+          updateChannelsPromises.push(dbClient.updateChannel({ channel }))
         }
         const videos = await getVideosForChannelId(channel.playlist)
-        channel.videoIds = []
-        updateChannelsPromises.push(dbClient.updateChannel({ channel }))
         return {
           videos: videos.map((videoItem) => {
             const video: Video = {
