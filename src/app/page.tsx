@@ -47,7 +47,7 @@ const Index: NextPage = () => {
                 target="_blank"
                 rel="noreferrer noopener"
               >
-                <img className={styles.thumbnail} src={e.thumbnail} alt={e.title} />
+                <img className={styles.thumbnail} src={e.thumbnail} alt="Video thumbnail" />
               </a>
 
               <b className={styles.title} title={e.title}>
@@ -62,7 +62,7 @@ const Index: NextPage = () => {
                   rel="noopener noreferrer"
                 >
                   <div className="w-4 h-4 overflow-hidden box-border shrink-0 grow-0 basis-auto">
-                    <Image src={e.channelThumbnail} width={16} height={16} alt={e.channelTitle} />
+                    <Image src={e.channelThumbnail} width={16} height={16} alt="Channel logo" />
                   </div>
                   <span>{e.channelTitle}</span>
                 </a>
