@@ -4,6 +4,17 @@
 module.exports = {
   reactStrictMode: true,
   images: {
-    domains: ["yt3.ggpht.com"],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.ggpht.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.ytimg.com',
+        pathname: '/**',
+      },
+    ],
   },
-};
+}
