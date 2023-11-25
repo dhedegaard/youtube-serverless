@@ -38,10 +38,7 @@ export const POST = async (request: NextRequest) => {
     revalidatePath('/')
 
     return NextResponse.json({
-      channels: channels.map(({ videoIds, ...channel }) => ({
-        ...channel,
-        videoIds: videoIds?.length ?? 0,
-      })),
+      channels,
     })
   } catch (error: unknown) {
     console.error(error)

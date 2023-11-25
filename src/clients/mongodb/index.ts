@@ -36,8 +36,6 @@ export const createMongoDbClient = z
             thumbnail: channel.thumbnail,
             channelThumbnail: channel.channelThumbnail,
             channelLink: channel.channelLink,
-            // NOTE: We never use videoIds for anything in the mongo backend.
-            videoIds: [],
           }
           return result
         })
@@ -48,15 +46,7 @@ export const createMongoDbClient = z
     const updateChannel = dbClientSchema.shape.updateChannel.implement(
       async function updateChannel({ channel }) {
         const { collection } = await getCollection<Channel>('channels')
-        await collection.replaceOne(
-          { channelId: channel.channelId },
-          {
-            ...channel,
-            // NOTE: We never use videoIds for anything in the mongo backend.
-            videoIds: [],
-          },
-          { upsert: true }
-        )
+        await collection.replaceOne({ channelId: channel.channelId }, channel, { upsert: true })
       }
     )
 

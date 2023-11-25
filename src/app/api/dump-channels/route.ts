@@ -47,9 +47,6 @@ const handleRequest = z
             thumbnail: channel.thumbnail,
             channelThumbnail: channel.channelThumbnail,
             channelLink: channel.channelLink,
-            // NOTE: We emit emoty videoIds here, as we do not dump videos we expect the receiver system (mostly likely
-            // our selves), to just import chennals and have no videos.
-            videoIds: [],
           }
           return result
         })

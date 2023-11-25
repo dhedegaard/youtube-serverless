@@ -60,7 +60,6 @@ export const POST = async (request: NextRequest) => {
       thumbnail: item.snippet.thumbnails.high.url,
       channelLink: `https://www.youtube.com/channel/${item.id}`,
       channelThumbnail: item.snippet.thumbnails.high.url,
-      videoIds: [],
     }
 
     const dbClient = await createMongoDbClient({
