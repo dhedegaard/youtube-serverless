@@ -65,6 +65,8 @@ export const POST = async (request: NextRequest) => {
 
     return NextResponse.json({
       channelcount: channels.length,
+      updatedChannels: updateChannelsPromises.length,
+      videoCount: videos.length,
     })
   } catch (error: unknown) {
     console.error(error)
