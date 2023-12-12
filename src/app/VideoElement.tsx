@@ -16,17 +16,12 @@ interface Props {
 export const VideoElement = memo(function VideoElement({ video }: Props) {
   const publishedAt = useMemo(() => new Date(video.videoPublishedAt), [video.videoPublishedAt])
   const [publishedAtFromNow, setPublishedAtFromNow] = useState(
-    publishedAt.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      hourCycle: 'h24',
-      minute: '2-digit',
-      timeZone: 'UTC',
-    })
+    `${dayjs(publishedAt).fromNow(true)} ago`
   )
 
   // Render the relative date on the client, to avoid having the value be cached on the server and being wrong.
   useEffect(() => {
-    setTimeout(() => setPublishedAtFromNow(dayjs(publishedAt).fromNow(true) + ' ago'), 1000)
+    setTimeout(() => setPublishedAtFromNow(`${dayjs(publishedAt).fromNow(true)} ago`), 1000)
   }, [publishedAt])
 
   return (
