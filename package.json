@@ -24,7 +24,6 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "aws-crt": "^1.19.0",
     "dayjs": "^1.11.10",
     "mongodb": "^6.3.0",
     "next": "^14.0.4",
