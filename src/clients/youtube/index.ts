@@ -1,42 +1,43 @@
-import Z from 'zod'
+import { z } from 'zod'
 import { SERVER_ENV } from '../../utils/server-env'
 
-const channelInfoItemSchema = Z.object({
-  id: Z.string().min(1),
-  snippet: Z.object({
-    title: Z.string().min(1),
-    description: Z.string(),
-    customUrl: Z.string(),
-    thumbnails: Z.object({
-      high: Z.object({
-        url: Z.string().min(1),
+const channelInfoItemSchema = z.object({
+  id: z.string().min(1),
+  snippet: z.object({
+    title: z.string().min(1),
+    description: z.string(),
+    customUrl: z.string(),
+    thumbnails: z.object({
+      high: z.object({
+        url: z.string().min(1),
       }),
     }),
   }),
-  contentDetails: Z.object({
-    relatedPlaylists: Z.object({
-      uploads: Z.string().min(1),
+  contentDetails: z.object({
+    relatedPlaylists: z.object({
+      uploads: z.string().min(1),
     }),
   }),
 })
-interface ChannelInfoItem extends Z.TypeOf<typeof channelInfoItemSchema> {}
-const channelInfoSchema = Z.object({
+interface ChannelInfoItem extends z.TypeOf<typeof channelInfoItemSchema> {}
+const channelInfoSchema = z.object({
   /** Not defined when there's no result for given channel ID input parameter. */
-  items: Z.optional(Z.array(channelInfoItemSchema as Z.ZodType<ChannelInfoItem>)),
+  items: z.optional(z.array(channelInfoItemSchema as z.ZodType<ChannelInfoItem>)),
 })
-interface ChannelInfo extends Z.TypeOf<typeof channelInfoSchema> {}
+interface ChannelInfo extends z.TypeOf<typeof channelInfoSchema> {}
 
-const getChannelInfoArgsSchema = Z.discriminatedUnion('type', [
-  Z.object({
-    type: Z.literal('channelId'),
-    channelId: Z.string().min(1),
+const getChannelInfoArgsSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('channelId'),
+    channelId: z.string().min(1),
   }),
-  Z.object({
-    type: Z.literal('forUsername'),
-    username: Z.string().min(1),
+  z.object({
+    type: z.literal('forUsername'),
+    username: z.string().min(1),
   }),
 ])
-export const getChannelInfo = Z.function()
+export const getChannelInfo = z
+  .function()
   .args(getChannelInfoArgsSchema)
   .implement(async function getChannelInfo(args): Promise<ChannelInfo> {
     const params = new URLSearchParams()
@@ -63,50 +64,54 @@ export const getChannelInfo = Z.function()
     return await channelInfoSchema.parseAsync(responseJson)
   })
 
-const videoItemSchema = Z.object({
-  contentDetails: Z.object({
-    videoId: Z.string().min(1),
-    videoPublishedAt: Z.string().min(1),
+const videoItemSchema = z.object({
+  contentDetails: z.object({
+    videoId: z.string().min(1),
+    videoPublishedAt: z.string().min(1),
   }),
-  snippet: Z.object({
-    publishedAt: Z.string().min(1),
-    channelId: Z.string().min(1),
-    title: Z.string().min(1),
-    description: Z.string(),
-    thumbnails: Z.object({
-      default: Z.object({
-        url: Z.string().min(1),
-        width: Z.number(),
-        height: Z.number(),
+  snippet: z.object({
+    publishedAt: z.string().min(1),
+    channelId: z.string().min(1),
+    title: z.string().min(1),
+    description: z.string(),
+    thumbnails: z.object({
+      default: z.object({
+        url: z.string().min(1),
+        width: z.number(),
+        height: z.number(),
       }),
-      medium: Z.object({
-        url: Z.string().min(1),
-        width: Z.number(),
-        height: Z.number(),
+      medium: z.object({
+        url: z.string().min(1),
+        width: z.number(),
+        height: z.number(),
       }),
-      high: Z.object({
-        url: Z.string().min(1),
-        width: Z.number(),
-        height: Z.number(),
+      high: z.object({
+        url: z.string().min(1),
+        width: z.number(),
+        height: z.number(),
       }),
-      standard: Z.object({
-        url: Z.string().min(1),
-        width: Z.number(),
-        height: Z.number(),
-      }).optional(),
-      maxres: Z.object({
-        url: Z.string().min(1),
-        width: Z.number(),
-        height: Z.number(),
-      }).optional(),
+      standard: z
+        .object({
+          url: z.string().min(1),
+          width: z.number(),
+          height: z.number(),
+        })
+        .optional(),
+      maxres: z
+        .object({
+          url: z.string().min(1),
+          width: z.number(),
+          height: z.number(),
+        })
+        .optional(),
     }),
-    channelTitle: Z.string().min(1),
+    channelTitle: z.string().min(1),
   }),
 })
-interface VideoItem extends Z.TypeOf<typeof videoItemSchema> {}
-const videoSchema = Z.object({
-  nextPageToken: Z.string().optional(),
-  items: Z.array(videoItemSchema as Z.ZodType<VideoItem>),
+interface VideoItem extends z.TypeOf<typeof videoItemSchema> {}
+const videoSchema = z.object({
+  nextPageToken: z.string().optional(),
+  items: z.array(videoItemSchema as z.ZodType<VideoItem>),
 })
 export const getVideosForChannelId = async (channelId: string): Promise<readonly VideoItem[]> => {
   const params = new URLSearchParams()
