@@ -34,7 +34,9 @@ export const POST = async (request: NextRequest) => {
   const { channelId, store } = paramsResult.data
 
   try {
-    const item = await getChannelInfo(channelId).then((data) => data.items?.[0])
+    const item = await getChannelInfo({ type: 'channelId', channelId }).then(
+      (data) => data.items?.[0]
+    )
     if (item == null) {
       return NextResponse.json(
         { error: `Channel with id not found: ${channelId}` },

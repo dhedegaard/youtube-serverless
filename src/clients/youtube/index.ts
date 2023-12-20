@@ -26,17 +26,42 @@ const channelInfoSchema = Z.object({
 })
 interface ChannelInfo extends Z.TypeOf<typeof channelInfoSchema> {}
 
-export const getChannelInfo = async (channelId: string): Promise<ChannelInfo> => {
-  const params = new URLSearchParams()
-  params.set('part', 'snippet,contentDetails')
-  params.set('id', channelId)
-  params.set('key', SERVER_ENV.YOUTUBE_API_KEY)
-  const resp = await fetch(`https://www.googleapis.com/youtube/v3/channels?${params.toString()}`)
-  if (!resp.ok) {
-    throw new Error(`Unable to get channel info: ${resp.status} ${resp.statusText}`)
-  }
-  return await resp.json().then((data: unknown) => channelInfoSchema.parseAsync(data))
-}
+const getChannelInfoArgsSchema = Z.discriminatedUnion('type', [
+  Z.object({
+    type: Z.literal('channelId'),
+    channelId: Z.string().min(1),
+  }),
+  Z.object({
+    type: Z.literal('forUsername'),
+    username: Z.string().min(1),
+  }),
+])
+export const getChannelInfo = Z.function()
+  .args(getChannelInfoArgsSchema)
+  .implement(async function getChannelInfo(args): Promise<ChannelInfo> {
+    const params = new URLSearchParams()
+    params.set('part', 'snippet,contentDetails')
+    switch (args.type) {
+      case 'channelId':
+        params.set('id', args.channelId)
+        break
+      case 'forUsername':
+        params.set('forUsername', args.username)
+        break
+      default:
+        // @ts-expect-error - exhaustive check
+        throw new TypeError(`Invalid type: ${args.type}`)
+    }
+    params.set('key', SERVER_ENV.YOUTUBE_API_KEY)
+    const response = await fetch(
+      `https://www.googleapis.com/youtube/v3/channels?${params.toString()}`
+    )
+    if (!response.ok) {
+      throw new Error(`Unable to get channel info: ${response.status} ${response.statusText}`)
+    }
+    const responseJson: unknown = await response.json()
+    return await channelInfoSchema.parseAsync(responseJson)
+  })
 
 const videoItemSchema = Z.object({
   contentDetails: Z.object({
