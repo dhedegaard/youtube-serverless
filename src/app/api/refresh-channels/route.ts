@@ -20,7 +20,9 @@ export const POST = async (request: NextRequest) => {
   try {
     const channels = await dbClient.getChannels({})
     for (const channel of channels) {
-      const item = await getChannelInfo(channel.channelId).then((data) => data.items?.[0])
+      const item = await getChannelInfo({ type: 'channelId', channelId: channel.channelId }).then(
+        (data) => data.items?.[0]
+      )
       if (item == null) {
         continue
       }
