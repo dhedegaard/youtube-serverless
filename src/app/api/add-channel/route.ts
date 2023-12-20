@@ -9,10 +9,17 @@ import { SERVER_ENV } from '../../../utils/server-env'
 
 export const revalidate = 0
 
-const searchParamsSchema = z.object({
-  channelId: z.string().min(1),
+const sharedSchema = z.object({
   store: z.optional(z.literal('true')),
 })
+const searchParamsSchema = z.union([
+  sharedSchema.extend({
+    channelId: z.string().min(1),
+  }),
+  sharedSchema.extend({
+    username: z.string().min(1),
+  }),
+])
 
 export const POST = async (request: NextRequest) => {
   if (!isApiRequestAuthenticated(request)) {
@@ -31,15 +38,17 @@ export const POST = async (request: NextRequest) => {
       { status: 400 }
     )
   }
-  const { channelId, store } = paramsResult.data
+  const { store, ...params } = paramsResult.data
 
   try {
-    const item = await getChannelInfo({ type: 'channelId', channelId }).then(
-      (data) => data.items?.[0]
-    )
+    const item = await getChannelInfo(
+      'username' in params
+        ? { type: 'forUsername', username: params.username }
+        : { type: 'channelId', channelId: params.channelId }
+    ).then((data) => data.items?.[0])
     if (item == null) {
       return NextResponse.json(
-        { error: `Channel with id not found: ${channelId}` },
+        { error: `Channel not found for params: ${JSON.stringify(params)}` },
         { status: 404 }
       )
     }
