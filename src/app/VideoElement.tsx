@@ -1,29 +1,14 @@
-'use client'
-
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import Image from 'next/image'
-import { memo, useEffect, useMemo, useState } from 'react'
+import { memo } from 'react'
 import { Video } from '../models/video'
+import { PublishedAt } from './PublishedAt'
 import styles from './page.module.css'
-
-dayjs.extend(relativeTime)
 
 interface Props {
   video: Video
 }
 
 export const VideoElement = memo(function VideoElement({ video }: Props) {
-  const publishedAt = useMemo(() => new Date(video.videoPublishedAt), [video.videoPublishedAt])
-  const [publishedAtFromNow, setPublishedAtFromNow] = useState(
-    `${dayjs(publishedAt).fromNow(true)} ago`
-  )
-
-  // Render the relative date on the client, to avoid having the value be cached on the server and being wrong.
-  useEffect(() => {
-    setTimeout(() => setPublishedAtFromNow(`${dayjs(publishedAt).fromNow(true)} ago`), 1000)
-  }, [publishedAt])
-
   return (
     <div className="flex-auto flex flex-col items-stretch">
       <a
@@ -51,15 +36,7 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
           </div>
           <span>{video.channelTitle}</span>
         </a>
-
-        <div
-          className="text-right whitespace-nowrap basis-auto text-gray-500 text-sm"
-          title={`${publishedAt.toLocaleString('en-US', {
-            timeZone: 'UTC',
-          })} UTC`}
-        >
-          {publishedAtFromNow}
-        </div>
+        <PublishedAt videoPublishedAt={video.videoPublishedAt} />{' '}
       </div>
     </div>
   )
