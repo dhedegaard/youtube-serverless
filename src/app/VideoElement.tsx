@@ -25,7 +25,7 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
   }, [publishedAt])
 
   return (
-    <div className="flex grow-0 shrink-0 basis-auto flex-col items-stretch mb-4 w-[calc(20%-8px)] max-lg:w-[calc(25%-8px)] max-md:w-[calc(100%/3-8px)] max-sm:w-[calc(50%-8px)]">
+    <div className="flex-auto flex flex-col items-stretch">
       <a
         className="relative p-0 overflow-hidden w-full pt-[calc(56.25%-1px)] flex rounded mb-1 bg-blend-multiply bg-gray-50"
         href={`https://www.youtube.com/watch?v=${video.videoId}`}
@@ -53,7 +53,7 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
         </a>
 
         <div
-          className="text-right whitespace-nowrap basis-auto text-gray-500 text-[0.75em]"
+          className="text-right whitespace-nowrap basis-auto text-gray-500 text-sm"
           title={`${publishedAt.toLocaleString('en-US', {
             timeZone: 'UTC',
           })} UTC`}

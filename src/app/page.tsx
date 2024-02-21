@@ -24,12 +24,12 @@ const Index: NextPage = () => {
   return (
     <>
       <nav className="w-full py-4 mb-2 bg-gray-700 text-white flex gap-4 items-end">
-        <div className="max-w-[1140px] mx-auto flex flex-wrap gap-3 w-full px-2">
+        <div className="max-w-7xl mx-auto flex flex-wrap gap-3 w-full px-2">
           <Image priority src={favicon} width={24} height={24} alt="Logo" />
           New youtube videos
         </div>
       </nav>
-      <div className="max-w-[1140px] mx-auto flex flex-wrap gap-[10px] px-2">
+      <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-2">
         {videos.map((video) => (
           <VideoElement key={video.videoId} video={video} />
         ))}
