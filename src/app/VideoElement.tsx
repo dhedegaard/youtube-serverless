@@ -12,12 +12,12 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
   return (
     <div className="flex-auto flex flex-col items-stretch">
       <a
-        className="relative p-0 overflow-hidden w-full pt-[calc(56.25%-1px)] flex rounded mb-1 bg-blend-multiply bg-gray-50"
+        className="relative p-0 overflow-hidden w-full pt-[calc(56.25%-1px)] flex rounded-lg mb-1 bg-blend-multiply bg-gray-50"
         href={`https://www.youtube.com/watch?v=${video.videoId}`}
         target="_blank"
         rel="noreferrer noopener"
       >
-        <img className={styles.thumbnail} src={video.thumbnail} alt="Video thumbnail" />
+        <Image fill className="object-cover" src={video.thumbnail} alt="Video thumbnail" />
       </a>
 
       <b className={styles.title} title={video.title}>
