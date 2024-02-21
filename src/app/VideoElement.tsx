@@ -17,7 +17,13 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
         target="_blank"
         rel="noreferrer noopener"
       >
-        <Image fill className="object-cover" src={video.thumbnail} alt="Video thumbnail" />
+        <Image
+          fill
+          className="object-cover"
+          src={video.thumbnail}
+          alt="Video thumbnail"
+          sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, 308px"
+        />
       </a>
 
       <b className={styles.title} title={video.title}>
