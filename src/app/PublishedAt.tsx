@@ -23,9 +23,13 @@ export const PublishedAt = memo(function PublishedAt({ videoPublishedAt }: Props
   return (
     <div
       className="text-right whitespace-nowrap basis-auto text-gray-500 text-sm"
-      title={`${publishedAt.toLocaleString('en-US', {
-        timeZone: 'UTC',
-      })} UTC`}
+      title={`${useMemo(
+        () =>
+          publishedAt.toLocaleString('en-US', {
+            timeZone: 'UTC',
+          }),
+        [publishedAt]
+      )} UTC`}
     >
       {publishedAtFromNow}
     </div>
