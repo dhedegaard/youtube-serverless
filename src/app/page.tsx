@@ -45,7 +45,7 @@ const getVideos = async () => {
 
   try {
     return {
-      videos: await dbClient.getLatestVideos({ limit: 50 }),
+      videos: await dbClient.getLatestVideos({ limit: 60 }),
     }
   } finally {
     await dbClient.close()

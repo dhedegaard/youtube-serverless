@@ -116,7 +116,7 @@ const videoSchema = z.object({
 export const getVideosForChannelId = async (channelId: string): Promise<readonly VideoItem[]> => {
   const params = new URLSearchParams()
   params.set('part', 'contentDetails,snippet')
-  params.set('maxResults', '50')
+  params.set('maxResults', '60')
   params.set('playlistId', channelId)
   params.set('key', SERVER_ENV.YOUTUBE_API_KEY)
   const resp = await fetch(
