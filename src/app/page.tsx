@@ -1,9 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import { NextPage } from 'next'
-import Image from 'next/image'
 import { use } from 'react'
-import favicon from '../../public/favicon.png'
 import { createMongoDbClient } from '../clients/mongodb'
+import { Logo } from '../components/Logo'
 import { SERVER_ENV } from '../utils/server-env'
 import { VideoElement } from './VideoElement'
 
@@ -25,7 +24,7 @@ const Index: NextPage = () => {
     <>
       <nav className="w-full py-4 mb-2 bg-gray-700 text-white flex gap-4 items-end">
         <div className="max-w-7xl mx-auto flex flex-wrap gap-3 w-full px-2">
-          <Image priority src={favicon} width={24} height={24} alt="Logo" />
+          <Logo className="flex-none" width={24} height={24} />
           New youtube videos
         </div>
       </nav>
