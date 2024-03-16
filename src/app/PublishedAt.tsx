@@ -1,5 +1,6 @@
 'use client'
 
+import clsx from 'clsx'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { memo, useEffect, useMemo, useState } from 'react'
@@ -11,9 +12,7 @@ interface Props {
 }
 export const PublishedAt = memo(function PublishedAt({ videoPublishedAt }: Props) {
   const publishedAt = useMemo(() => new Date(videoPublishedAt), [videoPublishedAt])
-  const [publishedAtFromNow, setPublishedAtFromNow] = useState(
-    `${dayjs(publishedAt).fromNow(true)} ago`
-  )
+  const [publishedAtFromNow, setPublishedAtFromNow] = useState<string | null>(null)
 
   // Render the relative date on the client, to avoid having the value be cached on the server and being wrong.
   useEffect(() => {
@@ -22,7 +21,10 @@ export const PublishedAt = memo(function PublishedAt({ videoPublishedAt }: Props
 
   return (
     <div
-      className="text-right whitespace-nowrap basis-auto text-gray-500 text-sm"
+      className={clsx(
+        'text-right whitespace-nowrap basis-auto text-gray-500 text-sm',
+        publishedAtFromNow == null && 'rounded w-1/4 skeleton bg-slate-50'
+      )}
       title={`${useMemo(
         () =>
           publishedAt.toLocaleString('en-US', {
@@ -31,7 +33,7 @@ export const PublishedAt = memo(function PublishedAt({ videoPublishedAt }: Props
         [publishedAt]
       )} UTC`}
     >
-      {publishedAtFromNow}
+      {publishedAtFromNow ?? <>&nbsp;</>}
     </div>
   )
 })
