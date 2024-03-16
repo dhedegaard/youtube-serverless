@@ -16,7 +16,7 @@ export const PublishedAt = memo(function PublishedAt({ videoPublishedAt }: Props
 
   // Render the relative date on the client, to avoid having the value be cached on the server and being wrong.
   useEffect(() => {
-    setTimeout(() => setPublishedAtFromNow(`${dayjs(publishedAt).fromNow(true)} ago`), 1000)
+    setPublishedAtFromNow(`${dayjs(publishedAt).fromNow(true)} ago`)
   }, [publishedAt])
 
   return (
