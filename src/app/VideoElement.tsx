@@ -1,4 +1,4 @@
-import Image from 'next/image'
+/* eslint-disable @next/next/no-img-element */
 import { memo } from 'react'
 import { Video } from '../models/video'
 import { PublishedAt } from './PublishedAt'
@@ -12,17 +12,17 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
   return (
     <div className="flex-auto flex flex-col items-stretch">
       <a
-        className="relative p-0 overflow-hidden w-full pt-[calc(56.25%-1px)] flex rounded-lg mb-1 bg-blend-multiply bg-gray-100"
+        className="relative p-0 overflow-hidden w-full flex rounded-lg mb-1 bg-blend-multiply bg-gray-100"
         href={`https://www.youtube.com/watch?v=${video.videoId}`}
         target="_blank"
         rel="noreferrer noopener"
       >
-        <Image
-          fill
-          className="object-cover"
+        <img
+          className="aspect-video w-full object-cover"
           src={video.thumbnail}
           alt="Video thumbnail"
           sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, 308px"
+          decoding="async"
           loading="lazy"
         />
       </a>
@@ -38,13 +38,15 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <div className="w-4 h-4 overflow-hidden box-border shrink-0 grow-0 basis-auto">
-            <Image
+          <div className="w-4 aspect-square overflow-hidden box-border shrink-0 grow-0 basis-auto">
+            <img
               src={video.channelThumbnail}
               width={16}
               height={16}
+              decoding="async"
               alt="Channel logo"
               loading="lazy"
+              className="object-cover"
             />
           </div>
           <span>{video.channelTitle}</span>
