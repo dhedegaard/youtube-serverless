@@ -22,13 +22,13 @@ const Index: NextPage = () => {
 
   return (
     <>
-      <nav className="w-full py-4 mb-2 bg-gray-700 text-white flex gap-4 items-end">
+      <nav className="w-full py-4 mb-4 bg-gray-700 text-white flex gap-4 items-end">
         <div className="max-w-7xl mx-auto flex flex-wrap gap-3 w-full px-2">
           <Logo className="flex-none" width={24} height={24} />
           New youtube videos
         </div>
       </nav>
-      <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 px-2">
+      <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 px-2 mb-4">
         {videos.map((video) => (
           <VideoElement key={video.videoId} video={video} />
         ))}
