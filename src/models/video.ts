@@ -9,5 +9,6 @@ export const videoSchema = z.strictObject({
   channelThumbnail: z.string(),
   channelLink: z.string(),
   title: z.string(),
+  durationInSeconds: z.optional(z.number().int().nonnegative()),
 })
 export interface Video extends z.TypeOf<typeof videoSchema> {}

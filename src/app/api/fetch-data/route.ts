@@ -1,7 +1,12 @@
+import { parse, toSeconds } from 'iso8601-duration'
 import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 import { createMongoDbClient } from '../../../clients/mongodb'
-import { getChannelInfo, getVideosForChannelId } from '../../../clients/youtube'
+import {
+  getChannelInfo,
+  getContentDetailsForVideos,
+  getVideosForChannelId,
+} from '../../../clients/youtube'
 import { Video } from '../../../models/video'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
@@ -32,8 +37,16 @@ export const POST = async (request: NextRequest) => {
           updateChannelsPromises.push(dbClient.updateChannel({ channel }))
         }
         const videos = await getVideosForChannelId(channel.playlist)
+        const contentDetailsItems = await getContentDetailsForVideos({
+          videoIds: videos.map((video) => video.contentDetails.videoId),
+        })
         return {
           videos: videos.map((videoItem) => {
+            const durationString = contentDetailsItems.items.find(
+              (item) => item.id === videoItem.contentDetails.videoId
+            )?.contentDetails.duration
+            const durationInSeconds =
+              durationString == null ? null : toSeconds(parse(durationString))
             const video: Video = {
               videoId: videoItem.contentDetails.videoId,
               channelId: channel.channelId,
@@ -43,6 +56,7 @@ export const POST = async (request: NextRequest) => {
               videoPublishedAt: videoItem.snippet.publishedAt,
               channelThumbnail: channel.thumbnail,
               channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
+              durationInSeconds: durationInSeconds ?? undefined,
             }
             return video
           }),

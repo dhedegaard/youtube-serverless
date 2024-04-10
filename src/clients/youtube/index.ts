@@ -126,3 +126,41 @@ export const getVideosForChannelId = async (channelId: string): Promise<readonly
   const data = await resp.json().then((data: unknown) => videoSchema.parseAsync(data))
   return data.items
 }
+
+const contentDetailsResponseItemSchema = z.object({
+  id: z.string().min(1),
+  contentDetails: z.object({
+    duration: z.string().startsWith('P') as z.ZodType<`P${string}`>,
+  }),
+})
+export interface ContentDetailsResponseItem
+  extends z.infer<typeof contentDetailsResponseItemSchema> {}
+
+const contentDetailsResponseSchema = z.object({
+  items: z.array(contentDetailsResponseItemSchema as z.ZodType<ContentDetailsResponseItem>),
+})
+export interface ContentDetailsResponse extends z.infer<typeof contentDetailsResponseSchema> {}
+
+export const getContentDetailsForVideos = z
+  .function()
+  .args(
+    z.object({
+      videoIds: z.array(z.string().min(1)).min(1).max(60),
+    })
+  )
+  .implement(async function getContentDetailsForVideos({
+    videoIds,
+  }): Promise<ContentDetailsResponse> {
+    const url = new URL('https://www.googleapis.com/youtube/v3/videos')
+    url.searchParams.set('part', 'contentDetails')
+    url.searchParams.set('id', videoIds.join(','))
+    url.searchParams.set('key', SERVER_ENV.YOUTUBE_API_KEY)
+
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error(`Unable to get video details: ${response.status} ${response.statusText}`)
+    }
+
+    const responseJson: unknown = await response.json()
+    return await contentDetailsResponseSchema.parseAsync(responseJson)
+  })
