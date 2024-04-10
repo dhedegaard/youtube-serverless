@@ -27,10 +27,11 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
         />
         {typeof video.durationInSeconds === 'number' && video.durationInSeconds > 0 && (
           <div className="pointer-events-none select-none bg-slate-900 bg-opacity-75 text-white text-xs py-0.5 px-1 font-semibold rounded absolute bottom-1 right-1">
-            {Math.floor(video.durationInSeconds / 60)
-              .toString()
-              .padStart(2, '0')}
-            :{(video.durationInSeconds % 60).toString().padStart(2, '0')}
+            {video.durationInSeconds > 60 * 60 && (
+              <>{Math.floor(video.durationInSeconds / (60 * 60))}:</>
+            )}
+            {(Math.floor(video.durationInSeconds / 60) % 60).toString().padStart(2, '0')}:
+            {(video.durationInSeconds % 60).toString().padStart(2, '0')}
           </div>
         )}
       </a>
