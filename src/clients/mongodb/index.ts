@@ -73,6 +73,7 @@ export const createMongoDbClient = z
                 channelThumbnail: video.channelThumbnail,
                 channelLink: video.channelLink,
                 title: video.title,
+                durationInSeconds: video.durationInSeconds,
               }
               return result
             })
