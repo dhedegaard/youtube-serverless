@@ -123,6 +123,14 @@ export const getVideosForChannelId = async (channelId: string): Promise<readonly
     `https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`,
     {}
   )
+  if (resp.status === 404) {
+    return []
+  }
+  if (!resp.ok) {
+    throw new Error(
+      `Unable to get videos for channel ID ${channelId}: ${resp.status} ${resp.statusText}`
+    )
+  }
   const data = await resp.json().then((data: unknown) => videoSchema.parseAsync(data))
   return data.items
 }
