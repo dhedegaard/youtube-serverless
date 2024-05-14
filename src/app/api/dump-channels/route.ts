@@ -54,7 +54,7 @@ const handleRequest = z
       const result: Result = {
         statusCode: 200,
         channels,
-        message: `Total number of channels: ${channels.length}`,
+        message: `Total number of channels: ${channels.length.toString()}`,
       }
       return result
     } finally {

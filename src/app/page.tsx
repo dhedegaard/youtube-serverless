@@ -10,13 +10,6 @@ import { VideoElement } from './VideoElement'
 // This is valid since we expect explicit cache invalidation when changes happen to data.
 export const revalidate = 10800
 
-interface ChannelElem {
-  key: string
-  link: string
-  thumbnail: string
-  title: string
-}
-
 const Index: NextPage = () => {
   const { videos } = use(getVideos())
 

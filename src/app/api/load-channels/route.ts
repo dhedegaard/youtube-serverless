@@ -27,7 +27,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse<Result>> 
     )
   }
 
-  const requestJson = await request.json()
+  const requestJson: unknown = await request.json()
   const requestBodyResult = requestBodySchema.safeParse(requestJson)
   if (!requestBodyResult.success) {
     return NextResponse.json<Result>(
@@ -47,7 +47,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse<Result>> 
       await dbClient.updateChannel({ channel })
     }
     return NextResponse.json<Result>(
-      { statusCode: 200, message: `Saved/updated ${channels.length} channels` },
+      { statusCode: 200, message: `Saved/updated ${channels.length.toString()} channels` },
       { status: 200 }
     )
   } finally {

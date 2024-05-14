@@ -51,6 +51,7 @@ export const getChannelInfo = z
         break
       default:
         // @ts-expect-error - exhaustive check
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         throw new TypeError(`Invalid type: ${args.type}`)
     }
     params.set('key', SERVER_ENV.YOUTUBE_API_KEY)
@@ -58,7 +59,9 @@ export const getChannelInfo = z
       `https://www.googleapis.com/youtube/v3/channels?${params.toString()}`
     )
     if (!response.ok) {
-      throw new Error(`Unable to get channel info: ${response.status} ${response.statusText}`)
+      throw new Error(
+        `Unable to get channel info: ${response.status.toString()} ${response.statusText}`
+      )
     }
     const responseJson: unknown = await response.json()
     return await channelInfoSchema.parseAsync(responseJson)
@@ -128,7 +131,7 @@ export const getVideosForChannelId = async (channelId: string): Promise<readonly
   }
   if (!resp.ok) {
     throw new Error(
-      `Unable to get videos for channel ID ${channelId}: ${resp.status} ${resp.statusText}`
+      `Unable to get videos for channel ID ${channelId}: ${resp.status.toString()} ${resp.statusText}`
     )
   }
   const data = await resp.json().then((data: unknown) => videoSchema.parseAsync(data))
@@ -169,7 +172,9 @@ export const getContentDetailsForVideos = z
 
     const response = await fetch(url)
     if (!response.ok) {
-      throw new Error(`Unable to get video details: ${response.status} ${response.statusText}`)
+      throw new Error(
+        `Unable to get video details: ${response.status.toString()} ${response.statusText}`
+      )
     }
 
     const responseJson: unknown = await response.json()

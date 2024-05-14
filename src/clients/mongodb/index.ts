@@ -16,12 +16,12 @@ export const createMongoDbClient = z
 
     type Collection = 'channels' | 'videos'
 
-    const getCollection = async <C extends Document = never>(collectionName: Collection) => {
+    const getCollection = <C extends Document = never>(collectionName: Collection) => {
       const collection = client.db(databaseName).collection<C>(collectionName)
 
-      return {
+      return Promise.resolve({
         collection,
-      }
+      })
     }
 
     const getChannels = dbClientSchema.shape.getChannels.implement(
@@ -81,7 +81,7 @@ export const createMongoDbClient = z
     )
 
     const deleteOldVideos = dbClientSchema.shape.deleteOldVideos.implement(
-      async function deleteOldVideos({ numberToKeep }): Promise<number> {
+      async function deleteOldVideos(): Promise<number> {
         // NOTE: Nothing to cleanup for this backend.
         return Promise.resolve(0)
       }
