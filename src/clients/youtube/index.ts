@@ -153,12 +153,15 @@ export const getContentDetailsForVideos = z
   .function()
   .args(
     z.object({
-      videoIds: z.array(z.string().min(1)).min(1).max(60),
+      videoIds: z.array(z.string().min(1)).max(60),
     })
   )
   .implement(async function getContentDetailsForVideos({
     videoIds,
   }): Promise<ContentDetailsResponse> {
+    if (videoIds.length === 0) {
+      return { items: [] }
+    }
     const url = new URL('https://www.googleapis.com/youtube/v3/videos')
     url.searchParams.set('part', 'contentDetails')
     url.searchParams.set('id', videoIds.join(','))
