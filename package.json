@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "engines": {
-    "node": "20"
+    "node": ">=20"
   },
   "scripts": {
     "build": "next build",
@@ -15,28 +15,27 @@
     "playwright": "playwright test"
   },
   "devDependencies": {
-    "@playwright/test": "^1.43.0",
-    "@types/node": "^20.12.7",
-    "@types/react": "^18.2.75",
-    "@types/react-dom": "^18.2.24",
+    "@playwright/test": "^1.44.0",
+    "@types/node": "^20.12.12",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.19",
     "eslint": "8.57.0",
-    "eslint-config-next": "14.1.4",
+    "eslint-config-next": "14.2.3",
     "eslint-plugin-tailwindcss": "^3.15.1",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "clsx": "^2.1.0",
-    "daisyui": "^4.10.1",
-    "dayjs": "^1.11.10",
+    "clsx": "^2.1.1",
+    "daisyui": "^4.11.1",
+    "dayjs": "^1.11.11",
     "iso8601-duration": "^2.1.2",
-    "mongodb": "^6.5.0",
-    "next": "^14.1.4",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-is": "^18.2.0",
-    "zod": "^3.22.4"
+    "mongodb": "^6.6.1",
+    "next": "^14.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^3.23.8"
   }
 }
