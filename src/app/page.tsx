@@ -28,7 +28,7 @@ const Index: NextPage = () => {
           New youtube videos
         </div>
       </nav>
-      <div className="mx-auto mb-4 grid max-w-7xl grid-cols-2 gap-x-4 gap-y-8 px-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="mx-auto mb-8 grid max-w-7xl grid-cols-2 gap-y-8 gap-x-6 px-2 md:grid-cols-3 lg:grid-cols-4">
         {videos.map((video) => (
           <VideoElement key={video.videoId} video={video} />
         ))}

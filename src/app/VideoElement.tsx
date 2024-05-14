@@ -12,7 +12,7 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
   return (
     <div className="flex flex-auto flex-col items-stretch">
       <a
-        className="relative mb-1 flex w-full overflow-hidden rounded-lg bg-gray-100 p-0 bg-blend-multiply"
+        className="relative mb-1 flex w-full overflow-hidden rounded-lg bg-gray-100 p-0 bg-blend-multiply shadow"
         href={`https://www.youtube.com/watch?v=${video.videoId}`}
         target="_blank"
         rel="noreferrer noopener"
