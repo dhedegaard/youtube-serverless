@@ -6,3 +6,4 @@ yarn*.log
 .vscode
 *.tsbuildinfo
 test-results
+.vercel
