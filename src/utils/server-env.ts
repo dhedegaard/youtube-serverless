@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 const envSchema = z.object({
   SECRET: z.string().min(1),
+  CRON_SECRET: z.optional(z.string().min(1)),
 
   YOUTUBE_API_KEY: z.string().min(1),
 
