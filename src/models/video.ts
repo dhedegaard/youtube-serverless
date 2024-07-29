@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const videoSchema = z.strictObject({
+export const Video = z.strictObject({
   channelId: z.string(),
   videoId: z.string(),
   videoPublishedAt: z.string(),
@@ -11,4 +11,4 @@ export const videoSchema = z.strictObject({
   title: z.string(),
   durationInSeconds: z.optional(z.number().int().nonnegative()),
 })
-export interface Video extends z.TypeOf<typeof videoSchema> {}
+export interface Video extends z.TypeOf<typeof Video> {}

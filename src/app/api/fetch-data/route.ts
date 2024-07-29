@@ -41,13 +41,13 @@ export const POST = async (request: NextRequest) => {
           videoIds: videos.map((video) => video.contentDetails.videoId),
         })
         return {
-          videos: videos.map((videoItem) => {
+          videos: videos.map<Video>((videoItem) => {
             const durationString = contentDetailsItems.items.find(
               (item) => item.id === videoItem.contentDetails.videoId
             )?.contentDetails.duration
             const durationInSeconds =
               durationString == null ? null : toSeconds(parse(durationString))
-            const video: Video = {
+            return {
               videoId: videoItem.contentDetails.videoId,
               channelId: channel.channelId,
               thumbnail: videoItem.snippet.thumbnails.high.url,
@@ -57,8 +57,7 @@ export const POST = async (request: NextRequest) => {
               channelThumbnail: channel.thumbnail,
               channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
               durationInSeconds: durationInSeconds ?? undefined,
-            }
-            return video
+            } satisfies Video
           }),
         }
       })

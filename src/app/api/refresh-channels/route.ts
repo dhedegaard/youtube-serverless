@@ -26,22 +26,21 @@ export const POST = async (request: NextRequest) => {
       if (item == null) {
         continue
       }
-      const toBeUpdated: Channel = {
-        ...channel,
-        channelTitle: item.snippet.title,
-        channelThumbnail: item.snippet.thumbnails.high.url,
-        playlist: item.contentDetails.relatedPlaylists.uploads,
-        thumbnail: item.snippet.thumbnails.high.url,
-        channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
-      }
-      await dbClient.updateChannel({ channel: toBeUpdated })
+      await dbClient.updateChannel({
+        channel: {
+          ...channel,
+          channelTitle: item.snippet.title,
+          channelThumbnail: item.snippet.thumbnails.high.url,
+          playlist: item.contentDetails.relatedPlaylists.uploads,
+          thumbnail: item.snippet.thumbnails.high.url,
+          channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
+        } satisfies Channel,
+      })
     }
 
     revalidatePath('/')
 
-    return NextResponse.json({
-      channels,
-    })
+    return NextResponse.json({ channels })
   } catch (error: unknown) {
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

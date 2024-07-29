@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const channelSchema = z.strictObject({
+export const Channel = z.strictObject({
   channelId: z.string(),
   channelTitle: z.string(),
   playlist: z.string(),
@@ -8,4 +8,4 @@ export const channelSchema = z.strictObject({
   channelThumbnail: z.string(),
   channelLink: z.string(),
 })
-export interface Channel extends z.TypeOf<typeof channelSchema> {}
+export interface Channel extends z.TypeOf<typeof Channel> {}

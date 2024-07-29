@@ -138,19 +138,18 @@ export const getVideosForChannelId = async (channelId: string): Promise<readonly
   return data.items
 }
 
-const contentDetailsResponseItemSchema = z.object({
+const ContentDetailsResponseItem = z.object({
   id: z.string().min(1),
   contentDetails: z.object({
     duration: z.string().startsWith('P') as z.ZodType<`P${string}`>,
   }),
 })
-export interface ContentDetailsResponseItem
-  extends z.infer<typeof contentDetailsResponseItemSchema> {}
+export interface ContentDetailsResponseItem extends z.infer<typeof ContentDetailsResponseItem> {}
 
-const contentDetailsResponseSchema = z.object({
-  items: z.array(contentDetailsResponseItemSchema as z.ZodType<ContentDetailsResponseItem>),
+const ContentDetailsResponse = z.object({
+  items: z.array(ContentDetailsResponseItem as z.ZodType<ContentDetailsResponseItem>),
 })
-export interface ContentDetailsResponse extends z.infer<typeof contentDetailsResponseSchema> {}
+export interface ContentDetailsResponse extends z.infer<typeof ContentDetailsResponse> {}
 
 export const getContentDetailsForVideos = z
   .function()
@@ -163,7 +162,7 @@ export const getContentDetailsForVideos = z
     videoIds,
   }): Promise<ContentDetailsResponse> {
     if (videoIds.length === 0) {
-      return { items: [] }
+      return { items: [] } satisfies ContentDetailsResponse
     }
     const url = new URL('https://www.googleapis.com/youtube/v3/videos')
     url.searchParams.set('part', 'contentDetails')
@@ -178,5 +177,5 @@ export const getContentDetailsForVideos = z
     }
 
     const responseJson: unknown = await response.json()
-    return await contentDetailsResponseSchema.parseAsync(responseJson)
+    return await ContentDetailsResponse.parseAsync(responseJson)
   })

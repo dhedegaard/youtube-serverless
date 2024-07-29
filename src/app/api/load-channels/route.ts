@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createMongoDbClient } from '../../../clients/mongodb'
-import { Channel, channelSchema } from '../../../models/channel'
+import { Channel } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
 
 export const revalidate = 0
 
 const requestBodySchema = z.object({
-  channels: z.array(channelSchema as z.ZodType<Channel>).min(1),
+  channels: z.array(Channel as z.ZodType<Channel>).min(1),
 })
 
 interface Result {

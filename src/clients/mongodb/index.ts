@@ -28,18 +28,17 @@ export const createMongoDbClient = z
       async function getChannels(): Promise<Channel[]> {
         const { collection } = await getCollection<Channel>('channels')
         const channelsWithId = await collection.find().toArray()
-        const result = channelsWithId.map<Channel>((channel) => {
-          const result: Channel = {
-            channelId: channel.channelId,
-            channelTitle: channel.channelTitle,
-            playlist: channel.playlist,
-            thumbnail: channel.thumbnail,
-            channelThumbnail: channel.channelThumbnail,
-            channelLink: channel.channelLink,
-          }
-          return result
-        })
-        return result
+        return channelsWithId.map<Channel>(
+          (channel) =>
+            ({
+              channelId: channel.channelId,
+              channelTitle: channel.channelTitle,
+              playlist: channel.playlist,
+              thumbnail: channel.thumbnail,
+              channelThumbnail: channel.channelThumbnail,
+              channelLink: channel.channelLink,
+            }) satisfies Channel
+        )
       }
     )
 
@@ -63,20 +62,20 @@ export const createMongoDbClient = z
         const { videos } = (await collection.findOne()) ?? {}
         return videos == null
           ? []
-          : videos.slice(0, limit).map((video) => {
-              const result: Video = {
-                channelId: video.channelId,
-                videoId: video.videoId,
-                videoPublishedAt: video.videoPublishedAt,
-                thumbnail: video.thumbnail,
-                channelTitle: video.channelTitle,
-                channelThumbnail: video.channelThumbnail,
-                channelLink: video.channelLink,
-                title: video.title,
-                durationInSeconds: video.durationInSeconds,
-              }
-              return result
-            })
+          : videos.slice(0, limit).map<Video>(
+              (video) =>
+                ({
+                  channelId: video.channelId,
+                  videoId: video.videoId,
+                  videoPublishedAt: video.videoPublishedAt,
+                  thumbnail: video.thumbnail,
+                  channelTitle: video.channelTitle,
+                  channelThumbnail: video.channelThumbnail,
+                  channelLink: video.channelLink,
+                  title: video.title,
+                  durationInSeconds: video.durationInSeconds,
+                }) satisfies Video
+            )
       }
     )
 
@@ -91,13 +90,12 @@ export const createMongoDbClient = z
 
     await client.connect()
 
-    const result: DbClient = {
+    return {
       getChannels,
       updateChannel,
       putLatestVideos,
       getLatestVideos,
       deleteOldVideos,
       close,
-    }
-    return result
+    } satisfies DbClient
   })
