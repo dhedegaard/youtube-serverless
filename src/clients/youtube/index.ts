@@ -141,7 +141,7 @@ export const getVideosForChannelId = async (channelId: string): Promise<readonly
 const ContentDetailsResponseItem = z.object({
   id: z.string().min(1),
   contentDetails: z.object({
-    duration: z.string().startsWith('P') as z.ZodType<`P${string}`>,
+    duration: z.optional(z.string().startsWith('P') as z.ZodType<`P${string}`>),
   }),
 })
 export interface ContentDetailsResponseItem extends z.infer<typeof ContentDetailsResponseItem> {}
