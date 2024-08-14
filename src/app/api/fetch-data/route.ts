@@ -56,7 +56,7 @@ export const POST = async (request: NextRequest) => {
               videoPublishedAt: videoItem.snippet.publishedAt,
               channelThumbnail: channel.thumbnail,
               channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
-              durationInSeconds: durationInSeconds ?? undefined,
+              durationInSeconds: durationInSeconds ?? null,
             } satisfies Video
           }),
         }
