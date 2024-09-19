@@ -6,8 +6,8 @@ export const metadata: Metadata = {
   title: 'New youtube videos',
   description: 'Aggregating youtube videos since 2015',
   icons: {
-    icon: '/favicon.png',
-    apple: '/favicon.png',
+    icon: { url: '/favicon.png', type: 'image/png' },
+    apple: { url: '/favicon.png', type: 'image/png' },
   },
   appleWebApp: true,
   openGraph: {
