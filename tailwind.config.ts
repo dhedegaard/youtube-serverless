@@ -1,5 +1,7 @@
+import type { Config } from 'tailwindcss/types/config'
+
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {},
@@ -10,4 +12,4 @@ module.exports = {
     themes: ['light'],
     logs: false,
   },
-}
+} satisfies Config

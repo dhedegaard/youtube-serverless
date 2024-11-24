@@ -5,9 +5,9 @@ import { Logo } from '../components/Logo'
 import { VideoElement } from './VideoElement'
 import { getVideos } from './actions'
 
-// Revalidate at least every 3 hours.
+// Revalidate at least every hour.
 // This is valid since we expect explicit cache invalidation when changes happen to data.
-export const revalidate = 10800
+export const revalidate = 3600
 
 const Index: NextPage = () => {
   const { videos } = use(getVideos())

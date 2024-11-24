@@ -9,7 +9,7 @@
   "scripts": {
     "build": "next build",
     "watch": "next dev",
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "lint": "next lint",
     "typecheck": "tsc --noemit",
     "playwright": "playwright test"
@@ -17,12 +17,12 @@
   "devDependencies": {
     "@playwright/test": "^1.49.0",
     "@types/node": "^20.14.10",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
+    "@types/react": "npm:types-react@19.0.0-rc.1",
+    "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "autoprefixer": "^10.4.20",
     "eslint": "8.57.0",
-    "eslint-config-next": "14.2.5",
+    "eslint-config-next": "15.0.3",
     "eslint-plugin-tailwindcss": "^3.17.5",
     "postcss": "^8.4.49",
     "prettier": "^3.3.3",
@@ -36,10 +36,14 @@
     "dayjs": "^1.11.13",
     "iso8601-duration": "^2.1.2",
     "mongodb": "^6.11.0",
-    "next": "^14.2.10",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "next": "15.0.3",
+    "react": "19.0.0-rc-66855b96-20241106",
+    "react-dom": "19.0.0-rc-66855b96-20241106",
     "swr": "^2.2.5",
     "zod": "^3.23.8"
+  },
+  "overrides": {
+    "@types/react": "npm:types-react@19.0.0-rc.1",
+    "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1"
   }
 }
