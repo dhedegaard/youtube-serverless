@@ -9,5 +9,8 @@
   "parserOptions": {
     "project": true
   },
+  "rules": {
+    "@typescript-eslint/no-empty-object-type": "off"
+  },
   "root": true
 }

@@ -1,27 +1,27 @@
 {
   "name": "youtube-serverless",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "build": "next build",
     "watch": "next dev",
     "dev": "next dev --turbopack",
     "lint": "next lint",
+    "start": "next start",
     "typecheck": "tsc --noemit",
     "playwright": "playwright test"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
     "@types/node": "^22.10.1",
-    "@types/react": "npm:types-react@19.0.0-rc.1",
-    "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
-    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
     "autoprefixer": "^10.4.20",
-    "eslint": "8.57.0",
+    "eslint": "9.16.0",
     "eslint-config-next": "15.0.4",
     "eslint-plugin-tailwindcss": "^3.17.5",
     "postcss": "^8.4.49",
@@ -37,12 +37,8 @@
     "iso8601-duration": "^2.1.2",
     "mongodb": "^6.11.0",
     "next": "15.0.4",
-    "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
     "zod": "^3.23.8"
-  },
-  "overrides": {
-    "@types/react": "npm:types-react@19.0.0-rc.1",
-    "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1"
   }
 }
