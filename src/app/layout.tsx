@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <meta charSet="utf-8" />
       </head>
-      <body>{children}</body>
+      <body className="overflow-y-scroll">{children}</body>
     </html>
   )
 }
