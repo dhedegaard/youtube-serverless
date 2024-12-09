@@ -41,24 +41,31 @@ export const POST = async (request: NextRequest) => {
           videoIds: videos.map((video) => video.contentDetails.videoId),
         })
         return {
-          videos: videos.map<Video>((videoItem) => {
-            const durationString = contentDetailsItems.items.find(
-              (item) => item.id === videoItem.contentDetails.videoId
-            )?.contentDetails.duration
-            const durationInSeconds =
-              durationString == null ? null : toSeconds(parse(durationString))
-            return {
-              videoId: videoItem.contentDetails.videoId,
-              channelId: channel.channelId,
-              thumbnail: videoItem.snippet.thumbnails.high.url,
-              channelTitle: videoItem.snippet.channelTitle,
-              title: videoItem.snippet.title,
-              videoPublishedAt: videoItem.snippet.publishedAt,
-              channelThumbnail: channel.thumbnail,
-              channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
-              durationInSeconds: durationInSeconds ?? null,
-            } satisfies Video
-          }),
+          videos: videos
+            .map<Video | null>((videoItem) => {
+              const contentDetailsItem = contentDetailsItems.items.find(
+                (item) => item.id === videoItem.contentDetails.videoId
+              )
+              const durationString = contentDetailsItem?.contentDetails.duration
+              const durationInSeconds =
+                durationString == null ? null : toSeconds(parse(durationString))
+              // NOTE: We skip upcomming videos, as they are not ready to be played yet.
+              if (contentDetailsItem?.snippet.liveBroadcastContent === 'upcoming') {
+                return null
+              }
+              return {
+                videoId: videoItem.contentDetails.videoId,
+                channelId: channel.channelId,
+                thumbnail: videoItem.snippet.thumbnails.high.url,
+                channelTitle: videoItem.snippet.channelTitle,
+                title: videoItem.snippet.title,
+                videoPublishedAt: videoItem.snippet.publishedAt,
+                channelThumbnail: channel.thumbnail,
+                channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
+                durationInSeconds: durationInSeconds ?? null,
+              } satisfies Video
+            })
+            .filter((video) => video != null),
         }
       })
     ).then((results) => ({

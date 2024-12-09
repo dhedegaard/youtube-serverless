@@ -134,7 +134,7 @@ export const getVideosForChannelId = async (channelId: string): Promise<readonly
       `Unable to get videos for channel ID ${channelId}: ${resp.status.toString()} ${resp.statusText}`
     )
   }
-  const data = await resp.json().then((data: unknown) => videoSchema.parseAsync(data))
+  const data = await resp.json().then(async (data: unknown) => await videoSchema.parseAsync(data))
   return data.items
 }
 
@@ -142,6 +142,9 @@ const ContentDetailsResponseItem = z.object({
   id: z.string().min(1),
   contentDetails: z.object({
     duration: z.optional(z.string().startsWith('P') as z.ZodType<`P${string}`>),
+  }),
+  snippet: z.object({
+    liveBroadcastContent: z.enum(['none', 'upcoming']),
   }),
 })
 export interface ContentDetailsResponseItem extends z.infer<typeof ContentDetailsResponseItem> {}
@@ -165,7 +168,7 @@ export const getContentDetailsForVideos = z
       return { items: [] } satisfies ContentDetailsResponse
     }
     const url = new URL('https://www.googleapis.com/youtube/v3/videos')
-    url.searchParams.set('part', 'contentDetails')
+    url.searchParams.set('part', 'contentDetails,snippet')
     url.searchParams.set('id', videoIds.join(','))
     url.searchParams.set('key', SERVER_ENV.YOUTUBE_API_KEY)
 
