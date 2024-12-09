@@ -144,7 +144,7 @@ const ContentDetailsResponseItem = z.object({
     duration: z.optional(z.string().startsWith('P') as z.ZodType<`P${string}`>),
   }),
   snippet: z.object({
-    liveBroadcastContent: z.enum(['none', 'upcoming']),
+    liveBroadcastContent: z.enum(['none', 'upcoming', 'live']),
   }),
 })
 export interface ContentDetailsResponseItem extends z.infer<typeof ContentDetailsResponseItem> {}
