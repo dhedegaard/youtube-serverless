@@ -40,5 +40,5 @@ jobs:
           project: "dennishedeg-youtube-ser-84"
           entrypoint: "jsr:@deno/nextjs-start"
           root: "."
-          include: .next, public
+          
           
