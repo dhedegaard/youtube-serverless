@@ -1,4 +1,5 @@
 import { Document, MongoClient } from 'mongodb'
+import { unstable_cache, unstable_expireTag } from 'next/cache'
 import { z } from 'zod'
 import { Channel } from '../../models/channel'
 import { Video } from '../../models/video'
@@ -49,34 +50,41 @@ export const createMongoDbClient = z
       }
     )
 
+    const latestVideosTag = 'latest-videos'
+
     const putLatestVideos = dbClientSchema.shape.putLatestVideos.implement(async function putVideo({
       videos,
     }) {
       const { collection } = await getCollection<{ videos: Video[] }>('videos')
       await collection.updateOne({}, { $set: { videos } }, { upsert: true })
+      unstable_expireTag(latestVideosTag)
     })
 
     const getLatestVideos = dbClientSchema.shape.getLatestVideos.implement(
-      async function getLatestVideos({ limit }): Promise<Video[]> {
-        const { collection } = await getCollection<{ videos: Video[] }>('videos')
-        const { videos } = (await collection.findOne()) ?? {}
-        return videos == null
-          ? []
-          : videos.slice(0, limit).map<Video>(
-              (video) =>
-                ({
-                  channelId: video.channelId,
-                  videoId: video.videoId,
-                  videoPublishedAt: video.videoPublishedAt,
-                  thumbnail: video.thumbnail,
-                  channelTitle: video.channelTitle,
-                  channelThumbnail: video.channelThumbnail,
-                  channelLink: video.channelLink,
-                  title: video.title,
-                  durationInSeconds: video.durationInSeconds,
-                }) satisfies Video
-            )
-      }
+      unstable_cache(
+        async function getLatestVideos({ limit }): Promise<Video[]> {
+          const { collection } = await getCollection<{ videos: Video[] }>('videos')
+          const { videos } = (await collection.findOne()) ?? {}
+          return videos == null
+            ? []
+            : videos.slice(0, limit).map<Video>(
+                (video) =>
+                  ({
+                    channelId: video.channelId,
+                    videoId: video.videoId,
+                    videoPublishedAt: video.videoPublishedAt,
+                    thumbnail: video.thumbnail,
+                    channelTitle: video.channelTitle,
+                    channelThumbnail: video.channelThumbnail,
+                    channelLink: video.channelLink,
+                    title: video.title,
+                    durationInSeconds: video.durationInSeconds,
+                  }) satisfies Video
+              )
+        },
+        ['latest-videos'],
+        { revalidate: 60 * 60, tags: [latestVideosTag] }
+      )
     )
 
     const deleteOldVideos = dbClientSchema.shape.deleteOldVideos.implement(
