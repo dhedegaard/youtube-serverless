@@ -18,12 +18,12 @@
   "devDependencies": {
     "@playwright/test": "^1.50.1",
     "@types/node": "^22.13.0",
-    "@types/react": "19.1.0",
-    "@types/react-dom": "19.1.1",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
     "@typescript-eslint/eslint-plugin": "^8.22.0",
     "autoprefixer": "^10.4.20",
     "eslint": "9.19.0",
-    "eslint-config-next": "15.2.4",
+    "eslint-config-next": "15.3.4",
     "eslint-plugin-tailwindcss": "^3.18.0",
     "postcss": "^8.5.1",
     "prettier": "^3.4.2",
@@ -37,14 +37,14 @@
     "dayjs": "^1.11.13",
     "iso8601-duration": "^2.1.2",
     "mongodb": "^6.13.0",
-    "next": "15.2.4",
+    "next": "15.3.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "ts-pattern": "^5.6.2",
     "zod": "^3.24.1"
   },
   "overrides": {
-    "@types/react": "19.1.0",
-    "@types/react-dom": "19.1.1"
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6"
   }
 }
