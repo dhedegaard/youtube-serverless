@@ -16,32 +16,32 @@
     "playwright": "playwright test"
   },
   "devDependencies": {
-    "@playwright/test": "^1.50.1",
+    "@playwright/test": "^1.53.1",
     "@types/node": "^22.13.0",
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
-    "@typescript-eslint/eslint-plugin": "^8.22.0",
-    "autoprefixer": "^10.4.20",
-    "eslint": "9.19.0",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "9.30.0",
     "eslint-config-next": "15.3.4",
     "eslint-plugin-tailwindcss": "^3.18.0",
-    "postcss": "^8.5.1",
-    "prettier": "^3.4.2",
-    "prettier-plugin-tailwindcss": "^0.6.11",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.6.13",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "clsx": "^2.1.1",
     "daisyui": "^4.12.23",
     "dayjs": "^1.11.13",
     "iso8601-duration": "^2.1.2",
-    "mongodb": "^6.13.0",
+    "mongodb": "^6.17.0",
     "next": "15.3.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "ts-pattern": "^5.6.2",
-    "zod": "^3.24.1"
+    "ts-pattern": "^5.7.1",
+    "zod": "^3.25.67"
   },
   "overrides": {
     "@types/react": "19.1.8",
