@@ -1,7 +1,6 @@
 import daisyui, { type Config as DaisyConfig } from 'daisyui'
 import type { Config } from 'tailwindcss/types/config'
 
-/** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
@@ -11,5 +10,6 @@ export default {
   /** @type {import('daisyui').Config} */
   daisyui: {
     logs: false,
+    themes: ['light'],
   } satisfies DaisyConfig,
 } satisfies Config
