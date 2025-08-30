@@ -37,7 +37,7 @@
     "dayjs": "^1.11.13",
     "iso8601-duration": "^2.1.2",
     "mongodb": "^6.17.0",
-    "next": "15.3.4",
+    "next": "15.4.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "ts-pattern": "^5.7.1",
