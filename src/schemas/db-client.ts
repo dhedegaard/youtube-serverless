@@ -18,13 +18,13 @@ export const DbClient = z.strictObject({
   }),
 
   getLatestVideos: z.function({
-    input: [z.object({ limit: z.number().int().positive() })],
+    input: [z.object({ limit: z.int().positive() })],
     output: z.promise(z.array(Video as z.ZodType<Video, Video>).readonly()),
   }),
 
   deleteOldVideos: z.function({
-    input: [z.object({ numberToKeep: z.number().int().positive() })],
-    output: z.promise(z.number().int().nonnegative()),
+    input: [z.object({ numberToKeep: z.int().positive() })],
+    output: z.promise(z.int().nonnegative()),
   }),
 
   close: z.function({

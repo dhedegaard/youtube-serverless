@@ -64,7 +64,7 @@ export const createMongoDbClient = cache(
       )
 
       const getLatestVideos = DbClient.shape.getLatestVideos.implementAsync(
-        unstable_cache(
+        unstable_cache<DbClient['getLatestVideos']>(
           async function getLatestVideos({ limit }): Promise<Video[]> {
             const { collection } = await getCollection<{ videos: Video[] }>('videos')
             const { videos } = (await collection.findOne()) ?? {}
