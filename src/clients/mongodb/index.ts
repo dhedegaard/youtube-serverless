@@ -86,7 +86,7 @@ export const createMongoDbClient = cache(
                       }) satisfies Video
                   )
             },
-            ['latest-videos', limit],
+            ['latest-videos', String(limit)],
             { revalidate: 60 * 60, tags: [latestVideosTag] }
           )()
         }
