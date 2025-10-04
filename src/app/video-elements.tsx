@@ -5,7 +5,7 @@ import { useSearchParams } from '../hooks/use-search-params'
 import type { Video } from '../models/video'
 import { VideoElement } from './VideoElement'
 
-const SHORT_DURATION_IN_SECONDS = 120
+const SHORT_DURATION_IN_SECONDS = 60 * 2 + 30
 
 interface VideoElementsProps {
   videos: readonly Video[]
