@@ -1,8 +1,8 @@
 import { revalidatePath } from 'next/cache'
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { createMongoDbClient } from '../../../clients/mongodb'
 import { getChannelInfo } from '../../../clients/youtube'
-import { Channel } from '../../../models/channel'
+import type { Channel } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
 
@@ -18,7 +18,7 @@ export const POST = async (request: NextRequest) => {
   })
 
   try {
-    const channels = await dbClient.getChannels({})
+    const channels = await dbClient.getChannels()
     for (const channel of channels) {
       const item = await getChannelInfo({ type: 'channelId', channelId: channel.channelId }).then(
         (data) => data.items?.[0]

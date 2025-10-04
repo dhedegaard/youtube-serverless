@@ -8,7 +8,7 @@ import { SERVER_ENV } from '../../../utils/server-env'
 export const revalidate = 0
 
 const requestBodySchema = z.object({
-  channels: z.array(Channel as z.ZodType<Channel>).min(1),
+  channels: z.array(Channel as z.ZodType<Channel, Channel>).min(1),
 })
 
 interface Result {

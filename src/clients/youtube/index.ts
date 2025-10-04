@@ -19,12 +19,12 @@ const channelInfoItemSchema = z.object({
     }),
   }),
 })
-interface ChannelInfoItem extends z.TypeOf<typeof channelInfoItemSchema> {}
+interface ChannelInfoItem extends z.infer<typeof channelInfoItemSchema> {}
 const channelInfoSchema = z.object({
   /** Not defined when there's no result for given channel ID input parameter. */
-  items: z.optional(z.array(channelInfoItemSchema as z.ZodType<ChannelInfoItem>)),
+  items: z.optional(z.array(channelInfoItemSchema as z.ZodType<ChannelInfoItem, ChannelInfoItem>)),
 })
-interface ChannelInfo extends z.TypeOf<typeof channelInfoSchema> {}
+interface ChannelInfo extends z.infer<typeof channelInfoSchema> {}
 
 const getChannelInfoArgsSchema = z.discriminatedUnion('type', [
   z.object({
@@ -37,9 +37,10 @@ const getChannelInfoArgsSchema = z.discriminatedUnion('type', [
   }),
 ])
 export const getChannelInfo = z
-  .function()
-  .args(getChannelInfoArgsSchema)
-  .implement(async function getChannelInfo(args): Promise<ChannelInfo> {
+  .function({
+    input: [getChannelInfoArgsSchema],
+  })
+  .implementAsync(async function getChannelInfo(args): Promise<ChannelInfo> {
     const params = new URLSearchParams()
     params.set('part', 'snippet,contentDetails')
     switch (args.type) {
@@ -111,10 +112,10 @@ const videoItemSchema = z.object({
     channelTitle: z.string().min(1),
   }),
 })
-interface VideoItem extends z.TypeOf<typeof videoItemSchema> {}
+interface VideoItem extends z.infer<typeof videoItemSchema> {}
 const videoSchema = z.object({
   nextPageToken: z.string().optional(),
-  items: z.array(videoItemSchema as z.ZodType<VideoItem>),
+  items: z.array(videoItemSchema as z.ZodType<VideoItem, VideoItem>),
 })
 export const getVideosForChannelId = async (channelId: string): Promise<readonly VideoItem[]> => {
   const params = new URLSearchParams()
@@ -141,7 +142,7 @@ export const getVideosForChannelId = async (channelId: string): Promise<readonly
 const ContentDetailsResponseItem = z.object({
   id: z.string().min(1),
   contentDetails: z.object({
-    duration: z.optional(z.string().startsWith('P') as z.ZodType<`P${string}`>),
+    duration: z.optional(z.string().startsWith('P') as z.ZodType<`P${string}`, `P${string}`>),
   }),
   snippet: z.object({
     liveBroadcastContent: z.enum(['none', 'upcoming', 'live']),
@@ -150,18 +151,21 @@ const ContentDetailsResponseItem = z.object({
 export interface ContentDetailsResponseItem extends z.infer<typeof ContentDetailsResponseItem> {}
 
 const ContentDetailsResponse = z.object({
-  items: z.array(ContentDetailsResponseItem as z.ZodType<ContentDetailsResponseItem>),
+  items: z.array(
+    ContentDetailsResponseItem as z.ZodType<ContentDetailsResponseItem, ContentDetailsResponseItem>
+  ),
 })
 export interface ContentDetailsResponse extends z.infer<typeof ContentDetailsResponse> {}
 
 export const getContentDetailsForVideos = z
-  .function()
-  .args(
-    z.object({
-      videoIds: z.array(z.string().min(1)).max(60),
-    })
-  )
-  .implement(async function getContentDetailsForVideos({
+  .function({
+    input: [
+      z.object({
+        videoIds: z.array(z.string().min(1)).max(60),
+      }),
+    ],
+  })
+  .implementAsync(async function getContentDetailsForVideos({
     videoIds,
   }): Promise<ContentDetailsResponse> {
     if (videoIds.length === 0) {

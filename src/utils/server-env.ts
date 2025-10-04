@@ -6,7 +6,10 @@ const envSchema = z.object({
 
   YOUTUBE_API_KEY: z.string().min(1),
 
-  MONGODB_URI: z.string().startsWith('mongodb') as z.ZodType<`mongodb${string}`>,
+  MONGODB_URI: z.string().startsWith('mongodb') as z.ZodType<
+    `mongodb${string}`,
+    `mongodb${string}`
+  >,
 })
 
 export const SERVER_ENV = envSchema.parse(

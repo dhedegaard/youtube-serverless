@@ -7,14 +7,15 @@ import { Video } from '../models/video'
 import { SERVER_ENV } from '../utils/server-env'
 
 const GetVideosResult = z.object({
-  videos: z.array(Video as z.ZodType<Video>).readonly(),
+  videos: z.array(Video as z.ZodType<Video, Video>).readonly(),
 })
 export interface GetVideosResult extends z.infer<typeof GetVideosResult> {}
 const _getVideos = cache(
   z
-    .function()
-    .returns(z.promise(GetVideosResult as z.ZodType<GetVideosResult>))
-    .implement(async function getVideos(): Promise<GetVideosResult> {
+    .function({
+      output: z.promise(GetVideosResult as z.ZodType<GetVideosResult, GetVideosResult>),
+    })
+    .implementAsync(async function getVideos(): Promise<GetVideosResult> {
       const dbClient = await createMongoDbClient({
         connectionString: SERVER_ENV.MONGODB_URI,
       })

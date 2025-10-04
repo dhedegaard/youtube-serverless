@@ -2,33 +2,41 @@ import { z } from 'zod'
 import { Channel } from '../models/channel'
 import { Video } from '../models/video'
 
-export const dbClientSchema = z.strictObject({
-  getChannels: z
-    .function()
-    .args(z.object({}))
-    .returns(z.promise(z.array(Channel as z.ZodType<Channel>))),
+export const DbClient = z.strictObject({
+  getChannels: z.function({
+    output: z.promise(z.array(Channel as z.ZodType<Channel, Channel>).readonly()),
+  }),
 
-  updateChannel: z
-    .function()
-    .args(z.object({ channel: Channel as z.ZodType<Channel> }))
-    .returns(z.promise(z.void())),
+  updateChannel: z.function({
+    input: [z.object({ channel: Channel as z.ZodType<Channel, Channel> })],
+    output: z.promise(z.void()),
+  }),
 
-  putLatestVideos: z
-    .function()
-    .args(z.object({ videos: z.array(Video as z.ZodType<Video>) }))
-    .returns(z.promise(z.void())),
+  putLatestVideos: z.function({
+    input: [z.object({ videos: z.array(Video as z.ZodType<Video, Video>).readonly() })],
+    output: z.promise(z.void()),
+  }),
 
-  getLatestVideos: z
-    .function()
-    .args(z.object({ limit: z.number().int().positive() }))
-    .returns(z.promise(z.array(Video as z.ZodType<Video>))),
+  getLatestVideos: z.function({
+    input: [z.object({ limit: z.number().int().positive() })],
+    output: z.promise(z.array(Video as z.ZodType<Video, Video>).readonly()),
+  }),
 
-  deleteOldVideos: z
-    .function()
-    .args(z.object({ numberToKeep: z.number().int().positive() }))
-    .returns(z.promise(z.number().int().nonnegative())),
+  deleteOldVideos: z.function({
+    input: [z.object({ numberToKeep: z.number().int().positive() })],
+    output: z.promise(z.number().int().nonnegative()),
+  }),
 
-  close: z.function().returns(z.promise(z.void())),
+  close: z.function({
+    output: z.promise(z.void()),
+  }),
 })
 
-export interface DbClient extends z.TypeOf<typeof dbClientSchema> {}
+export interface DbClient {
+  getChannels: () => Promise<readonly Channel[]>
+  updateChannel: (args: { channel: Channel }) => Promise<void>
+  putLatestVideos: (args: { videos: readonly Video[] }) => Promise<void>
+  getLatestVideos: (args: { limit: number }) => Promise<readonly Video[]>
+  deleteOldVideos: (args: { numberToKeep: number }) => Promise<number>
+  close: () => Promise<void>
+}

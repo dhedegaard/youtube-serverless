@@ -1,17 +1,18 @@
-import { Document, MongoClient } from 'mongodb'
+import { type Document, MongoClient } from 'mongodb'
 import { unstable_cache, unstable_expireTag } from 'next/cache'
 import { cache } from 'react'
 import { z } from 'zod'
-import { Channel } from '../../models/channel'
-import { Video } from '../../models/video'
-import { DbClient, dbClientSchema } from '../../schemas/db-client'
+import type { Channel } from '../../models/channel'
+import type { Video } from '../../models/video'
+import { DbClient } from '../../schemas/db-client'
 
 export const createMongoDbClient = cache(
   z
-    .function()
-    .args(z.object({ connectionString: z.string().min(1) }))
-    .returns(z.promise(dbClientSchema as z.ZodType<DbClient>))
-    .implement(async function createMongoDbClient({ connectionString }): Promise<DbClient> {
+    .function({
+      input: [z.object({ connectionString: z.string().min(1) })],
+      output: z.promise(DbClient as unknown as z.ZodType<DbClient, DbClient>),
+    })
+    .implementAsync(async function createMongoDbClient({ connectionString }) {
       const databaseName = 'youtube-serverless'
 
       // Maintain the same client across factory calls, as long as the connection string is the same.
@@ -27,7 +28,7 @@ export const createMongoDbClient = cache(
         })
       }
 
-      const getChannels = dbClientSchema.shape.getChannels.implement(
+      const getChannels = DbClient.shape.getChannels.implementAsync(
         async function getChannels(): Promise<Channel[]> {
           const { collection } = await getCollection<Channel>('channels')
           const channelsWithId = await collection.find().toArray()
@@ -45,7 +46,7 @@ export const createMongoDbClient = cache(
         }
       )
 
-      const updateChannel = dbClientSchema.shape.updateChannel.implement(
+      const updateChannel = DbClient.shape.updateChannel.implementAsync(
         async function updateChannel({ channel }) {
           const { collection } = await getCollection<Channel>('channels')
           await collection.replaceOne({ channelId: channel.channelId }, channel, { upsert: true })
@@ -54,15 +55,15 @@ export const createMongoDbClient = cache(
 
       const latestVideosTag = 'latest-videos'
 
-      const putLatestVideos = dbClientSchema.shape.putLatestVideos.implement(
+      const putLatestVideos = DbClient.shape.putLatestVideos.implementAsync(
         async function putVideo({ videos }) {
           const { collection } = await getCollection<{ videos: Video[] }>('videos')
-          await collection.updateOne({}, { $set: { videos } }, { upsert: true })
+          await collection.updateOne({}, { $set: { videos: [...videos] } }, { upsert: true })
           unstable_expireTag(latestVideosTag)
         }
       )
 
-      const getLatestVideos = dbClientSchema.shape.getLatestVideos.implement(
+      const getLatestVideos = DbClient.shape.getLatestVideos.implementAsync(
         unstable_cache(
           async function getLatestVideos({ limit }): Promise<Video[]> {
             const { collection } = await getCollection<{ videos: Video[] }>('videos')
@@ -89,24 +90,26 @@ export const createMongoDbClient = cache(
         )
       )
 
-      const deleteOldVideos = dbClientSchema.shape.deleteOldVideos.implement(
+      const deleteOldVideos = DbClient.shape.deleteOldVideos.implementAsync(
         async function deleteOldVideos(): Promise<number> {
           // NOTE: Nothing to cleanup for this backend.
           return Promise.resolve(0)
         }
       )
 
-      const close: DbClient['close'] = () => client.close()
+      const close: DbClient['close'] = DbClient.shape.close.implementAsync(async function close() {
+        await client.close()
+      })
 
       await client.connect()
 
-      return {
+      return await DbClient.parseAsync({
         getChannels,
         updateChannel,
         putLatestVideos,
         getLatestVideos,
         deleteOldVideos,
         close,
-      } satisfies DbClient
+      } satisfies DbClient)
     })
 )

@@ -11,4 +11,4 @@ export const Video = z.strictObject({
   title: z.string(),
   durationInSeconds: z.nullable(z.number().int().nonnegative()),
 })
-export interface Video extends z.TypeOf<typeof Video> {}
+export interface Video extends z.infer<typeof Video> {}
