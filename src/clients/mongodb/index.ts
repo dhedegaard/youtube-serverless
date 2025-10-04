@@ -64,30 +64,32 @@ export const createMongoDbClient = cache(
       )
 
       const getLatestVideos = DbClient.shape.getLatestVideos.implementAsync(
-        unstable_cache<DbClient['getLatestVideos']>(
-          async function getLatestVideos({ limit }): Promise<Video[]> {
-            const { collection } = await getCollection<{ videos: Video[] }>('videos')
-            const { videos } = (await collection.findOne()) ?? {}
-            return videos == null
-              ? []
-              : videos.slice(0, limit).map<Video>(
-                  (video) =>
-                    ({
-                      channelId: video.channelId,
-                      videoId: video.videoId,
-                      videoPublishedAt: video.videoPublishedAt,
-                      thumbnail: video.thumbnail,
-                      channelTitle: video.channelTitle,
-                      channelThumbnail: video.channelThumbnail,
-                      channelLink: video.channelLink,
-                      title: video.title,
-                      durationInSeconds: video.durationInSeconds,
-                    }) satisfies Video
-                )
-          },
-          ['latest-videos'],
-          { revalidate: 60 * 60, tags: [latestVideosTag] }
-        )
+        async function getLatestVideos({ limit }): Promise<Video[]> {
+          return await unstable_cache(
+            async () => {
+              const { collection } = await getCollection<{ videos: Video[] }>('videos')
+              const { videos } = (await collection.findOne()) ?? {}
+              return videos == null
+                ? []
+                : videos.slice(0, limit).map<Video>(
+                    (video) =>
+                      ({
+                        channelId: video.channelId,
+                        videoId: video.videoId,
+                        videoPublishedAt: video.videoPublishedAt,
+                        thumbnail: video.thumbnail,
+                        channelTitle: video.channelTitle,
+                        channelThumbnail: video.channelThumbnail,
+                        channelLink: video.channelLink,
+                        title: video.title,
+                        durationInSeconds: video.durationInSeconds,
+                      }) satisfies Video
+                  )
+            },
+            ['latest-videos', limit],
+            { revalidate: 60 * 60, tags: [latestVideosTag] }
+          )()
+        }
       )
 
       const deleteOldVideos = DbClient.shape.deleteOldVideos.implementAsync(
