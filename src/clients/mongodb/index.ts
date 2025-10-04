@@ -12,7 +12,7 @@ export const createMongoDbClient = cache(
       input: [z.object({ connectionString: z.string().min(1) })],
       output: z.promise(DbClient as unknown as z.ZodType<DbClient, DbClient>),
     })
-    .implementAsync(async function createMongoDbClient({ connectionString }) {
+    .implementAsync(async function createMongoDbClient({ connectionString }): Promise<DbClient> {
       const databaseName = 'youtube-serverless'
 
       // Maintain the same client across factory calls, as long as the connection string is the same.
@@ -103,13 +103,13 @@ export const createMongoDbClient = cache(
 
       await client.connect()
 
-      return await DbClient.parseAsync({
+      return {
         getChannels,
         updateChannel,
         putLatestVideos,
         getLatestVideos,
         deleteOldVideos,
         close,
-      } satisfies DbClient)
+      } satisfies DbClient
     })
 )

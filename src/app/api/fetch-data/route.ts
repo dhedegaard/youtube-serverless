@@ -24,7 +24,7 @@ export const POST = async (request: NextRequest) => {
   })
 
   try {
-    const channels = await dbClient.getChannels({})
+    const channels = await dbClient.getChannels()
     const updateChannelsPromises: Promise<unknown>[] = []
     // Determine all the new videos.
     const { videos } = await Promise.all(
