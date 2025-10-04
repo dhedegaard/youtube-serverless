@@ -79,8 +79,8 @@ export const POST = async (request: NextRequest) => {
     await Promise.all([
       // The channelpromises ran in parallel, await them before invalidating anything.
       Promise.all(updateChannelsPromises),
-      // We store up to the last 50 videos and throw away the rest.
-      dbClient.putLatestVideos({ videos: videos.slice(0, 60) }),
+      // We store up to the last 120 videos and throw away the rest.
+      dbClient.putLatestVideos({ videos: videos.slice(0, 120) }),
     ])
 
     revalidatePath('/')
