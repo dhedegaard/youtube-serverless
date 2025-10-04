@@ -18,7 +18,7 @@ export const DbClient = z.strictObject({
   }),
 
   getLatestVideos: z.function({
-    input: [z.object({ limit: z.int().positive() })],
+    input: [z.object({ limit: z.int().positive(), types: z.literal(['all', 'long-videos']) })],
     output: z.promise(z.array(Video as z.ZodType<Video, Video>).readonly()),
   }),
 
@@ -36,7 +36,10 @@ export interface DbClient {
   getChannels: () => Promise<readonly Channel[]>
   updateChannel: (args: { channel: Channel }) => Promise<void>
   putLatestVideos: (args: { videos: readonly Video[] }) => Promise<void>
-  getLatestVideos: (args: { limit: number }) => Promise<readonly Video[]>
+  getLatestVideos: (args: {
+    limit: number
+    types: 'all' | 'long-videos'
+  }) => Promise<readonly Video[]>
   deleteOldVideos: (args: { numberToKeep: number }) => Promise<number>
   close: () => Promise<void>
 }

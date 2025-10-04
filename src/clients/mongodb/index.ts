@@ -1,10 +1,13 @@
 import { type Document, MongoClient } from 'mongodb'
 import { unstable_cache, unstable_expireTag } from 'next/cache'
 import { cache } from 'react'
+import { match } from 'ts-pattern'
 import { z } from 'zod'
 import type { Channel } from '../../models/channel'
 import type { Video } from '../../models/video'
 import { DbClient } from '../../schemas/db-client'
+
+const SHORT_DURATION_IN_SECONDS = 60 * 2 + 30
 
 export const createMongoDbClient = cache(
   z
@@ -64,29 +67,42 @@ export const createMongoDbClient = cache(
       )
 
       const getLatestVideos = DbClient.shape.getLatestVideos.implementAsync(
-        async function getLatestVideos({ limit }): Promise<Video[]> {
+        async function getLatestVideos({ limit, types }): Promise<Video[]> {
           return await unstable_cache(
             async () => {
               const { collection } = await getCollection<{ videos: Video[] }>('videos')
               const { videos } = (await collection.findOne()) ?? {}
               return videos == null
                 ? []
-                : videos.slice(0, limit).map<Video>(
-                    (video) =>
-                      ({
-                        channelId: video.channelId,
-                        videoId: video.videoId,
-                        videoPublishedAt: video.videoPublishedAt,
-                        thumbnail: video.thumbnail,
-                        channelTitle: video.channelTitle,
-                        channelThumbnail: video.channelThumbnail,
-                        channelLink: video.channelLink,
-                        title: video.title,
-                        durationInSeconds: video.durationInSeconds,
-                      }) satisfies Video
-                  )
+                : videos
+                    .filter((video) =>
+                      match(types)
+                        .with('all', () => true)
+                        .with(
+                          'long-videos',
+                          () =>
+                            video.durationInSeconds == null ||
+                            video.durationInSeconds >= SHORT_DURATION_IN_SECONDS
+                        )
+                        .exhaustive()
+                    )
+                    .slice(0, limit)
+                    .map<Video>(
+                      (video) =>
+                        ({
+                          channelId: video.channelId,
+                          videoId: video.videoId,
+                          videoPublishedAt: video.videoPublishedAt,
+                          thumbnail: video.thumbnail,
+                          channelTitle: video.channelTitle,
+                          channelThumbnail: video.channelThumbnail,
+                          channelLink: video.channelLink,
+                          title: video.title,
+                          durationInSeconds: video.durationInSeconds,
+                        }) satisfies Video
+                    )
             },
-            ['latest-videos', String(limit)],
+            ['latest-videos', String(limit), types],
             { revalidate: 60 * 60, tags: [latestVideosTag] }
           )()
         }
