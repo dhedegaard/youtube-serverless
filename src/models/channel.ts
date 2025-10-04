@@ -8,4 +8,4 @@ export const Channel = z.strictObject({
   channelThumbnail: z.string(),
   channelLink: z.string(),
 })
-export interface Channel extends z.TypeOf<typeof Channel> {}
+export interface Channel extends z.infer<typeof Channel> {}

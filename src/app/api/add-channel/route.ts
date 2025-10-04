@@ -33,7 +33,7 @@ export const POST = async (request: NextRequest) => {
     return NextResponse.json(
       {
         error: 'Missing or bad query params',
-        errors: paramsResult.error.errors,
+        errors: paramsResult.error.issues,
       },
       { status: 400 }
     )

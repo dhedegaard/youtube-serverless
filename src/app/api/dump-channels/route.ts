@@ -9,10 +9,10 @@ export const revalidate = 0
 
 const Result = z.object({
   statusCode: z.number().int().positive(),
-  channels: z.array(Channel as z.ZodType<Channel>),
+  channels: z.array(Channel as z.ZodType<Channel, Channel>),
   message: z.string().min(1),
 })
-interface Result extends z.TypeOf<typeof Result> {}
+interface Result extends z.infer<typeof Result> {}
 
 export const GET = async (request: NextRequest): Promise<NextResponse<Result>> => {
   const result = await handleRequest({ request })
@@ -20,10 +20,11 @@ export const GET = async (request: NextRequest): Promise<NextResponse<Result>> =
 }
 
 const handleRequest = z
-  .function()
-  .args(z.object({ request: z.instanceof(Request) as z.ZodType<NextRequest> }))
-  .returns(z.promise(Result))
-  .implement(async function handleRequest({ request }): Promise<Result> {
+  .function({
+    input: [z.object({ request: z.unknown() as z.ZodType<NextRequest, NextRequest> })],
+    output: z.promise(Result),
+  })
+  .implementAsync(async function handleRequest({ request }): Promise<Result> {
     if (!isApiRequestAuthenticated(request)) {
       return {
         channels: [],
@@ -37,7 +38,7 @@ const handleRequest = z
     })
 
     try {
-      const channels = await dbClient.getChannels({}).then((channels) =>
+      const channels = await dbClient.getChannels().then((channels) =>
         channels.map<Channel>(
           (channel) =>
             ({
