@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import { Header } from './header'
 import { LoadingVideoElement } from './loading-video-element'
 
