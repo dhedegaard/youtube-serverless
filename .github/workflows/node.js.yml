@@ -5,6 +5,13 @@ on:
   pull_request:
     branches: ["master"]
 
+env:
+  CI: true
+  SECRET: TEST
+  CRON_SECRET: TEST
+  YOUTUBE_API_KEY: TEST
+  MONGODB_URI: TEST
+
 jobs:
   build:
     runs-on: ubuntu-latest
