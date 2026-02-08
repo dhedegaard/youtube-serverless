@@ -1,5 +1,5 @@
 import { type Document, MongoClient } from 'mongodb'
-import { unstable_cache, unstable_expireTag } from 'next/cache'
+import { revalidateTag, unstable_cache } from 'next/cache'
 import { cache } from 'react'
 import { match } from 'ts-pattern'
 import { z } from 'zod'
@@ -62,7 +62,7 @@ export const createMongoDbClient = cache(
         async function putVideo({ videos }) {
           const { collection } = await getCollection<{ videos: Video[] }>('videos')
           await collection.updateOne({}, { $set: { videos: [...videos] } }, { upsert: true })
-          unstable_expireTag(latestVideosTag)
+          revalidateTag(latestVideosTag, { expire: 0 })
         }
       )
 

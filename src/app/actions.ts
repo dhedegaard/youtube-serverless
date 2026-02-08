@@ -16,9 +16,7 @@ const _getVideos = cache(
       output: z.promise(GetVideosResult as z.ZodType<GetVideosResult, GetVideosResult>),
     })
     .implementAsync(async function getVideos(): Promise<GetVideosResult> {
-      const dbClient = await createMongoDbClient({
-        connectionString: SERVER_ENV.MONGODB_URI,
-      })
+      const dbClient = await createMongoDbClient({ connectionString: SERVER_ENV.MONGODB_URI })
 
       try {
         return {
