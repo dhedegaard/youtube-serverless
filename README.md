@@ -1,6 +1,8 @@
 # youtube-serverless
 
-In order to run the project you need to set the following environment variables:
+Requires Node.js 24 or newer.
+
+In order to run the project you need to set the following environment variables in `.envrc`:
 
 ```
 MONGODB_URI=

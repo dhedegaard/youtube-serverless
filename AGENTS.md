@@ -6,7 +6,7 @@
 - Frontpage (`/`) renders latest videos and supports a client-side shorts filter.
 
 ## Stack
-- Node.js `>=22` (`package.json` engines)
+- Node.js `>=24` (`package.json` engines)
 - Next.js `16.1.6` + React `19.2.x`
 - TypeScript (strict), Zod for runtime validation
 - MongoDB (`mongodb` driver)
@@ -14,7 +14,7 @@
 - Playwright for end-to-end tests
 
 ## Environment Variables
-Required in `.env.local`:
+Required in `.envrc`:
 - `MONGODB_URI`
 - `YOUTUBE_API_KEY`
 - `SECRET`
@@ -22,7 +22,7 @@ Required in `.env.local`:
 Optional:
 - `CRON_SECRET` (accepted for Vercel cron auth)
 
-Validation is centralized in `src/utils/server-env.ts` using Zod. Access env values via `SERVER_ENV` (do not read `process.env.*` directly in feature code).
+Validation is centralized in `src/utils/server-env.ts` using Zod. The app loads required values from `.envrc` before validation. Access env values via `SERVER_ENV` (do not read `process.env.*` directly in feature code).
 
 ## Common Commands
 - Install deps: `npm install`
