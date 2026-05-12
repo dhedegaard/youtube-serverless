@@ -12,7 +12,7 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
   return (
     <div className="flex flex-auto flex-col items-stretch">
       <a
-        className="relative mb-1 flex w-full overflow-hidden rounded-lg bg-gray-100 p-0 bg-blend-multiply shadow"
+        className="relative mb-1 flex w-full overflow-hidden rounded-lg bg-gray-100 p-0 bg-blend-multiply shadow-sm"
         href={`https://www.youtube.com/watch?v=${video.videoId}`}
         target="_blank"
         rel="noreferrer noopener"
@@ -26,7 +26,7 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
           loading="lazy"
         />
         {typeof video.durationInSeconds === 'number' && video.durationInSeconds > 0 && (
-          <div className="pointer-events-none absolute bottom-1 right-1 select-none rounded bg-slate-900/75 px-1 py-0.5 text-xs font-semibold text-white">
+          <div className="pointer-events-none absolute bottom-1 right-1 select-none rounded-sm bg-slate-900/75 px-1 py-0.5 text-xs font-semibold text-white">
             {video.durationInSeconds > 60 * 60 && (
               <>{Math.floor(video.durationInSeconds / (60 * 60))}:</>
             )}

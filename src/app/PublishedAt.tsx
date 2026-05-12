@@ -23,7 +23,7 @@ export const PublishedAt = memo(function PublishedAt({ videoPublishedAt }: Props
     <div
       className={clsx(
         'basis-auto whitespace-nowrap text-right text-sm text-gray-500',
-        publishedAtFromNow == null && 'skeleton w-1/4 rounded bg-slate-50'
+        publishedAtFromNow == null && 'skeleton w-1/4 rounded-sm bg-slate-50'
       )}
       title={`${useMemo(
         () =>

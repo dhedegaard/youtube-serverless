@@ -20,11 +20,15 @@ export const ShortsToggle = memo<ShortsToggleProps>(function ShortsToggle({ clas
     [setSearchParams]
   )
   return (
-    <label className="flex items-center gap-2">
-      <div className="text-white">Show shorts</div>
+    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-white select-none">
+      <span>Show shorts</span>
       <input
         type="checkbox"
-        className={clsx('toggle toggle-primary', className)}
+        aria-label="Show shorts"
+        className={clsx(
+          'toggle toggle-primary toggle-sm border-white/80 bg-white shadow-sm focus-visible:outline-white',
+          className
+        )}
         defaultChecked={searchParams?.showShorts === '1'}
         onChange={handleChange}
       />

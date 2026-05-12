@@ -8,7 +8,7 @@ export const Header = memo(function Header() {
       <div className="mx-auto flex w-full max-w-7xl flex-wrap gap-3 px-4">
         <Logo className="flex-none" width={24} height={24} />
         <div className="flex-auto text-white">New youtube videos</div>
-        <Suspense fallback={<div className="skeleton w-36 rounded" />}>
+        <Suspense fallback={<div className="skeleton w-36 rounded-sm" />}>
           <ShortsToggle className="flex-none" />
         </Suspense>
       </div>
