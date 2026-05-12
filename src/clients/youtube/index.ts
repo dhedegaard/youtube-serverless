@@ -9,7 +9,6 @@ const channelInfoItemSchema = z.object({
   snippet: z.object({
     title: z.string().min(1),
     description: z.string(),
-    customUrl: z.string(),
     thumbnails: z.object({
       high: z.object({
         url: z.string().min(1),
