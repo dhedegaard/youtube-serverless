@@ -36,13 +36,13 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
         )}
       </a>
 
-      <b className={styles.title} title={video.title}>
+      <b className={styles['title']} title={video.title}>
         {video.title}
       </b>
 
       <div className="mt-auto flex w-full items-center justify-between">
         <a
-          className={styles.channelTitle}
+          className={styles['channelTitle']}
           href={video.channelLink}
           target="_blank"
           rel="noopener noreferrer"

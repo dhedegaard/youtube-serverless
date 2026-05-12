@@ -10,6 +10,7 @@ const eslintConfig = defineConfig([
   {
     rules: {
       '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
     },
     languageOptions: {
       parserOptions: {

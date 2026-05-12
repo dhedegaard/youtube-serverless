@@ -4,31 +4,31 @@ import { Video } from '../models/video'
 
 export const DbClient = z.strictObject({
   getChannels: z.function({
-    output: z.promise(z.array(Channel as z.ZodType<Channel, Channel>).readonly()),
+    output: z.array(Channel as z.ZodType<Channel, Channel>).readonly(),
   }),
 
   updateChannel: z.function({
     input: [z.object({ channel: Channel as z.ZodType<Channel, Channel> })],
-    output: z.promise(z.void()),
+    output: z.void(),
   }),
 
   putLatestVideos: z.function({
     input: [z.object({ videos: z.array(Video as z.ZodType<Video, Video>).readonly() })],
-    output: z.promise(z.void()),
+    output: z.void(),
   }),
 
   getLatestVideos: z.function({
     input: [z.object({ limit: z.int().positive(), types: z.literal(['all', 'long-videos']) })],
-    output: z.promise(z.array(Video as z.ZodType<Video, Video>).readonly()),
+    output: z.array(Video as z.ZodType<Video, Video>).readonly(),
   }),
 
   deleteOldVideos: z.function({
     input: [z.object({ numberToKeep: z.int().positive() })],
-    output: z.promise(z.int().nonnegative()),
+    output: z.int().nonnegative(),
   }),
 
   close: z.function({
-    output: z.promise(z.void()),
+    output: z.void(),
   }),
 })
 

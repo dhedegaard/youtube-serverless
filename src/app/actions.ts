@@ -13,7 +13,7 @@ export interface GetVideosResult extends z.infer<typeof GetVideosResult> {}
 const _getVideos = cache(
   z
     .function({
-      output: z.promise(GetVideosResult as z.ZodType<GetVideosResult, GetVideosResult>),
+      output: GetVideosResult as z.ZodType<GetVideosResult, GetVideosResult>,
     })
     .implementAsync(async function getVideos(): Promise<GetVideosResult> {
       const dbClient = await createMongoDbClient({ connectionString: SERVER_ENV.MONGODB_URI })
