@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import * as z from 'zod'
 
 const envSchema = z.object({
   SECRET: z.string().min(1),

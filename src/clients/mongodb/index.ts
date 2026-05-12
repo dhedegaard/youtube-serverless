@@ -1,7 +1,7 @@
 import { type Document, MongoClient } from 'mongodb'
 import { revalidateTag, unstable_cache } from 'next/cache'
 import { match } from 'ts-pattern'
-import { z } from 'zod'
+import * as z from 'zod'
 import { Channel } from '../../models/channel'
 import { Video } from '../../models/video'
 

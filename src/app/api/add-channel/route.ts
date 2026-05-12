@@ -1,6 +1,6 @@
 import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
+import * as z from 'zod'
 import { createMongoDbClient } from '../../../clients/mongodb'
 import { getChannelInfo } from '../../../clients/youtube'
 import { Channel } from '../../../models/channel'

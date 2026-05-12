@@ -1,7 +1,7 @@
 'use server'
 
 import { cache } from 'react'
-import { z } from 'zod'
+import * as z from 'zod'
 import { createMongoDbClient } from '../clients/mongodb'
 import { Video } from '../models/video'
 import { SERVER_ENV } from '../utils/server-env'

@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import * as z from 'zod'
 import { SERVER_ENV } from '../../utils/server-env'
 
 const channelInfoItemSchema = z.object({
