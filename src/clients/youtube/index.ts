@@ -1,6 +1,9 @@
 import * as z from 'zod'
 import { SERVER_ENV } from '../../utils/server-env'
 
+// YouTube Data API list endpoints cap page sizes at 50.
+const YOUTUBE_MAX_RESULTS = 50
+
 const channelInfoItemSchema = z.object({
   id: z.string().min(1),
   snippet: z.object({
@@ -120,7 +123,7 @@ const videoSchema = z.object({
 export const getVideosForChannelId = async (channelId: string): Promise<readonly VideoItem[]> => {
   const params = new URLSearchParams()
   params.set('part', 'contentDetails,snippet')
-  params.set('maxResults', '60')
+  params.set('maxResults', String(YOUTUBE_MAX_RESULTS))
   params.set('playlistId', channelId)
   params.set('key', SERVER_ENV.YOUTUBE_API_KEY)
   const resp = await fetch(
@@ -161,7 +164,7 @@ export const getContentDetailsForVideos = z
   .function({
     input: [
       z.object({
-        videoIds: z.array(z.string().min(1)).max(60),
+        videoIds: z.array(z.string().min(1)).max(YOUTUBE_MAX_RESULTS),
       }),
     ],
   })
