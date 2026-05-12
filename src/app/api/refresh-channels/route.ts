@@ -19,28 +19,32 @@ export const POST = async (request: NextRequest) => {
 
   try {
     const channels = await dbClient.getChannels()
+    const updatedChannels: Channel[] = []
     for (const channel of channels) {
       const item = await getChannelInfo({ type: 'channelId', channelId: channel.channelId }).then(
         (data) => data.items?.[0]
       )
       if (item == null) {
+        updatedChannels.push(channel)
         continue
       }
+      const updatedChannel = {
+        ...channel,
+        channelTitle: item.snippet.title,
+        channelThumbnail: item.snippet.thumbnails.high.url,
+        playlist: item.contentDetails.relatedPlaylists.uploads,
+        thumbnail: item.snippet.thumbnails.high.url,
+        channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
+      } satisfies Channel
       await dbClient.updateChannel({
-        channel: {
-          ...channel,
-          channelTitle: item.snippet.title,
-          channelThumbnail: item.snippet.thumbnails.high.url,
-          playlist: item.contentDetails.relatedPlaylists.uploads,
-          thumbnail: item.snippet.thumbnails.high.url,
-          channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
-        } satisfies Channel,
+        channel: updatedChannel,
       })
+      updatedChannels.push(updatedChannel)
     }
 
     revalidatePath('/')
 
-    return NextResponse.json({ channels })
+    return NextResponse.json({ channels: updatedChannels })
   } catch (error: unknown) {
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

@@ -19,6 +19,10 @@ test('/api/refresh-channels should return 200', async ({ request }) => {
   })
 
   expect(response.status()).toBe(200)
+  const responseJson: unknown = await response.json()
+  expect(responseJson).toMatchObject({
+    channels: expect.any(Array),
+  })
 })
 
 test('/api/dump-channels should return 200', async ({ request }) => {
