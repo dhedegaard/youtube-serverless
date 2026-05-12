@@ -4,10 +4,33 @@ import { match } from 'ts-pattern'
 import * as z from 'zod'
 import { Channel } from '../../models/channel'
 import { Video } from '../../models/video'
-import { isShortDuration } from '../../utils/youtube-shorts'
+import { classifyShortVideo } from '../../utils/youtube-shorts'
 
 const ChannelSchema = Channel as z.ZodType<Channel, Channel>
 const VideoSchema = Video as z.ZodType<Video, Video>
+type StoredVideo = Omit<Video, 'isShort' | 'shortDetectionMethod'> &
+  Partial<Pick<Video, 'isShort' | 'shortDetectionMethod'>>
+
+const normalizeStoredVideo = (video: StoredVideo): Video => {
+  const fallbackClassification = classifyShortVideo({
+    durationInSeconds: video.durationInSeconds,
+    isServedAsShort: null,
+  })
+
+  return {
+    channelId: video.channelId,
+    videoId: video.videoId,
+    videoPublishedAt: video.videoPublishedAt,
+    thumbnail: video.thumbnail,
+    channelTitle: video.channelTitle,
+    channelThumbnail: video.channelThumbnail,
+    channelLink: video.channelLink,
+    title: video.title,
+    durationInSeconds: video.durationInSeconds,
+    isShort: video.isShort ?? fallbackClassification.isShort,
+    shortDetectionMethod: video.shortDetectionMethod ?? fallbackClassification.shortDetectionMethod,
+  } satisfies Video
+}
 
 export const createMongoDbClient = z
   .function({
@@ -79,37 +102,19 @@ export const createMongoDbClient = z
       .implementAsync(async function getLatestVideos({ limit, types }): Promise<Video[]> {
         return await unstable_cache(
           async () => {
-            const { collection } = await getCollection<{ videos: Video[] }>('videos')
+            const { collection } = await getCollection<{ videos: StoredVideo[] }>('videos')
             const { videos } = (await collection.findOne()) ?? {}
             return videos == null
               ? []
               : videos
+                  .map(normalizeStoredVideo)
                   .filter((video) =>
                     match(types)
                       .with('all', () => true)
-                      .with(
-                        'long-videos',
-                        () =>
-                          video.durationInSeconds == null ||
-                          !isShortDuration(video.durationInSeconds)
-                      )
+                      .with('long-videos', () => !video.isShort)
                       .exhaustive()
                   )
                   .slice(0, limit)
-                  .map<Video>(
-                    (video) =>
-                      ({
-                        channelId: video.channelId,
-                        videoId: video.videoId,
-                        videoPublishedAt: video.videoPublishedAt,
-                        thumbnail: video.thumbnail,
-                        channelTitle: video.channelTitle,
-                        channelThumbnail: video.channelThumbnail,
-                        channelLink: video.channelLink,
-                        title: video.title,
-                        durationInSeconds: video.durationInSeconds,
-                      }) satisfies Video
-                  )
           },
           ['latest-videos', String(limit), types],
           { revalidate: 60 * 60, tags: [latestVideosTag] }

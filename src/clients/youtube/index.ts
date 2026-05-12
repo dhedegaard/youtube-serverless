@@ -188,3 +188,32 @@ export const getContentDetailsForVideos = z
     const responseJson: unknown = await response.json()
     return await ContentDetailsResponse.parseAsync(responseJson)
   })
+
+export const isVideoServedAsShort = z
+  .function({
+    input: [z.object({ videoId: z.string().min(1) })],
+    output: z.boolean().nullable(),
+  })
+  .implementAsync(async function isVideoServedAsShort({ videoId }): Promise<boolean | null> {
+    try {
+      const url = new URL(`https://www.youtube.com/shorts/${encodeURIComponent(videoId)}`)
+      const response = await fetch(url, {
+        method: 'HEAD',
+        redirect: 'manual',
+        signal: AbortSignal.timeout(5_000),
+      })
+
+      if (response.status === 200) {
+        return true
+      }
+
+      if (response.status >= 300 && response.status < 400) {
+        const location = response.headers.get('location')
+        return location == null || !location.includes('/watch') ? null : false
+      }
+
+      return null
+    } catch {
+      return null
+    }
+  })

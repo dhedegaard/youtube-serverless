@@ -5,14 +5,18 @@ import { createMongoDbClient } from '../../../clients/mongodb'
 import {
   getChannelInfo,
   getContentDetailsForVideos,
+  isVideoServedAsShort,
   getVideosForChannelId,
 } from '../../../clients/youtube'
 import { Video } from '../../../models/video'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
+import { classifyShortVideo } from '../../../utils/youtube-shorts'
 
 export const maxDuration = 60
 export const revalidate = 0
+
+type VideoWithoutShortClassification = Omit<Video, 'isShort' | 'shortDetectionMethod'>
 
 export const POST = async (request: NextRequest) => {
   if (!isApiRequestAuthenticated(request)) {
@@ -27,8 +31,8 @@ export const POST = async (request: NextRequest) => {
     const channels = await dbClient.getChannels()
     const updateChannelsPromises: Promise<unknown>[] = []
     // Determine all the new videos.
-    const { videos } = await Promise.all(
-      channels.map<Promise<{ videos: Video[] }>>(async (channel) => {
+    const unclassifiedVideos = await Promise.all(
+      channels.map<Promise<{ videos: VideoWithoutShortClassification[] }>>(async (channel) => {
         const item = await getChannelInfo({ type: 'channelId', channelId: channel.channelId }).then(
           (data) => data.items?.[0]
         )
@@ -42,7 +46,7 @@ export const POST = async (request: NextRequest) => {
         })
         return {
           videos: videos
-            .map<Video | null>((videoItem) => {
+            .map<VideoWithoutShortClassification | null>((videoItem) => {
               const contentDetailsItem = contentDetailsItems.items.find(
                 (item) => item.id === videoItem.contentDetails.videoId
               )
@@ -63,24 +67,36 @@ export const POST = async (request: NextRequest) => {
                 channelThumbnail: channel.thumbnail,
                 channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
                 durationInSeconds: durationInSeconds ?? null,
-              } satisfies Video
+              } satisfies VideoWithoutShortClassification
             })
             .filter((video) => video != null),
         }
       })
-    ).then((results) => ({
-      // Flatmap the videos from all the channels, and order then by when they were published (ASC).
-      videos: results
-        .flatMap((result) => result.videos)
-        .sort((a, b) => a.videoPublishedAt.localeCompare(b.videoPublishedAt))
-        .reverse(),
-    }))
+    )
+      .then((results) => ({
+        // Flatmap the videos from all the channels, and order then by when they were published (ASC).
+        videos: results
+          .flatMap((result) => result.videos)
+          .sort((a, b) => a.videoPublishedAt.localeCompare(b.videoPublishedAt))
+          .reverse(),
+      }))
+      .then((result) => result.videos)
+
+    const videos = await Promise.all(
+      unclassifiedVideos.slice(0, 120).map(async (video) => ({
+        ...video,
+        ...classifyShortVideo({
+          durationInSeconds: video.durationInSeconds,
+          isServedAsShort: await isVideoServedAsShort({ videoId: video.videoId }),
+        }),
+      }))
+    )
 
     await Promise.all([
       // The channelpromises ran in parallel, await them before invalidating anything.
       Promise.all(updateChannelsPromises),
       // We store up to the last 120 videos and throw away the rest.
-      dbClient.putLatestVideos({ videos: videos.slice(0, 120) }),
+      dbClient.putLatestVideos({ videos }),
     ])
 
     revalidatePath('/')
@@ -88,7 +104,7 @@ export const POST = async (request: NextRequest) => {
     return NextResponse.json({
       channelcount: channels.length,
       updatedChannels: updateChannelsPromises.length,
-      videoCount: videos.length,
+      videoCount: unclassifiedVideos.length,
     })
   } catch (error: unknown) {
     console.error(error)
