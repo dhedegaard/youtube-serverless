@@ -1,6 +1,6 @@
 'use client'
 
-import { useSearchParams as useNextSearchParams, usePathname, useRouter } from 'next/navigation'
+import { useSearchParams as useNextSearchParams, usePathname } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
 import * as z from 'zod'
 
@@ -17,7 +17,6 @@ export const useSearchParams = () => {
     [rawSearchParams]
   )
 
-  const router = useRouter()
   const setSearchParams = useCallback(
     (searchParams: SearchParams) => {
       const newSearchParams = new URLSearchParams()
@@ -28,13 +27,11 @@ export const useSearchParams = () => {
         }
       }
 
-      if (newSearchParams.size === 0) {
-        router.replace(pathname)
-      } else {
-        router.replace(`${pathname}?${newSearchParams.toString()}`)
-      }
+      const href =
+        newSearchParams.size === 0 ? pathname : `${pathname}?${newSearchParams.toString()}`
+      window.history.replaceState(null, '', href)
     },
-    [pathname, router]
+    [pathname]
   )
 
   return useMemo(
