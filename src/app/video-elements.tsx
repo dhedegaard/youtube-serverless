@@ -3,9 +3,8 @@
 import { memo, useMemo } from 'react'
 import { useSearchParams } from '../hooks/use-search-params'
 import type { Video } from '../models/video'
+import { isShortDuration } from '../utils/youtube-shorts'
 import { VideoElement } from './VideoElement'
-
-const SHORT_DURATION_IN_SECONDS = 60 * 2 + 30
 
 interface VideoElementsProps {
   videos: readonly Video[]
@@ -19,7 +18,7 @@ export const VideoElements = memo<VideoElementsProps>(function VideoElements({ v
         ? videos
         : videos.filter(
             (video) =>
-              video.durationInSeconds == null || video.durationInSeconds > SHORT_DURATION_IN_SECONDS
+              video.durationInSeconds == null || !isShortDuration(video.durationInSeconds)
           ),
     [videos, searchParams]
   )

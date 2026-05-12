@@ -4,8 +4,8 @@ import { match } from 'ts-pattern'
 import * as z from 'zod'
 import { Channel } from '../../models/channel'
 import { Video } from '../../models/video'
+import { isShortDuration } from '../../utils/youtube-shorts'
 
-const SHORT_DURATION_IN_SECONDS = 60 * 2 + 30
 const ChannelSchema = Channel as z.ZodType<Channel, Channel>
 const VideoSchema = Video as z.ZodType<Video, Video>
 
@@ -91,7 +91,7 @@ export const createMongoDbClient = z
                         'long-videos',
                         () =>
                           video.durationInSeconds == null ||
-                          video.durationInSeconds >= SHORT_DURATION_IN_SECONDS
+                          !isShortDuration(video.durationInSeconds)
                       )
                       .exhaustive()
                   )
