@@ -31,7 +31,7 @@ export const useSearchParams = () => {
       if (newSearchParams.size === 0) {
         router.replace(pathname)
       } else {
-        router.replace(`?${new URLSearchParams(searchParams).toString()}`)
+        router.replace(`${pathname}?${newSearchParams.toString()}`)
       }
     },
     [pathname, router]
