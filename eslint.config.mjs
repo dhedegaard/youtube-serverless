@@ -26,6 +26,8 @@ const eslintConfig = defineConfig([
     'build/**',
     'next-env.d.ts',
     'src/codegen/**',
+    'test-results/**',
+    'playwright-report/**',
     '.prettier*',
     '*.config.*',
   ]),
