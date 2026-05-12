@@ -27,7 +27,16 @@ export const POST = async (request: NextRequest): Promise<NextResponse<Result>> 
     )
   }
 
-  const requestJson: unknown = await request.json()
+  let requestJson: unknown
+  try {
+    requestJson = await request.json()
+  } catch {
+    return NextResponse.json<Result>(
+      { statusCode: 400, message: 'Missing or bad request body' },
+      { status: 400 }
+    )
+  }
+
   const requestBodyResult = requestBodySchema.safeParse(requestJson)
   if (!requestBodyResult.success) {
     return NextResponse.json<Result>(

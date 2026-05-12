@@ -31,6 +31,23 @@ test('/api/dump-channels should return 200', async ({ request }) => {
   expect(response.status()).toBe(200)
 })
 
+test('/api/load-channels should return 400 for malformed JSON', async ({ request }) => {
+  const response = await request.post('/api/load-channels', {
+    headers: {
+      Authorization: SERVER_ENV.SECRET,
+      'Content-Type': 'application/json',
+    },
+    data: '{"channels":',
+  })
+
+  expect(response.status()).toBe(400)
+  const responseJson: unknown = await response.json()
+  expect(responseJson).toMatchObject({
+    statusCode: 400,
+    message: 'Missing or bad request body',
+  })
+})
+
 test('/api/add-channel should return 404 if channel not found', async ({ request }) => {
   const response = await request.post(
     `/api/add-channel?${new URLSearchParams({
