@@ -1,6 +1,5 @@
 import { type Document, MongoClient } from 'mongodb'
 import { revalidateTag, unstable_cache } from 'next/cache'
-import { match } from 'ts-pattern'
 import * as z from 'zod'
 import { Channel } from '../../models/channel'
 import { Video } from '../../models/video'
@@ -73,27 +72,17 @@ export const createMongoDbClient = z
 
     const getLatestVideos = z
       .function({
-        input: [z.object({ limit: z.int().positive(), types: z.literal(['all', 'long-videos']) })],
+        input: [z.object({ limit: z.int().positive() })],
         output: z.array(VideoSchema).readonly(),
       })
-      .implementAsync(async function getLatestVideos({ limit, types }): Promise<Video[]> {
+      .implementAsync(async function getLatestVideos({ limit }): Promise<Video[]> {
         return await unstable_cache(
           async () => {
             const { collection } = await getCollection<{ videos: StoredVideo[] }>('videos')
             const { videos } = (await collection.findOne()) ?? {}
-            return videos == null
-              ? []
-              : videos
-                  .map(normalizeStoredVideo)
-                  .filter((video) =>
-                    match(types)
-                      .with('all', () => true)
-                      .with('long-videos', () => !video.isShort)
-                      .exhaustive()
-                  )
-                  .slice(0, limit)
+            return videos == null ? [] : videos.map(normalizeStoredVideo).slice(0, limit)
           },
-          ['latest-videos', String(limit), types],
+          ['latest-videos', String(limit)],
           { revalidate: 60 * 60, tags: [latestVideosTag] }
         )()
       })

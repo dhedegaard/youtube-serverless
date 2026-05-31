@@ -20,7 +20,7 @@ const _getVideos = cache(
 
       try {
         return {
-          videos: await dbClient.getLatestVideos({ limit: 60, types: 'all' }),
+          videos: await dbClient.getLatestVideos({ limit: 60 }),
         } satisfies GetVideosResult
       } finally {
         await dbClient.close()
