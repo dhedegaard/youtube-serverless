@@ -54,6 +54,16 @@ lists the uploads playlist (`getVideosForChannelId`), fetches durations/live sta
 and writes them. The homepage server component reads that stored set. The YouTube client lives
 in `src/clients/youtube/`; the Mongo client + all DB access in `src/clients/mongodb/`.
 
+**Per-channel resilience (both refresh routes):** channels are refreshed independently via
+`Promise.allSettled`, so one failing channel never aborts the run. The settled results are fed
+to a *pure, unit-tested* aggregator — `aggregateRefresh` (`fetch-data`) and `refreshAllChannels`
+(`refresh-channels`) — which decides what to persist and shares one HTTP-status policy
+(`src/utils/refresh-status.ts`, `refreshStatus`): **no channel succeeded → 500** (and the DB is
+left untouched rather than blanked — `videosToStore` is `null`), **all succeeded → 200**, **some
+succeeded → 207** (store the survivors). The empty-guard keys on *channels that succeeded*, not
+on video count — a channel with zero uploads is still a success. When adding logic to a refresh
+route, keep the fetch/`allSettled` in the route and the decision in the pure aggregator.
+
 **MongoDB shape (`youtube-serverless` db):** two collections. `channels` holds one document per
 tracked channel. `videos` holds a **single document** with a `videos` array — written with
 `updateOne({}, …, { upsert: true })` and read with `findOne()`. Stored videos may predate the
@@ -81,7 +91,11 @@ is wrapped in React `cache`; `getLatestVideos` is wrapped in `unstable_cache` (t
 `Authorization: Bearer <CRON_SECRET>`, `Authorization: <SECRET>`, or `?token=<SECRET>`):
 `fetch-data` (refresh videos), `refresh-channels` (refresh channel metadata), `add-channel`
 (add one by `channelId`/`username`; persists only with `?store=true`), `load-channels` (bulk
-import via body), `dump-channels` (GET export).
+import via body), `dump-channels` (GET export). Auth is split for testability:
+`isApiRequestAuthenticated` (`api-helpers.ts`) just adapts a `NextRequest` + `SERVER_ENV` into
+the pure `isAuthorized` (`is-authorized.ts`), which holds the actual logic and is the unit-tested
+part. The `cronSecret != null` guard there is load-bearing — without it a missing `CRON_SECRET`
+would match the literal header `Bearer undefined`.
 
 ## Conventions
 
