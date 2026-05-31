@@ -57,10 +57,16 @@ export const POST = async (request: NextRequest) => {
               if (contentDetailsItem?.snippet.liveBroadcastContent === 'upcoming') {
                 return null
               }
+              // Available videos always carry a high thumbnail; bail out defensively
+              // if one is ever missing rather than render a broken image.
+              const thumbnail = videoItem.snippet.thumbnails.high?.url
+              if (thumbnail == null) {
+                return null
+              }
               return {
                 videoId: videoItem.contentDetails.videoId,
                 channelId: channel.channelId,
-                thumbnail: videoItem.snippet.thumbnails.high.url,
+                thumbnail,
                 channelTitle: videoItem.snippet.channelTitle,
                 title: videoItem.snippet.title,
                 videoPublishedAt: videoItem.snippet.publishedAt,

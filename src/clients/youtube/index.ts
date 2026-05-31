@@ -1,5 +1,6 @@
 import * as z from 'zod'
 import { SERVER_ENV } from '../../utils/server-env'
+import { parseAvailablePlaylistItems, type VideoItem } from './playlist-items'
 
 // YouTube Data API list endpoints cap page sizes at 50.
 const YOUTUBE_MAX_RESULTS = 50
@@ -70,58 +71,9 @@ export const getChannelInfo = z
     return await channelInfoSchema.parseAsync(responseJson)
   })
 
-const videoItemSchema = z.object({
-  contentDetails: z.object({
-    videoId: z.string().min(1),
-    videoPublishedAt: z.string().min(1),
-  }),
-  snippet: z.object({
-    publishedAt: z.string().min(1),
-    channelId: z.string().min(1),
-    title: z.string().min(1),
-    description: z.string(),
-    thumbnails: z.object({
-      default: z.object({
-        url: z.string().min(1),
-        width: z.number(),
-        height: z.number(),
-      }),
-      medium: z.object({
-        url: z.string().min(1),
-        width: z.number(),
-        height: z.number(),
-      }),
-      high: z.object({
-        url: z.string().min(1),
-        width: z.number(),
-        height: z.number(),
-      }),
-      standard: z
-        .object({
-          url: z.string().min(1),
-          width: z.number(),
-          height: z.number(),
-        })
-        .optional(),
-      maxres: z
-        .object({
-          url: z.string().min(1),
-          width: z.number(),
-          height: z.number(),
-        })
-        .optional(),
-    }),
-    channelTitle: z.string().min(1),
-  }),
-})
-interface VideoItem extends z.infer<typeof videoItemSchema> {}
-const videoSchema = z.object({
-  nextPageToken: z.string().optional(),
-  items: z.array(videoItemSchema as z.ZodType<VideoItem, VideoItem>),
-})
 export const getVideosForChannelId = async (channelId: string): Promise<readonly VideoItem[]> => {
   const params = new URLSearchParams()
-  params.set('part', 'contentDetails,snippet')
+  params.set('part', 'contentDetails,snippet,status')
   params.set('maxResults', String(YOUTUBE_MAX_RESULTS))
   params.set('playlistId', channelId)
   params.set('key', SERVER_ENV.YOUTUBE_API_KEY)
@@ -137,8 +89,8 @@ export const getVideosForChannelId = async (channelId: string): Promise<readonly
       `Unable to get videos for channel ID ${channelId}: ${resp.status.toString()} ${resp.statusText}`
     )
   }
-  const data = await resp.json().then(async (data: unknown) => await videoSchema.parseAsync(data))
-  return data.items
+  const json: unknown = await resp.json()
+  return await parseAvailablePlaylistItems(json)
 }
 
 const ContentDetailsResponseItem = z.object({
