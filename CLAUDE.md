@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 npm run dev              # dev server (Turbopack) at http://localhost:3000
-npm run build            # production build (required before integration tests)
+npm run build            # production build
 npm run start            # serve the production build
 npm run typecheck        # tsc --noemit
 npm run lint             # eslint .
@@ -23,8 +23,11 @@ There are two distinct test layers:
   `npx vitest run path/to/file.test.ts` or `npx vitest run -t "name"`.
 - **Integration (Playwright, `*.spec.ts`)** live in `tests/`. Single test:
   `npx playwright test -g "name"`. Two gotchas:
-  - Playwright's `webServer` is `npm run start`, so **a production build must exist first**
-    (`npm run build`); it does not use the dev server.
+  - Playwright's `webServer` runs `npm run build && npm run start`, so it always serves a
+    **fresh production build** (no manual `npm run build` needed; `timeout` is raised for the
+    cold build). It deliberately does **not** use the dev server: the Next dev runtime fails to
+    hydrate React under Playwright's Chromium (HMR WebSocket handshake fails), so client
+    interactions like the shorts toggle never fire — only the production build hydrates reliably.
   - `tests/api.spec.ts` and `tests/frontpage.spec.ts` hit the **live YouTube Data API and the
     real MongoDB**, and `/api/fetch-data` / `/api/refresh-channels` **mutate the database**.
     They need real env, so they are **local-only** — CI runs only `test:unit`.

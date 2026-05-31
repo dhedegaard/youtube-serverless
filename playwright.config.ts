@@ -38,10 +38,16 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  // Run your local dev server before starting the tests.
+  // Build and serve the production app before the tests run. The integration
+  // suite must run against a production build (the Next dev server does not
+  // reliably hydrate under Playwright), and chaining the build in means a run
+  // can never serve stale code. `reuseExistingServer` still lets you skip the
+  // rebuild by leaving a server running on :3000 locally.
   webServer: {
-    command: 'npm run start',
+    command: 'npm run build && npm run start',
     url: 'http://127.0.0.1:3000',
+    // A cold production build can exceed Playwright's 60s webServer default.
+    timeout: 180_000,
     reuseExistingServer: !process.env['CI'],
   },
 })
