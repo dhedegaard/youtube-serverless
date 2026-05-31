@@ -48,7 +48,9 @@ export const POST = async (request: NextRequest) => {
     })
 
     const status = refreshStatus(succeededCount, failedCount)
-    if (status === 500) {
+    // Nothing refreshed — surface a hard failure (status is 500 here). Branch on
+    // the semantic condition, not the status value, mirroring fetch-data.
+    if (succeededCount === 0) {
       return NextResponse.json(
         {
           error: 'All channels failed to refresh',
