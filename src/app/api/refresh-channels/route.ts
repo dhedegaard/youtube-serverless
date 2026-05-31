@@ -23,6 +23,14 @@ export const POST = async (request: NextRequest) => {
   try {
     const existingChannels = await dbClient.getChannels()
 
+    // No channels configured is a valid, expected state (fresh install or the
+    // last channel removed), not a failure — return a clean no-op rather than
+    // tripping monitoring with a 500.
+    if (existingChannels.length === 0) {
+      console.info('No channels configured; skipping refresh')
+      return NextResponse.json({ channels: [], failedChannels: 0 }, { status: 200 })
+    }
+
     // Refresh each channel's metadata; one failing channel must not abort the
     // run. A missing item (channel not found on YouTube) is a benign no-op that
     // keeps the existing data.

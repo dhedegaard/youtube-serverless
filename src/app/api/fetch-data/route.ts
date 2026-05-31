@@ -72,6 +72,17 @@ export const POST = async (request: NextRequest) => {
   try {
     const channels = await dbClient.getChannels()
 
+    // No channels configured is a valid, expected state (fresh install or the
+    // last channel removed), not a failure — return a clean no-op rather than
+    // tripping monitoring with a 500. Returns before any write/revalidate.
+    if (channels.length === 0) {
+      console.info('No channels configured; skipping refresh')
+      return NextResponse.json(
+        { channelCount: 0, succeededChannels: 0, failedChannels: 0, videoCount: 0 },
+        { status: 200 }
+      )
+    }
+
     // Refresh every channel independently — one failing channel must not abort
     // the whole run (see aggregateRefresh for how partial failures are handled).
     const channelResults = await Promise.allSettled(
