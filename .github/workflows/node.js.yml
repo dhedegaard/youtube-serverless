@@ -26,4 +26,6 @@ jobs:
       - run: npm ci
       - run: npm run typecheck --if-present
       - run: npm run lint --if-present
-      - run: npm run test --if-present
+      # Run the Vitest unit tests; the Playwright integration suites hit live
+      # YouTube/MongoDB and are local-only (see playwright.config.ts).
+      - run: npm run test:unit

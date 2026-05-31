@@ -4,6 +4,11 @@ export default defineConfig({
   // Look for test files in the "tests" directory, relative to this configuration file.
   testDir: './tests',
 
+  // Playwright owns `*.spec.ts` integration tests only. Unit tests are Vitest
+  // `*.test.ts` files under `src/**/__tests__/` — exclude Playwright's default
+  // `.test.ts` matching so it never picks them up.
+  testMatch: /.*\.spec\.ts$/,
+
   // Run all tests in parallel.
   fullyParallel: true,
 

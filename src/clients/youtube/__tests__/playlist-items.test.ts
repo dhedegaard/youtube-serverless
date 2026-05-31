@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test'
-import { parseAvailablePlaylistItems } from '../src/clients/youtube/playlist-items'
+import { expect, test } from 'vitest'
+import { parseAvailablePlaylistItems } from '../playlist-items'
 
 const thumb = { url: 'https://example.com/t.jpg', width: 120, height: 90 }
 

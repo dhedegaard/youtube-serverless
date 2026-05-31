@@ -13,6 +13,9 @@
     "lint": "eslint .",
     "start": "next start",
     "typecheck": "tsc --noemit",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "playwright test",
     "playwright": "playwright test"
   },
   "devDependencies": {
@@ -31,7 +34,8 @@
     "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.3"
+    "typescript-eslint": "^8.59.3",
+    "vitest": "^4.1.7"
   },
   "dependencies": {
     "clsx": "^2.1.1",

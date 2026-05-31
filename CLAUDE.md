@@ -5,26 +5,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev         # dev server (Turbopack) at http://localhost:3000
-npm run build       # production build (required before `npm run playwright`)
-npm run start       # serve the production build
-npm run typecheck   # tsc --noemit
-npm run lint        # eslint .
-npm run playwright  # run the Playwright test suite
+npm run dev              # dev server (Turbopack) at http://localhost:3000
+npm run build            # production build (required before integration tests)
+npm run start            # serve the production build
+npm run typecheck        # tsc --noemit
+npm run lint             # eslint .
+npm run test:unit        # Vitest unit tests (no server/env) — this is what CI runs
+npm run test:watch       # Vitest in watch mode
+npm run test:integration # Playwright integration suite (alias: npm run playwright)
 ```
 
-Single test: `npx playwright test tests/playlist-items.spec.ts` (by file) or
-`npx playwright test -g "drops a deleted video"` (by title).
+There are two distinct test layers:
+- **Unit (Vitest, `*.test.ts`)** live in a `__tests__/` directory next to the module they
+  cover (e.g. `src/clients/youtube/__tests__/playlist-items.test.ts`). No network, no env, no
+  server — fast and CI-safe. This is the layer to extend for pure logic. Config:
+  `vitest.config.ts` (only matches `src/**/__tests__/**/*.test.ts`). Single test:
+  `npx vitest run path/to/file.test.ts` or `npx vitest run -t "name"`.
+- **Integration (Playwright, `*.spec.ts`)** live in `tests/`. Single test:
+  `npx playwright test -g "name"`. Two gotchas:
+  - Playwright's `webServer` is `npm run start`, so **a production build must exist first**
+    (`npm run build`); it does not use the dev server.
+  - `tests/api.spec.ts` and `tests/frontpage.spec.ts` hit the **live YouTube Data API and the
+    real MongoDB**, and `/api/fetch-data` / `/api/refresh-channels` **mutate the database**.
+    They need real env, so they are **local-only** — CI runs only `test:unit`.
 
-Notes that bite if missed:
-- **There is no `npm test` script.** CI runs `npm run test --if-present`, which is a
-  no-op — the test suite is effectively local-only. Run `npm run playwright` manually.
-- Playwright's `webServer` is `npm run start`, so **a production build must exist first**
-  (`npm run build`). It does not use the dev server.
-- The `tests/api.spec.ts` and `tests/frontpage.spec.ts` suites hit the **live YouTube Data
-  API and the real MongoDB**, and `/api/fetch-data` / `/api/refresh-channels` **mutate the
-  database**. They require real env vars present. `tests/playlist-items.spec.ts` is a pure
-  unit test (no network/env) and is the model for testing logic in isolation.
+Other notes:
 - Node >= 24, ESM (`"type": "module"`). TypeScript is `@tsconfig/strictest` and ESLint is
   `strictTypeChecked` — expect `noUncheckedIndexedAccess`, so index/env access uses bracket
   notation (`process.env['X']`, `styles['title']`).
