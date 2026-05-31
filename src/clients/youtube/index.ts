@@ -5,6 +5,12 @@ import { parseAvailablePlaylistItems, type VideoItem } from './playlist-items'
 // YouTube Data API list endpoints cap page sizes at 50.
 const YOUTUBE_MAX_RESULTS = 50
 
+// Bound every YouTube Data API request so a single hung connection can't stall
+// the whole refresh run until the platform's maxDuration kills it — that would
+// abort *all* channels and defeat the per-channel isolation in the refresh
+// routes. A timed-out request rejects, isolating the failure to its channel.
+const YOUTUBE_API_TIMEOUT_MS = 10_000
+
 const channelInfoItemSchema = z.object({
   id: z.string().min(1),
   snippet: z.object({
@@ -60,7 +66,8 @@ export const getChannelInfo = z
     }
     params.set('key', SERVER_ENV.YOUTUBE_API_KEY)
     const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/channels?${params.toString()}`
+      `https://www.googleapis.com/youtube/v3/channels?${params.toString()}`,
+      { signal: AbortSignal.timeout(YOUTUBE_API_TIMEOUT_MS) }
     )
     if (!response.ok) {
       throw new Error(
@@ -79,7 +86,7 @@ export const getVideosForChannelId = async (channelId: string): Promise<readonly
   params.set('key', SERVER_ENV.YOUTUBE_API_KEY)
   const resp = await fetch(
     `https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`,
-    {}
+    { signal: AbortSignal.timeout(YOUTUBE_API_TIMEOUT_MS) }
   )
   if (resp.status === 404) {
     return []
@@ -130,7 +137,7 @@ export const getContentDetailsForVideos = z
     url.searchParams.set('id', videoIds.join(','))
     url.searchParams.set('key', SERVER_ENV.YOUTUBE_API_KEY)
 
-    const response = await fetch(url)
+    const response = await fetch(url, { signal: AbortSignal.timeout(YOUTUBE_API_TIMEOUT_MS) })
     if (!response.ok) {
       throw new Error(
         `Unable to get video details: ${response.status.toString()} ${response.statusText}`
