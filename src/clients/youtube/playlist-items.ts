@@ -43,7 +43,6 @@ const videoItemSchema = z.object({
 export interface VideoItem extends z.infer<typeof videoItemSchema> {}
 
 const videoSchema = z.object({
-  nextPageToken: z.string().optional(),
   items: z.array(videoItemSchema as z.ZodType<VideoItem, VideoItem>),
 })
 
