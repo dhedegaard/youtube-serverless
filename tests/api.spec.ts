@@ -1,14 +1,18 @@
 import test, { expect } from '@playwright/test'
 import { SERVER_ENV } from '../src/utils/server-env'
 
-test('/api/fetch-data should return 200', async ({ request }) => {
+test('/api/fetch-data should succeed (200 all channels, 207 if some failed)', async ({
+  request,
+}) => {
   const response = await request.post('/api/fetch-data', {
     headers: {
       Authorization: SERVER_ENV.SECRET,
     },
   })
 
-  expect(response.status()).toBe(200)
+  // A run that stored videos returns 200 (every channel succeeded) or 207 (some
+  // channels failed but survivors were stored). Only a total failure is 5xx.
+  expect([200, 207]).toContain(response.status())
 })
 
 test('/api/refresh-channels should return 200', async ({ request }) => {

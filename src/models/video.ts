@@ -17,3 +17,6 @@ export const Video = z.strictObject({
   shortDetectionMethod: ShortDetectionMethod,
 })
 export interface Video extends z.infer<typeof Video> {}
+
+/** A video before its shorts classification has been determined. */
+export type VideoWithoutShortClassification = Omit<Video, 'isShort' | 'shortDetectionMethod'>

@@ -4,33 +4,10 @@ import { match } from 'ts-pattern'
 import * as z from 'zod'
 import { Channel } from '../../models/channel'
 import { Video } from '../../models/video'
-import { classifyShortVideo } from '../../utils/youtube-shorts'
+import { normalizeStoredVideo, type StoredVideo } from './normalize-stored-video'
 
 const ChannelSchema = Channel as z.ZodType<Channel, Channel>
 const VideoSchema = Video as z.ZodType<Video, Video>
-type StoredVideo = Omit<Video, 'isShort' | 'shortDetectionMethod'> &
-  Partial<Pick<Video, 'isShort' | 'shortDetectionMethod'>>
-
-const normalizeStoredVideo = (video: StoredVideo): Video => {
-  const fallbackClassification = classifyShortVideo({
-    durationInSeconds: video.durationInSeconds,
-    isServedAsShort: null,
-  })
-
-  return {
-    channelId: video.channelId,
-    videoId: video.videoId,
-    videoPublishedAt: video.videoPublishedAt,
-    thumbnail: video.thumbnail,
-    channelTitle: video.channelTitle,
-    channelThumbnail: video.channelThumbnail,
-    channelLink: video.channelLink,
-    title: video.title,
-    durationInSeconds: video.durationInSeconds,
-    isShort: video.isShort ?? fallbackClassification.isShort,
-    shortDetectionMethod: video.shortDetectionMethod ?? fallbackClassification.shortDetectionMethod,
-  } satisfies Video
-}
 
 export const createMongoDbClient = z
   .function({
