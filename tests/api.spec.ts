@@ -15,14 +15,17 @@ test('/api/fetch-data should succeed (200 all channels, 207 if some failed)', as
   expect([200, 207]).toContain(response.status())
 })
 
-test('/api/refresh-channels should return 200', async ({ request }) => {
+test('/api/refresh-channels should succeed (200 all channels, 207 if some failed)', async ({
+  request,
+}) => {
   const response = await request.post('/api/refresh-channels', {
     headers: {
       Authorization: SERVER_ENV.SECRET,
     },
   })
 
-  expect(response.status()).toBe(200)
+  // 200 (every channel refreshed) or 207 (some failed but survivors kept).
+  expect([200, 207]).toContain(response.status())
   const responseJson: unknown = await response.json()
   expect(responseJson).toMatchObject({
     channels: expect.any(Array),

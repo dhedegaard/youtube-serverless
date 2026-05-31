@@ -2,9 +2,12 @@ import { revalidatePath } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 import { createMongoDbClient } from '../../../clients/mongodb'
 import { getChannelInfo } from '../../../clients/youtube'
+import { channelFromInfoItem } from '../../../clients/youtube/channel-from-info-item'
 import type { Channel } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
+import { refreshStatus } from '../../../utils/refresh-status'
 import { SERVER_ENV } from '../../../utils/server-env'
+import { refreshAllChannels } from './refresh-all-channels'
 
 export const revalidate = 0
 
@@ -18,33 +21,47 @@ export const POST = async (request: NextRequest) => {
   })
 
   try {
-    const channels = await dbClient.getChannels()
-    const updatedChannels: Channel[] = []
-    for (const channel of channels) {
-      const item = await getChannelInfo({ type: 'channelId', channelId: channel.channelId }).then(
-        (data) => data.items?.[0]
-      )
+    const existingChannels = await dbClient.getChannels()
+
+    // Refresh each channel's metadata; one failing channel must not abort the
+    // run. A missing item (channel not found on YouTube) is a benign no-op that
+    // keeps the existing data.
+    const refreshOne = async (channel: Channel): Promise<Channel> => {
+      const item = await getChannelInfo({
+        type: 'channelId',
+        channelId: channel.channelId,
+      }).then((data) => data.items?.[0])
       if (item == null) {
-        updatedChannels.push(channel)
-        continue
+        return channel
       }
-      const updatedChannel = {
-        ...channel,
-        channelTitle: item.snippet.title,
-        channelThumbnail: item.snippet.thumbnails.high.url,
-        playlist: item.contentDetails.relatedPlaylists.uploads,
-        thumbnail: item.snippet.thumbnails.high.url,
-        channelLink: `https://www.youtube.com/channel/${channel.channelId}`,
-      } satisfies Channel
-      await dbClient.updateChannel({
-        channel: updatedChannel,
-      })
-      updatedChannels.push(updatedChannel)
+      const updatedChannel = channelFromInfoItem(item)
+      await dbClient.updateChannel({ channel: updatedChannel })
+      return updatedChannel
+    }
+
+    const { channels, succeededCount, failedCount, errors } = await refreshAllChannels(
+      existingChannels,
+      refreshOne
+    )
+    errors.forEach(({ channel, error }) => {
+      console.error(`Failed to refresh channel ${channel.channelId}:`, error)
+    })
+
+    const status = refreshStatus(succeededCount, failedCount)
+    if (status === 500) {
+      return NextResponse.json(
+        {
+          error: 'All channels failed to refresh',
+          channelCount: existingChannels.length,
+          failedChannels: failedCount,
+        },
+        { status }
+      )
     }
 
     revalidatePath('/')
 
-    return NextResponse.json({ channels: updatedChannels })
+    return NextResponse.json({ channels, failedChannels: failedCount }, { status })
   } catch (error: unknown) {
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

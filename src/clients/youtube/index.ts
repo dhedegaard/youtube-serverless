@@ -22,7 +22,7 @@ const channelInfoItemSchema = z.object({
     }),
   }),
 })
-interface ChannelInfoItem extends z.infer<typeof channelInfoItemSchema> {}
+export interface ChannelInfoItem extends z.infer<typeof channelInfoItemSchema> {}
 const channelInfoSchema = z.object({
   /** Not defined when there's no result for given channel ID input parameter. */
   items: z.optional(z.array(channelInfoItemSchema as z.ZodType<ChannelInfoItem, ChannelInfoItem>)),

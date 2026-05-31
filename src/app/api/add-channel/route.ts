@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import * as z from 'zod'
 import { createMongoDbClient } from '../../../clients/mongodb'
 import { getChannelInfo } from '../../../clients/youtube'
-import { Channel } from '../../../models/channel'
+import { channelFromInfoItem } from '../../../clients/youtube/channel-from-info-item'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { SERVER_ENV } from '../../../utils/server-env'
 
@@ -64,14 +64,7 @@ export const POST = async (request: NextRequest) => {
       )
     }
 
-    const channel: Channel = {
-      channelId: item.id,
-      channelTitle: item.snippet.title,
-      playlist: item.contentDetails.relatedPlaylists.uploads,
-      thumbnail: item.snippet.thumbnails.high.url,
-      channelLink: `https://www.youtube.com/channel/${item.id}`,
-      channelThumbnail: item.snippet.thumbnails.high.url,
-    }
+    const channel = channelFromInfoItem(item)
 
     const dbClient = await createMongoDbClient({
       connectionString: SERVER_ENV.MONGODB_URI,

@@ -1,4 +1,5 @@
 import type { VideoWithoutShortClassification } from '../../../models/video'
+import { refreshStatus } from '../../../utils/refresh-status'
 
 export type { VideoWithoutShortClassification }
 
@@ -31,9 +32,10 @@ export const aggregateRefresh = (
   )
   const succeededCount = succeeded.length
   const failedCount = results.length - succeededCount
+  const status = refreshStatus(succeededCount, failedCount)
 
   if (succeededCount === 0) {
-    return { videosToStore: null, succeededCount, failedCount, status: 500 }
+    return { videosToStore: null, succeededCount, failedCount, status }
   }
 
   const videosToStore = succeeded
@@ -42,5 +44,5 @@ export const aggregateRefresh = (
     .sort((a, b) => b.videoPublishedAt.localeCompare(a.videoPublishedAt))
     .slice(0, limit)
 
-  return { videosToStore, succeededCount, failedCount, status: failedCount === 0 ? 200 : 207 }
+  return { videosToStore, succeededCount, failedCount, status }
 }
