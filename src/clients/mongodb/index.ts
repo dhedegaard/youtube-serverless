@@ -31,7 +31,7 @@ export const createMongoDbClient = z
       .function({
         output: z.array(ChannelSchema).readonly(),
       })
-      .implementAsync(async function getChannels(): Promise<Channel[]> {
+      .implementAsync(async function getChannels(): Promise<readonly Channel[]> {
         const { collection } = await getCollection<Channel>('channels')
         const channelsWithId = await collection.find().toArray()
         return channelsWithId.map<Channel>(

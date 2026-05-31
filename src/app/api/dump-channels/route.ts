@@ -9,7 +9,7 @@ export const revalidate = 0
 
 const Result = z.object({
   statusCode: z.number().int().positive(),
-  channels: z.array(Channel as z.ZodType<Channel, Channel>),
+  channels: z.array(Channel as z.ZodType<Channel, Channel>).readonly(),
   message: z.string().min(1),
 })
 interface Result extends z.infer<typeof Result> {}
@@ -38,19 +38,7 @@ const handleRequest = z
     })
 
     try {
-      const channels = await dbClient.getChannels().then((channels) =>
-        channels.map<Channel>(
-          (channel) =>
-            ({
-              channelId: channel.channelId,
-              channelTitle: channel.channelTitle,
-              playlist: channel.playlist,
-              thumbnail: channel.thumbnail,
-              channelThumbnail: channel.channelThumbnail,
-              channelLink: channel.channelLink,
-            }) satisfies Channel
-        )
-      )
+      const channels = await dbClient.getChannels()
       return {
         statusCode: 200,
         channels,
