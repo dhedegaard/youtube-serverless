@@ -9,6 +9,7 @@ import { refreshStatus } from '../../../utils/refresh-status'
 import { SERVER_ENV } from '../../../utils/server-env'
 import { refreshAllChannels } from './refresh-all-channels'
 
+export const maxDuration = 60
 export const revalidate = 0
 
 export const POST = async (request: NextRequest) => {
