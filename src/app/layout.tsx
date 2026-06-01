@@ -6,7 +6,10 @@ export const metadata: Metadata = {
   title: 'New youtube videos',
   description: 'Aggregating youtube videos since 2015',
   icons: {
-    icon: { url: '/favicon.png', type: 'image/png' },
+    icon: [
+      { url: '/favicon.ico', type: 'image/x-icon', sizes: 'any' },
+      { url: '/favicon.png', type: 'image/png' },
+    ],
     apple: { url: '/favicon.png', type: 'image/png' },
   },
   appleWebApp: true,
