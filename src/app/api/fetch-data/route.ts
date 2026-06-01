@@ -11,7 +11,7 @@ import type { Channel } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
 import { settleWithConcurrency } from '../../../utils/concurrency'
 import { SERVER_ENV } from '../../../utils/server-env'
-import { classifyShortVideo } from '../../../utils/youtube-shorts'
+import { classifyShortVideo, reusableShortClassifications } from '../../../utils/youtube-shorts'
 import { aggregateRefresh, type VideoWithoutShortClassification } from './aggregate-refresh'
 
 export const maxDuration = 60
@@ -128,6 +128,19 @@ export const POST = async (request: NextRequest) => {
       )
     }
 
+    // Reuse authoritative shorts classifications from the previously stored set so
+    // we only HEAD-check videos not yet definitively classified. Degrade to
+    // checking everything if the prior read fails.
+    let priorShorts = reusableShortClassifications([])
+    try {
+      priorShorts = reusableShortClassifications(
+        await dbClient.getLatestVideos({ limit: MAX_STORED_VIDEOS })
+      )
+    } catch (error: unknown) {
+      console.error('Failed to read prior shorts classifications; checking all videos:', error)
+    }
+    const reusedCount = videosToStore.filter((video) => priorShorts.has(video.videoId)).length
+
     // Classify each stored video as a short. A failure for one video must not
     // drop it or fail the run, so fall back to duration-only detection (as
     // normalizeStoredVideo does for older records) and log — rather than letting
@@ -136,6 +149,10 @@ export const POST = async (request: NextRequest) => {
       items: videosToStore,
       limit: SHORTS_CONCURRENCY,
       worker: async (video) => {
+        const reused = priorShorts.get(video.videoId)
+        if (reused != null) {
+          return { ...video, ...reused }
+        }
         const isServedAsShort = await isVideoServedAsShort({ videoId: video.videoId }).catch(
           (error: unknown) => {
             console.error(`Failed to classify video ${video.videoId} as short:`, error)
@@ -161,6 +178,7 @@ export const POST = async (request: NextRequest) => {
         succeededChannels: succeededCount,
         failedChannels: failedCount,
         videoCount: videos.length,
+        reusedShortClassifications: reusedCount,
       },
       { status }
     )

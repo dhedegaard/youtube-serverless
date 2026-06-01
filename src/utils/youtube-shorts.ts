@@ -1,4 +1,4 @@
-import type { ShortDetectionMethod } from '../models/video'
+import type { ShortDetectionMethod, Video } from '../models/video'
 
 // YouTube classifies eligible Shorts as videos up to three minutes long:
 // https://support.google.com/youtube/answer/15424877
@@ -37,4 +37,21 @@ export const classifyShortVideo = ({
     isShort: false,
     shortDetectionMethod: 'unknown',
   }
+}
+
+// Authoritative (youtube-shorts-url) classifications from a prior set, keyed by
+// videoId — a refresh can reuse these and skip re-checking (status is immutable).
+export const reusableShortClassifications = (
+  videos: readonly Pick<Video, 'videoId' | 'isShort' | 'shortDetectionMethod'>[]
+): Map<string, ShortClassification> => {
+  const reusable = new Map<string, ShortClassification>()
+  for (const video of videos) {
+    if (video.shortDetectionMethod === 'youtube-shorts-url') {
+      reusable.set(video.videoId, {
+        isShort: video.isShort,
+        shortDetectionMethod: video.shortDetectionMethod,
+      })
+    }
+  }
+  return reusable
 }
