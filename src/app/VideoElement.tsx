@@ -59,7 +59,7 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
           </div>
           <span>{video.channelTitle}</span>
         </a>
-        <PublishedAt videoPublishedAt={video.videoPublishedAt} />{' '}
+        <PublishedAt videoPublishedAt={video.videoPublishedAt} />
       </div>
     </div>
   )
