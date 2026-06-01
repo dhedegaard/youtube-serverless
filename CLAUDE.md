@@ -77,8 +77,9 @@ authoritative signal — `isVideoServedAsShort` does a `HEAD` on `youtube.com/sh
 inspects the redirect — and falls back to duration (≤ 3 min) when that's inconclusive. The
 result is persisted with the method used (`youtube-shorts-url` | `duration` | `unknown`).
 
-**Frontend:** App Router, React 19 with the **React Compiler enabled** (`reactCompiler: true` —
-do not hand-add `useMemo`/`useCallback` purely for perf). The page (`src/app/page.tsx`) is a
+**Frontend:** App Router, React 19 with the **React Compiler enabled** (`reactCompiler: true`).
+Manual `useMemo`/`useCallback`/`memo` are kept intentionally as a safety net alongside the
+compiler — **do not strip them**; adding them is fine too. The page (`src/app/page.tsx`) is a
 server component pulling the latest 60 via the `getVideos` server action. Shorts are hidden by
 default and the "Show shorts" toggle is **purely client-side** (`?showShorts=1`), driven through
 `window.history` and kept in sync with Next's `useSearchParams` (`src/hooks/use-search-params.ts`).
