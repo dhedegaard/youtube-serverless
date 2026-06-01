@@ -1,11 +1,8 @@
 'use client'
 
 import clsx from 'clsx'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { memo, useEffect, useMemo, useState } from 'react'
-
-dayjs.extend(relativeTime)
+import { relativeTimeAgo } from '../utils/relative-time'
 
 interface Props {
   videoPublishedAt: string
@@ -16,13 +13,13 @@ export const PublishedAt = memo(function PublishedAt({ videoPublishedAt }: Props
 
   // Render the relative date on the client, to avoid having the value be cached on the server and being wrong.
   useEffect(() => {
-    setPublishedAtFromNow(`${dayjs(publishedAt).fromNow(true)} ago`)
+    setPublishedAtFromNow(relativeTimeAgo(publishedAt))
   }, [publishedAt])
 
   return (
     <div
       className={clsx(
-        'basis-auto whitespace-nowrap text-right text-sm text-gray-500',
+        'basis-auto text-right text-sm whitespace-nowrap text-gray-500',
         publishedAtFromNow == null && 'skeleton w-1/4 rounded-sm bg-slate-50'
       )}
       title={`${useMemo(
