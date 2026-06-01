@@ -21,12 +21,11 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
           className="aspect-video w-full object-cover"
           src={video.thumbnail}
           alt="Video thumbnail"
-          sizes="(max-width: 767px) 50vw, (max-width: 1024px) 33vw, 308px"
           decoding="async"
           loading="lazy"
         />
         {typeof video.durationInSeconds === 'number' && video.durationInSeconds > 0 && (
-          <div className="pointer-events-none absolute bottom-1 right-1 select-none rounded-sm bg-slate-900/75 px-1 py-0.5 text-xs font-semibold text-white">
+          <div className="pointer-events-none absolute right-1 bottom-1 rounded-sm bg-slate-900/75 px-1 py-0.5 text-xs font-semibold text-white select-none">
             {video.durationInSeconds >= 60 * 60 && (
               <>{Math.floor(video.durationInSeconds / (60 * 60))}:</>
             )}
