@@ -1,8 +1,5 @@
 import { expect, test } from 'vitest'
-import {
-  aggregateRefresh,
-  type VideoWithoutShortClassification,
-} from '../aggregate-refresh'
+import { aggregateRefresh, type VideoWithoutShortClassification } from '../aggregate-refresh'
 
 const video = (videoId: string, videoPublishedAt: string): VideoWithoutShortClassification => ({
   channelId: 'UCexample',
@@ -26,7 +23,10 @@ const fail = (): PromiseRejectedResult => ({ status: 'rejected', reason: new Err
 
 test('all channels succeed → 200, newest-first, capped to limit', () => {
   const result = aggregateRefresh(
-    [ok([video('a', '2024-01-02T00:00:00Z')]), ok([video('b', '2024-01-03T00:00:00Z'), video('c', '2024-01-01T00:00:00Z')])],
+    [
+      ok([video('a', '2024-01-02T00:00:00Z')]),
+      ok([video('b', '2024-01-03T00:00:00Z'), video('c', '2024-01-01T00:00:00Z')]),
+    ],
     2
   )
   expect(result.status).toBe(200)

@@ -53,9 +53,7 @@ const videoSchema = z.object({
  * (rather than blacklisting known-bad statuses) fails safe against unknown or
  * future values.
  */
-export const parseAvailablePlaylistItems = async (
-  json: unknown
-): Promise<readonly VideoItem[]> => {
+export const parseAvailablePlaylistItems = async (json: unknown): Promise<readonly VideoItem[]> => {
   const data = await videoSchema.parseAsync(json)
   return data.items.filter((item) => AVAILABLE_PRIVACY_STATUSES.has(item.status.privacyStatus))
 }

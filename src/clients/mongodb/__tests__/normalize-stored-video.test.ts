@@ -28,7 +28,11 @@ test('keeps an already-classified value instead of re-deriving it', () => {
   // Stored as not-a-short via the URL signal, despite a short duration — the
   // stored classification must win over the duration fallback.
   const result = normalizeStoredVideo(
-    storedVideo({ durationInSeconds: 10, isShort: false, shortDetectionMethod: 'youtube-shorts-url' })
+    storedVideo({
+      durationInSeconds: 10,
+      isShort: false,
+      shortDetectionMethod: 'youtube-shorts-url',
+    })
   )
   expect(result.isShort).toBe(false)
   expect(result.shortDetectionMethod).toBe('youtube-shorts-url')
