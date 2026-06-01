@@ -20,7 +20,7 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
         <img
           className="aspect-video w-full object-cover"
           src={video.thumbnail}
-          alt="Video thumbnail"
+          alt={video.title}
           decoding="async"
           loading="lazy"
         />
@@ -52,7 +52,7 @@ export const VideoElement = memo(function VideoElement({ video }: Props) {
               width={16}
               height={16}
               decoding="async"
-              alt="Channel logo"
+              alt=""
               loading="lazy"
               className="object-cover"
             />
