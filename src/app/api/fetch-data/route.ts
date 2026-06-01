@@ -43,7 +43,9 @@ const fetchChannelVideos = async (channel: Channel): Promise<VideoWithoutShortCl
         (item) => item.id === videoItem.contentDetails.videoId
       )
       const durationString = contentDetailsItem?.contentDetails.duration
-      const durationInSeconds = durationString == null ? null : toSeconds(parse(durationString))
+      // Round: the Video schema requires an integer second count.
+      const durationInSeconds =
+        durationString == null ? null : Math.round(toSeconds(parse(durationString)))
       // NOTE: We skip upcomming videos, as they are not ready to be played yet.
       if (contentDetailsItem?.snippet.liveBroadcastContent === 'upcoming') {
         return null
