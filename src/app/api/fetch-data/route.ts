@@ -134,13 +134,12 @@ export const POST = async (request: NextRequest) => {
       items: videosToStore,
       limit: SHORTS_CONCURRENCY,
       worker: async (video) => {
-        let isServedAsShort: boolean | null
-        try {
-          isServedAsShort = await isVideoServedAsShort({ videoId: video.videoId })
-        } catch (error: unknown) {
-          console.error(`Failed to classify video ${video.videoId} as short:`, error)
-          isServedAsShort = null
-        }
+        const isServedAsShort = await isVideoServedAsShort({ videoId: video.videoId }).catch(
+          (error: unknown) => {
+            console.error(`Failed to classify video ${video.videoId} as short:`, error)
+            return null
+          }
+        )
         return {
           ...video,
           ...classifyShortVideo({ durationInSeconds: video.durationInSeconds, isServedAsShort }),
