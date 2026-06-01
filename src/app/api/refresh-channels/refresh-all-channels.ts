@@ -1,4 +1,5 @@
 import type { Channel } from '../../../models/channel'
+import { settleWithConcurrency } from '../../../utils/concurrency'
 
 export interface RefreshAllChannelsResult {
   /** Every channel in its best-known state: refreshed where it succeeded, existing data otherwise. */
@@ -26,22 +27,22 @@ export const refreshAllChannels = async (
 ): Promise<RefreshAllChannelsResult> => {
   const result: Channel[] = []
   const errors: { channel: Channel; error: unknown }[] = []
-  const batchSize = Math.max(1, concurrency)
 
-  for (let start = 0; start < channels.length; start += batchSize) {
-    const batch = channels.slice(start, start + batchSize)
-    const settled = await Promise.allSettled(batch.map((channel) => refreshOne(channel)))
-    settled.forEach((outcome, index) => {
-      const channel = batch[index]
-      if (channel == null) return
-      if (outcome.status === 'fulfilled') {
-        result.push(outcome.value)
-      } else {
-        errors.push({ channel, error: outcome.reason })
-        result.push(channel)
-      }
-    })
-  }
+  const settled = await settleWithConcurrency({
+    items: channels,
+    limit: concurrency,
+    worker: (channel) => refreshOne(channel),
+  })
+  settled.forEach((outcome, index) => {
+    const channel = channels[index]
+    if (channel == null) return
+    if (outcome.status === 'fulfilled') {
+      result.push(outcome.value)
+    } else {
+      errors.push({ channel, error: outcome.reason })
+      result.push(channel)
+    }
+  })
 
   return {
     channels: result,

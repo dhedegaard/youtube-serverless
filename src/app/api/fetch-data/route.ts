@@ -9,6 +9,7 @@ import {
 } from '../../../clients/youtube'
 import type { Channel } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
+import { settleWithConcurrency } from '../../../utils/concurrency'
 import { SERVER_ENV } from '../../../utils/server-env'
 import { classifyShortVideo } from '../../../utils/youtube-shorts'
 import { aggregateRefresh, type VideoWithoutShortClassification } from './aggregate-refresh'
@@ -19,11 +20,19 @@ export const revalidate = 0
 // We store up to the last 120 videos and throw away the rest.
 const MAX_STORED_VIDEOS = 120
 
+// Bound the per-channel fan-out so a large channel set can't burst into a flood
+// of concurrent YouTube Data API calls (two list calls per channel) and trip
+// rate limits.
+const CHANNEL_CONCURRENCY = 8
+
+// The shorts check is a HEAD per video (up to MAX_STORED_VIDEOS). Bound it to
+// avoid hammering youtube.com, but keep it high enough that the 5s per-request
+// timeout can't serialise into the route's maxDuration.
+const SHORTS_CONCURRENCY = 24
+
 // Fetch and shape a single channel's latest uploads. Throws on any upstream
-// failure so the caller (Promise.allSettled) can isolate it to this channel.
-const fetchChannelVideos = async (
-  channel: Channel
-): Promise<VideoWithoutShortClassification[]> => {
+// failure so the caller (settleWithConcurrency) can isolate it to this channel.
+const fetchChannelVideos = async (channel: Channel): Promise<VideoWithoutShortClassification[]> => {
   const videos = await getVideosForChannelId(channel.playlist)
   const contentDetailsItems = await getContentDetailsForVideos({
     videoIds: videos.map((video) => video.contentDetails.videoId),
@@ -85,9 +94,11 @@ export const POST = async (request: NextRequest) => {
 
     // Refresh every channel independently — one failing channel must not abort
     // the whole run (see aggregateRefresh for how partial failures are handled).
-    const channelResults = await Promise.allSettled(
-      channels.map((channel) => fetchChannelVideos(channel))
-    )
+    const channelResults = await settleWithConcurrency({
+      items: channels,
+      limit: CHANNEL_CONCURRENCY,
+      worker: (channel) => fetchChannelVideos(channel),
+    })
     channelResults.forEach((result, index) => {
       if (result.status === 'rejected') {
         console.error(
@@ -106,19 +117,30 @@ export const POST = async (request: NextRequest) => {
     // than blanking the homepage, and surface a hard failure for monitoring.
     if (videosToStore == null) {
       return NextResponse.json(
-        { error: 'All channels failed to refresh', channelCount: channels.length, failedChannels: failedCount },
+        {
+          error: 'All channels failed to refresh',
+          channelCount: channels.length,
+          failedChannels: failedCount,
+        },
         { status }
       )
     }
 
-    const videos = await Promise.all(
-      videosToStore.map(async (video) => ({
+    // `isVideoServedAsShort` never throws (it returns null on any failure), so
+    // every result is fulfilled; the fulfilled-only unwrap is just type-safe.
+    const classified = await settleWithConcurrency({
+      items: videosToStore,
+      limit: SHORTS_CONCURRENCY,
+      worker: async (video) => ({
         ...video,
         ...classifyShortVideo({
           durationInSeconds: video.durationInSeconds,
           isServedAsShort: await isVideoServedAsShort({ videoId: video.videoId }),
         }),
-      }))
+      }),
+    })
+    const videos = classified.flatMap((outcome) =>
+      outcome.status === 'fulfilled' ? [outcome.value] : []
     )
 
     await dbClient.putLatestVideos({ videos })
