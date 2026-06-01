@@ -126,18 +126,26 @@ export const POST = async (request: NextRequest) => {
       )
     }
 
-    // `isVideoServedAsShort` never throws (it returns null on any failure), so
-    // every result is fulfilled; the fulfilled-only unwrap is just type-safe.
+    // Classify each stored video as a short. A failure for one video must not
+    // drop it or fail the run, so fall back to duration-only detection (as
+    // normalizeStoredVideo does for older records) and log — rather than letting
+    // it surface as a rejected result the unwrap would silently discard.
     const classified = await settleWithConcurrency({
       items: videosToStore,
       limit: SHORTS_CONCURRENCY,
-      worker: async (video) => ({
-        ...video,
-        ...classifyShortVideo({
-          durationInSeconds: video.durationInSeconds,
-          isServedAsShort: await isVideoServedAsShort({ videoId: video.videoId }),
-        }),
-      }),
+      worker: async (video) => {
+        let isServedAsShort: boolean | null
+        try {
+          isServedAsShort = await isVideoServedAsShort({ videoId: video.videoId })
+        } catch (error: unknown) {
+          console.error(`Failed to classify video ${video.videoId} as short:`, error)
+          isServedAsShort = null
+        }
+        return {
+          ...video,
+          ...classifyShortVideo({ durationInSeconds: video.durationInSeconds, isServedAsShort }),
+        }
+      },
     })
     const videos = classified.flatMap((outcome) =>
       outcome.status === 'fulfilled' ? [outcome.value] : []
