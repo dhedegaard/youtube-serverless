@@ -10,11 +10,23 @@ env:
   SECRET: TEST
   CRON_SECRET: TEST
   YOUTUBE_API_KEY: TEST
-  MONGODB_URI: mongodb://TEST
+  # mongodb service (below) so `npm run build` can prerender the DB-backed homepage.
+  MONGODB_URI: mongodb://localhost:27017
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v6
@@ -26,6 +38,7 @@ jobs:
       - run: npm ci
       - run: npm run typecheck --if-present
       - run: npm run lint --if-present
+      - run: npm run build
       # Run the Vitest unit tests; the Playwright integration suites hit live
       # YouTube/MongoDB and are local-only (see playwright.config.ts).
       - run: npm run test:unit
