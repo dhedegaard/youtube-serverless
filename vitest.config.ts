@@ -7,5 +7,7 @@ export default defineConfig({
   test: {
     include: ['src/**/__tests__/**/*.test.ts'],
     environment: 'node',
+    // Pin TZ so date-sensitive tests behave the same locally and in CI (both UTC).
+    env: { TZ: 'UTC' },
   },
 })

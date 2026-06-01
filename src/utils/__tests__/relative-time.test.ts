@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest'
 import { relativeTimeAgo } from '../relative-time'
 
-// Reference instant; each `then` is an exact timestamp whose expected string was
-// captured from dayjs(...).fromNow(true) + ' ago' (the behavior this replaces),
-// covering every relativeTime threshold band and its boundaries.
+// Reference instant; each `then` is an exact UTC timestamp with its expected
+// "x ago" string. UTC-pinned (code uses getUTC*, vitest sets TZ=UTC) so results
+// don't vary by timezone. Covers every threshold band and its boundaries.
 const NOW = new Date('2026-06-01T12:00:00.000Z')
 
 const cases: [label: string, then: string, expected: string][] = [
@@ -30,8 +30,8 @@ const cases: [label: string, then: string, expected: string][] = [
   ['10mo', '2025-08-01T12:00:00.000Z', '10 months ago'],
   ['11mo', '2025-07-01T12:00:00.000Z', 'a year ago'],
   ['12mo', '2025-06-01T12:00:00.000Z', 'a year ago'],
-  ['17mo', '2025-01-01T13:00:00.000Z', 'a year ago'],
-  ['18mo', '2024-12-01T13:00:00.000Z', '2 years ago'],
+  ['17mo', '2025-01-01T12:00:00.000Z', 'a year ago'],
+  ['18mo', '2024-12-01T12:00:00.000Z', '2 years ago'],
   ['24mo', '2024-06-01T12:00:00.000Z', '2 years ago'],
   ['36mo', '2023-06-01T12:00:00.000Z', '3 years ago'],
 ]

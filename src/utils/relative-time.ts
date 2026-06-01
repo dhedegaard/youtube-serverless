@@ -43,20 +43,22 @@ const THRESHOLDS: readonly Threshold[] = [
 const UNIT_MS = { second: 1e3, minute: 6e4, hour: 36e5, day: 864e5 } as const
 
 // dayjs/moment-style month add with day clamping (Jan 31 + 1mo -> Feb 28/29).
+// UTC methods keep this timezone-independent (dayjs's local ones weren't).
 const addMonths = (date: Date, n: number): Date => {
-  const day = date.getDate()
+  const day = date.getUTCDate()
   const d = new Date(date.getTime())
-  d.setDate(1)
-  d.setMonth(d.getMonth() + n)
-  const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()
-  d.setDate(Math.min(day, daysInMonth))
+  d.setUTCDate(1)
+  d.setUTCMonth(d.getUTCMonth() + n)
+  const daysInMonth = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate()
+  d.setUTCDate(Math.min(day, daysInMonth))
   return d
 }
 
 // Port of dayjs Utils.monthDiff(a, b): signed fractional months between a and b.
 const monthDiff = (a: Date, b: Date): number => {
-  if (a.getDate() < b.getDate()) return -monthDiff(b, a)
-  const wholeMonthDiff = (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth())
+  if (a.getUTCDate() < b.getUTCDate()) return -monthDiff(b, a)
+  const wholeMonthDiff =
+    (b.getUTCFullYear() - a.getUTCFullYear()) * 12 + (b.getUTCMonth() - a.getUTCMonth())
   const anchor = addMonths(a, wholeMonthDiff)
   const beforeAnchor = b.getTime() - anchor.getTime() < 0
   const anchor2 = addMonths(a, wholeMonthDiff + (beforeAnchor ? -1 : 1))
