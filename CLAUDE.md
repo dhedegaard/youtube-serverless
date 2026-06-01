@@ -15,6 +15,11 @@ npm run test:watch       # Vitest in watch mode
 npm run test:integration # Playwright integration suite (alias: npm run playwright)
 ```
 
+There is **no `format` script** and `npm run lint` is **ESLint-only** — Prettier is not
+wired into lint or CI. Formatting follows `.prettierrc` (no semicolons, single quotes,
+`printWidth` 100, `prettier-plugin-tailwindcss`); run `npx prettier --write` on changed
+files manually before committing.
+
 There are two distinct test layers:
 - **Unit (Vitest, `*.test.ts`)** live in a `__tests__/` directory next to the module they
   cover (e.g. `src/clients/youtube/__tests__/playlist-items.test.ts`). No network, no env, no
