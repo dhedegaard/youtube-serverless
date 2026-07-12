@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import * as z from 'zod'
+import * as z from 'zod/mini'
 import { createMongoDbClient } from '../../../clients/mongodb'
 import { Channel } from '../../../models/channel'
 import { isApiRequestAuthenticated } from '../../../utils/api-helpers'
@@ -8,9 +8,9 @@ import { SERVER_ENV } from '../../../utils/server-env'
 export const revalidate = 0
 
 const Result = z.object({
-  statusCode: z.number().int().positive(),
-  channels: z.array(Channel as z.ZodType<Channel, Channel>).readonly(),
-  message: z.string().min(1),
+  statusCode: z.int().check(z.positive()),
+  channels: z.readonly(z.array(Channel as z.ZodMiniType<Channel, Channel>)),
+  message: z.string().check(z.minLength(1)),
 })
 interface Result extends z.infer<typeof Result> {}
 
@@ -21,7 +21,7 @@ export const GET = async (request: NextRequest): Promise<NextResponse<Result>> =
 
 const handleRequest = z
   .function({
-    input: [z.object({ request: z.unknown() as z.ZodType<NextRequest, NextRequest> })],
+    input: [z.object({ request: z.unknown() as z.ZodMiniType<NextRequest, NextRequest> })],
     output: z.promise(Result),
   })
   .implementAsync(async function handleRequest({ request }): Promise<Result> {

@@ -1,19 +1,19 @@
 'use server'
 
 import { cache } from 'react'
-import * as z from 'zod'
+import * as z from 'zod/mini'
 import { createMongoDbClient } from '../clients/mongodb'
 import { Video } from '../models/video'
 import { SERVER_ENV } from '../utils/server-env'
 
 const GetVideosResult = z.object({
-  videos: z.array(Video as z.ZodType<Video, Video>).readonly(),
+  videos: z.readonly(z.array(Video as z.ZodMiniType<Video, Video>)),
 })
 export interface GetVideosResult extends z.infer<typeof GetVideosResult> {}
 const _getVideos = cache(
   z
     .function({
-      output: GetVideosResult as z.ZodType<GetVideosResult, GetVideosResult>,
+      output: GetVideosResult as z.ZodMiniType<GetVideosResult, GetVideosResult>,
     })
     .implementAsync(async function getVideos(): Promise<GetVideosResult> {
       const dbClient = await createMongoDbClient({ connectionString: SERVER_ENV.MONGODB_URI })

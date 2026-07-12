@@ -4,6 +4,6 @@ export default {
   reactStrictMode: true,
   reactCompiler: true,
   experimental: {
-    optimizePackageImports: ['zod'],
+    optimizePackageImports: ['zod/mini'],
   },
 } satisfies NextConfig

@@ -108,10 +108,15 @@ would match the literal header `Bearer undefined`.
 
 ## Conventions
 
-- **zod is the validation layer everywhere**, including runtime-validated function signatures via
-  `z.function({...}).implementAsync(...)`. When an `interface X extends z.infer<typeof schema>` is
-  used as an array/element type, the codebase casts `schema as z.ZodType<X, X>` — this is
-  intentional and repository-wide; keep it for consistency. Parsing uniformly uses `parseAsync`.
+- **zod is the validation layer everywhere**, imported as `import * as z from 'zod/mini'` — the
+  tree-shakeable `zod/mini` entrypoint, never bare `'zod'`. Mini has **no method chaining**:
+  wrappers are functions (`z.optional(x)`, `z.nullable(x)`, `z.readonly(x)`, `z.extend(base, {…})`)
+  and refinements go through `.check(…)` (`z.string().check(z.minLength(1))`,
+  `z.array(x).check(z.maxLength(50))`, `z.int().check(z.positive())`). Runtime-validated function
+  signatures via `z.function({...}).implementAsync(...)` work unchanged. When an
+  `interface X extends z.infer<typeof schema>` is used as an array/element type, the codebase casts
+  `schema as z.ZodMiniType<X, X>` (mini's name for `ZodType`) — this is intentional and
+  repository-wide; keep it for consistency. Parsing uniformly uses `parseAsync`.
 - Keep network/`fetch` and `SERVER_ENV` access out of pure logic so it stays unit-testable — see
   `src/clients/youtube/playlist-items.ts` (pure parse + filter) vs `index.ts` (does the fetch).
 - When handling YouTube playlist data, remember deleted/private videos stay in the uploads

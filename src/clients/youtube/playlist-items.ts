@@ -1,4 +1,4 @@
-import * as z from 'zod'
+import * as z from 'zod/mini'
 
 // Schema + filtering for the YouTube `playlistItems.list` response, kept in its
 // own module (free of `SERVER_ENV`/`fetch`) so the parse-and-filter logic can be
@@ -9,7 +9,7 @@ import * as z from 'zod'
 // `status.privacyStatus` that isn't `public`/`unlisted`. We keep the schema
 // tolerant of those so parsing never throws, then filter them out below.
 const thumbnailSchema = z.object({
-  url: z.string().min(1),
+  url: z.string().check(z.minLength(1)),
   width: z.number(),
   height: z.number(),
 })
@@ -19,31 +19,31 @@ const AVAILABLE_PRIVACY_STATUSES = new Set(['public', 'unlisted'])
 
 const videoItemSchema = z.object({
   contentDetails: z.object({
-    videoId: z.string().min(1),
-    videoPublishedAt: z.string().min(1).optional(),
+    videoId: z.string().check(z.minLength(1)),
+    videoPublishedAt: z.optional(z.string().check(z.minLength(1))),
   }),
   status: z.object({
     privacyStatus: z.string(),
   }),
   snippet: z.object({
-    publishedAt: z.string().min(1),
-    channelId: z.string().min(1),
-    title: z.string().min(1),
+    publishedAt: z.string().check(z.minLength(1)),
+    channelId: z.string().check(z.minLength(1)),
+    title: z.string().check(z.minLength(1)),
     description: z.string(),
     thumbnails: z.object({
-      default: thumbnailSchema.optional(),
-      medium: thumbnailSchema.optional(),
-      high: thumbnailSchema.optional(),
-      standard: thumbnailSchema.optional(),
-      maxres: thumbnailSchema.optional(),
+      default: z.optional(thumbnailSchema),
+      medium: z.optional(thumbnailSchema),
+      high: z.optional(thumbnailSchema),
+      standard: z.optional(thumbnailSchema),
+      maxres: z.optional(thumbnailSchema),
     }),
-    channelTitle: z.string().min(1),
+    channelTitle: z.string().check(z.minLength(1)),
   }),
 })
 export interface VideoItem extends z.infer<typeof videoItemSchema> {}
 
 const videoSchema = z.object({
-  items: z.array(videoItemSchema as z.ZodType<VideoItem, VideoItem>),
+  items: z.array(videoItemSchema as z.ZodMiniType<VideoItem, VideoItem>),
 })
 
 /**

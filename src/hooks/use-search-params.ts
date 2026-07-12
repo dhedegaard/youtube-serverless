@@ -2,7 +2,7 @@
 
 import { useSearchParams as useNextSearchParams, usePathname } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
-import * as z from 'zod'
+import * as z from 'zod/mini'
 
 const SearchParams = z.object({
   showShorts: z.optional(z.literal('1')),
