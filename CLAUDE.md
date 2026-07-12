@@ -109,9 +109,10 @@ would match the literal header `Bearer undefined`.
 ## Conventions
 
 - **zod is the validation layer everywhere**, imported as `import * as z from 'zod/mini'` — the
-  tree-shakeable `zod/mini` entrypoint, never bare `'zod'`. Mini has **no method chaining**:
-  wrappers are functions (`z.optional(x)`, `z.nullable(x)`, `z.readonly(x)`, `z.extend(base, {…})`)
-  and refinements go through `.check(…)` (`z.string().check(z.minLength(1))`,
+  tree-shakeable entrypoint, never bare `'zod'`. Mini has **no method chaining**: wrappers are
+  functions (`z.optional(x)`, `z.nullable(x)`, `z.readonly(x)`, `z.safeExtend(base, {…})` — prefer
+  `safeExtend` over `extend`, which lets an overlapping key silently replace the base's with an
+  incompatible type) and refinements go through `.check(…)` (`z.string().check(z.minLength(1))`,
   `z.array(x).check(z.maxLength(50))`, `z.int().check(z.positive())`). Runtime-validated function
   signatures via `z.function({...}).implementAsync(...)` work unchanged. When an
   `interface X extends z.infer<typeof schema>` is used as an array/element type, the codebase casts

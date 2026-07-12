@@ -13,10 +13,10 @@ const sharedSchema = z.object({
   store: z.optional(z.literal('true')),
 })
 const searchParamsSchema = z.union([
-  z.extend(sharedSchema, {
+  z.safeExtend(sharedSchema, {
     channelId: z.string().check(z.minLength(1)),
   }),
-  z.extend(sharedSchema, {
+  z.safeExtend(sharedSchema, {
     username: z.string().check(z.minLength(1)),
   }),
 ])
