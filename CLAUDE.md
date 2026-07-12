@@ -18,7 +18,9 @@ npm run test:integration # Playwright integration suite (alias: npm run playwrig
 There is **no `format` script** and `npm run lint` is **ESLint-only** — Prettier is not
 wired into lint or CI. Formatting follows `.prettierrc` (no semicolons, single quotes,
 `printWidth` 100, `prettier-plugin-tailwindcss`); run `npx prettier --write` on changed
-files manually before committing.
+files manually before committing — but **only on code files**. Do not run it on `CLAUDE.md` or
+other markdown: it reformats the whole file (`*emphasis*` → `_emphasis_`, blank lines after list
+intros), burying the real change in unrelated churn. Hand-edit markdown instead.
 
 There are two distinct test layers:
 - **Unit (Vitest, `*.test.ts`)** live in a `__tests__/` directory next to the module they
@@ -41,6 +43,10 @@ Other notes:
 - Node >= 24, ESM (`"type": "module"`). TypeScript is `@tsconfig/strictest` and ESLint is
   `strictTypeChecked` — expect `noUncheckedIndexedAccess`, so index/env access uses bracket
   notation (`process.env['X']`, `styles['title']`).
+- `npm run build` prints **no JS size columns** (only Route/Revalidate/Expire), so bundle-size
+  questions need measuring by hand:
+  `find .next/static/chunks -name '*.js' -exec cat {} + | gzip -c | wc -c`. Compare branches with
+  a clean `.next` each time.
 
 ## Environment
 
