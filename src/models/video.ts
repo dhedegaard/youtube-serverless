@@ -1,4 +1,4 @@
-import * as z from 'zod'
+import * as z from 'zod/mini'
 
 export const ShortDetectionMethod = z.enum(['youtube-shorts-url', 'duration', 'unknown'])
 export type ShortDetectionMethod = z.infer<typeof ShortDetectionMethod>
@@ -12,7 +12,7 @@ export const Video = z.strictObject({
   channelThumbnail: z.string(),
   channelLink: z.string(),
   title: z.string(),
-  durationInSeconds: z.nullable(z.number().int().nonnegative()),
+  durationInSeconds: z.nullable(z.int().check(z.nonnegative())),
   isShort: z.boolean(),
   shortDetectionMethod: ShortDetectionMethod,
 })

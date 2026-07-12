@@ -1,12 +1,12 @@
-import * as z from 'zod'
+import * as z from 'zod/mini'
 
 const envSchema = z.object({
-  SECRET: z.string().min(1),
-  CRON_SECRET: z.optional(z.string().min(1)),
+  SECRET: z.string().check(z.minLength(1)),
+  CRON_SECRET: z.optional(z.string().check(z.minLength(1))),
 
-  YOUTUBE_API_KEY: z.string().min(1),
+  YOUTUBE_API_KEY: z.string().check(z.minLength(1)),
 
-  MONGODB_URI: z.string().startsWith('mongodb') as z.ZodType<
+  MONGODB_URI: z.string().check(z.startsWith('mongodb')) as z.ZodMiniType<
     `mongodb${string}`,
     `mongodb${string}`
   >,

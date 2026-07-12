@@ -1,4 +1,4 @@
-import * as z from 'zod'
+import * as z from 'zod/mini'
 import { SERVER_ENV } from '../../utils/server-env'
 import { parseAvailablePlaylistItems, type VideoItem } from './playlist-items'
 
@@ -12,37 +12,37 @@ const YOUTUBE_MAX_RESULTS = 50
 const YOUTUBE_API_TIMEOUT_MS = 10_000
 
 const channelInfoItemSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().check(z.minLength(1)),
   snippet: z.object({
-    title: z.string().min(1),
+    title: z.string().check(z.minLength(1)),
     description: z.string(),
     thumbnails: z.object({
       high: z.object({
-        url: z.string().min(1),
+        url: z.string().check(z.minLength(1)),
       }),
     }),
   }),
   contentDetails: z.object({
     relatedPlaylists: z.object({
-      uploads: z.string().min(1),
+      uploads: z.string().check(z.minLength(1)),
     }),
   }),
 })
 export interface ChannelInfoItem extends z.infer<typeof channelInfoItemSchema> {}
 const channelInfoSchema = z.object({
   /** Not defined when there's no result for given channel ID input parameter. */
-  items: z.optional(z.array(channelInfoItemSchema as z.ZodType<ChannelInfoItem, ChannelInfoItem>)),
+  items: z.optional(z.array(channelInfoItemSchema as z.ZodMiniType<ChannelInfoItem, ChannelInfoItem>)),
 })
 interface ChannelInfo extends z.infer<typeof channelInfoSchema> {}
 
 const getChannelInfoArgsSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('channelId'),
-    channelId: z.string().min(1),
+    channelId: z.string().check(z.minLength(1)),
   }),
   z.object({
     type: z.literal('forUsername'),
-    username: z.string().min(1),
+    username: z.string().check(z.minLength(1)),
   }),
 ])
 export const getChannelInfo = z
@@ -101,9 +101,11 @@ export const getVideosForChannelId = async (channelId: string): Promise<readonly
 }
 
 const ContentDetailsResponseItem = z.object({
-  id: z.string().min(1),
+  id: z.string().check(z.minLength(1)),
   contentDetails: z.object({
-    duration: z.optional(z.string().startsWith('P') as z.ZodType<`P${string}`, `P${string}`>),
+    duration: z.optional(
+      z.string().check(z.startsWith('P')) as z.ZodMiniType<`P${string}`, `P${string}`>
+    ),
   }),
   snippet: z.object({
     liveBroadcastContent: z.enum(['none', 'upcoming', 'live']),
@@ -113,7 +115,7 @@ export interface ContentDetailsResponseItem extends z.infer<typeof ContentDetail
 
 const ContentDetailsResponse = z.object({
   items: z.array(
-    ContentDetailsResponseItem as z.ZodType<ContentDetailsResponseItem, ContentDetailsResponseItem>
+    ContentDetailsResponseItem as z.ZodMiniType<ContentDetailsResponseItem, ContentDetailsResponseItem>
   ),
 })
 export interface ContentDetailsResponse extends z.infer<typeof ContentDetailsResponse> {}
@@ -122,7 +124,7 @@ export const getContentDetailsForVideos = z
   .function({
     input: [
       z.object({
-        videoIds: z.array(z.string().min(1)).max(YOUTUBE_MAX_RESULTS),
+        videoIds: z.array(z.string().check(z.minLength(1))).check(z.maxLength(YOUTUBE_MAX_RESULTS)),
       }),
     ],
   })
@@ -150,8 +152,8 @@ export const getContentDetailsForVideos = z
 
 export const isVideoServedAsShort = z
   .function({
-    input: [z.object({ videoId: z.string().min(1) })],
-    output: z.boolean().nullable(),
+    input: [z.object({ videoId: z.string().check(z.minLength(1)) })],
+    output: z.nullable(z.boolean()),
   })
   .implementAsync(async function isVideoServedAsShort({ videoId }): Promise<boolean | null> {
     try {

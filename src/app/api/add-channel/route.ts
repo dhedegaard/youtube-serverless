@@ -1,6 +1,6 @@
 import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
-import * as z from 'zod'
+import * as z from 'zod/mini'
 import { createMongoDbClient } from '../../../clients/mongodb'
 import { getChannelInfo } from '../../../clients/youtube'
 import { channelFromInfoItem } from '../../../clients/youtube/channel-from-info-item'
@@ -13,11 +13,11 @@ const sharedSchema = z.object({
   store: z.optional(z.literal('true')),
 })
 const searchParamsSchema = z.union([
-  sharedSchema.extend({
-    channelId: z.string().min(1),
+  z.safeExtend(sharedSchema, {
+    channelId: z.string().check(z.minLength(1)),
   }),
-  sharedSchema.extend({
-    username: z.string().min(1),
+  z.safeExtend(sharedSchema, {
+    username: z.string().check(z.minLength(1)),
   }),
 ])
 

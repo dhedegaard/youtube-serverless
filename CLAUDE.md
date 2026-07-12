@@ -18,7 +18,9 @@ npm run test:integration # Playwright integration suite (alias: npm run playwrig
 There is **no `format` script** and `npm run lint` is **ESLint-only** — Prettier is not
 wired into lint or CI. Formatting follows `.prettierrc` (no semicolons, single quotes,
 `printWidth` 100, `prettier-plugin-tailwindcss`); run `npx prettier --write` on changed
-files manually before committing.
+files manually before committing — but **only on code files**. Do not run it on `CLAUDE.md` or
+other markdown: it reformats the whole file (`*emphasis*` → `_emphasis_`, blank lines after list
+intros), burying the real change in unrelated churn. Hand-edit markdown instead.
 
 There are two distinct test layers:
 - **Unit (Vitest, `*.test.ts`)** live in a `__tests__/` directory next to the module they
@@ -41,6 +43,10 @@ Other notes:
 - Node >= 24, ESM (`"type": "module"`). TypeScript is `@tsconfig/strictest` and ESLint is
   `strictTypeChecked` — expect `noUncheckedIndexedAccess`, so index/env access uses bracket
   notation (`process.env['X']`, `styles['title']`).
+- `npm run build` prints **no JS size columns** (only Route/Revalidate/Expire), so bundle-size
+  questions need measuring by hand:
+  `find .next/static/chunks -name '*.js' -exec cat {} + | gzip -c | wc -c`. Compare branches with
+  a clean `.next` each time.
 
 ## Environment
 
@@ -108,10 +114,16 @@ would match the literal header `Bearer undefined`.
 
 ## Conventions
 
-- **zod is the validation layer everywhere**, including runtime-validated function signatures via
-  `z.function({...}).implementAsync(...)`. When an `interface X extends z.infer<typeof schema>` is
-  used as an array/element type, the codebase casts `schema as z.ZodType<X, X>` — this is
-  intentional and repository-wide; keep it for consistency. Parsing uniformly uses `parseAsync`.
+- **zod is the validation layer everywhere**, imported as `import * as z from 'zod/mini'` — the
+  tree-shakeable entrypoint, never bare `'zod'`. Mini has **no method chaining**: wrappers are
+  functions (`z.optional(x)`, `z.nullable(x)`, `z.readonly(x)`, `z.safeExtend(base, {…})` — prefer
+  `safeExtend` over `extend`, which lets an overlapping key silently replace the base's with an
+  incompatible type) and refinements go through `.check(…)` (`z.string().check(z.minLength(1))`,
+  `z.array(x).check(z.maxLength(50))`, `z.int().check(z.positive())`). Runtime-validated function
+  signatures via `z.function({...}).implementAsync(...)` work unchanged. When an
+  `interface X extends z.infer<typeof schema>` is used as an array/element type, the codebase casts
+  `schema as z.ZodMiniType<X, X>` (mini's name for `ZodType`) — this is intentional and
+  repository-wide; keep it for consistency. Parsing uniformly uses `parseAsync`.
 - Keep network/`fetch` and `SERVER_ENV` access out of pure logic so it stays unit-testable — see
   `src/clients/youtube/playlist-items.ts` (pure parse + filter) vs `index.ts` (does the fetch).
 - When handling YouTube playlist data, remember deleted/private videos stay in the uploads

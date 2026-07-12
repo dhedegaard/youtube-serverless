@@ -1,16 +1,16 @@
 import { type Document, MongoClient } from 'mongodb'
 import { revalidateTag, unstable_cache } from 'next/cache'
-import * as z from 'zod'
+import * as z from 'zod/mini'
 import { Channel } from '../../models/channel'
 import { Video } from '../../models/video'
 import { normalizeStoredVideo, type StoredVideo } from './normalize-stored-video'
 
-const ChannelSchema = Channel as z.ZodType<Channel, Channel>
-const VideoSchema = Video as z.ZodType<Video, Video>
+const ChannelSchema = Channel as z.ZodMiniType<Channel, Channel>
+const VideoSchema = Video as z.ZodMiniType<Video, Video>
 
 export const createMongoDbClient = z
   .function({
-    input: [z.object({ connectionString: z.string().min(1) })],
+    input: [z.object({ connectionString: z.string().check(z.minLength(1)) })],
   })
   .implementAsync(async function createMongoDbClient({ connectionString }) {
     const databaseName = 'youtube-serverless'
@@ -29,7 +29,7 @@ export const createMongoDbClient = z
 
     const getChannels = z
       .function({
-        output: z.array(ChannelSchema).readonly(),
+        output: z.readonly(z.array(ChannelSchema)),
       })
       .implementAsync(async function getChannels(): Promise<readonly Channel[]> {
         const { collection } = await getCollection<Channel>('channels')
@@ -61,7 +61,7 @@ export const createMongoDbClient = z
 
     const putLatestVideos = z
       .function({
-        input: [z.object({ videos: z.array(VideoSchema).readonly() })],
+        input: [z.object({ videos: z.readonly(z.array(VideoSchema)) })],
         output: z.void(),
       })
       .implementAsync(async function putVideo({ videos }) {
@@ -72,8 +72,8 @@ export const createMongoDbClient = z
 
     const getLatestVideos = z
       .function({
-        input: [z.object({ limit: z.int().positive() })],
-        output: z.array(VideoSchema).readonly(),
+        input: [z.object({ limit: z.int().check(z.positive()) })],
+        output: z.readonly(z.array(VideoSchema)),
       })
       .implementAsync(async function getLatestVideos({ limit }): Promise<Video[]> {
         return await unstable_cache(
