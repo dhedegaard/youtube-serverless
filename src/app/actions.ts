@@ -33,6 +33,6 @@ export async function getVideos(): Promise<GetVideosResult> {
     return await _getVideos()
   } catch (error: unknown) {
     console.error(error)
-    throw new Error('Unknown error')
+    throw new Error('Unknown error', { cause: error })
   }
 }
