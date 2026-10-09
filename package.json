@@ -29,7 +29,7 @@
     "@types/react-dom": "19.3.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9.39.5",
-    "eslint-config-next": "16.3.5",
+    "eslint-config-next": "16.3.8",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.3.3",
@@ -42,7 +42,7 @@
     "daisyui": "^5.7.37",
     "iso8601-duration": "^2.1.4",
     "mongodb": "^7.6.0",
-    "next": "^16.3.5",
+    "next": "^16.3.8",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "zod": "^4.6.2"
