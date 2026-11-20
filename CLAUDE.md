@@ -4,16 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-```bash
-npm run dev              # dev server (Turbopack) at http://localhost:3000
-npm run build            # production build
-npm run start            # serve the production build
-npm run typecheck        # tsc --noemit
-npm run lint             # eslint .
-npm run test:unit        # Vitest unit tests (no server/env) — this is what CI runs
-npm run test:watch       # Vitest in watch mode
-npm run test:integration # Playwright integration suite (alias: npm run playwright)
-```
+Scripts are in `package.json`. CI runs only `test:unit`; `test:integration` (alias `playwright`)
+is the Playwright suite.
 
 There is **no `format` script** and `npm run lint` is **ESLint-only** — Prettier is not
 wired into lint or CI. Formatting follows `.prettierrc` (no semicolons, single quotes,
@@ -83,11 +75,6 @@ tracked channel. `videos` holds a **single document** with a `videos` array — 
 `updateOne({}, …, { upsert: true })` and read with `findOne()`. Stored videos may predate the
 shorts fields, so `normalizeStoredVideo` backfills `isShort`/`shortDetectionMethod` on read.
 
-**Shorts detection (`src/utils/youtube-shorts.ts`):** `classifyShortVideo` prefers the
-authoritative signal — `isVideoServedAsShort` does a `HEAD` on `youtube.com/shorts/<id>` and
-inspects the redirect — and falls back to duration (≤ 3 min) when that's inconclusive. The
-result is persisted with the method used (`youtube-shorts-url` | `duration` | `unknown`).
-
 **Frontend:** App Router, React 19 with the **React Compiler enabled** (`reactCompiler: true`).
 Manual `useMemo`/`useCallback`/`memo` are kept intentionally as a safety net alongside the
 compiler — **do not strip them**; adding them is fine too. The page (`src/app/page.tsx`) is a
@@ -103,10 +90,8 @@ is wrapped in React `cache`; `getLatestVideos` is wrapped in `unstable_cache` (t
 (`putLatestVideos`) and `revalidatePath('/')` (the routes).
 
 **API routes** (all under `src/app/api/`, all gated by `isApiRequestAuthenticated`, which accepts
-`Authorization: Bearer <CRON_SECRET>`, `Authorization: <SECRET>`, or `?token=<SECRET>`):
-`fetch-data` (refresh videos), `refresh-channels` (refresh channel metadata), `add-channel`
-(add one by `channelId`/`username`; persists only with `?store=true`), `load-channels` (bulk
-import via body), `dump-channels` (GET export). Auth is split for testability:
+`Authorization: Bearer <CRON_SECRET>`, `Authorization: <SECRET>`, or `?token=<SECRET>`).
+`add-channel` persists only with `?store=true`. Auth is split for testability:
 `isApiRequestAuthenticated` (`api-helpers.ts`) just adapts a `NextRequest` + `SERVER_ENV` into
 the pure `isAuthorized` (`is-authorized.ts`), which holds the actual logic and is the unit-tested
 part. The `cronSecret != null` guard there is load-bearing — without it a missing `CRON_SECRET`
